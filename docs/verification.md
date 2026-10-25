@@ -7,3 +7,5 @@ Development baseline: Home Assistant 2026.10.4, ESPHome 2026.10.0, two Home Assi
 - Version 0.2.2 adds real Silero checks on synthetic silence/noise and deterministic tests of no-name room questions, clarification cooldown and no-memory handling of unclear speech.
 - Physical rain recordings, quiet/short speech, overlapping speakers, echo during real playback and two simultaneous rooms still need installation-specific evaluation. There is no speaker recognition, camera recognition or guarantee of human-level understanding.
 - Hosted HACS/Hassfest workflows must run after publication. Adding the repo as custom is separate from approval for the default catalog.
+
+Final 0.2.2 checks: 16 unit tests, eight HA adapter tests and cancellation checks passed. Silero accepted synthetic Amala speech, followed by a successful STT round trip. Three live Ollama cases passed: unintelligible/no-context silence, addressed clarification and an open room question without a name. Physical microphone/rain testing remains pending.

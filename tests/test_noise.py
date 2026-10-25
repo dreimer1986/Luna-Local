@@ -38,6 +38,14 @@ class NoiseTests(unittest.TestCase):
         guard = noise.ReplyGuard(); guard.spoken(100,False)
         self.assertFalse(guard.apply({'kind':'noise','response_expected':True}, 'Luna',101)[1])
 
+    def test_empty_stt_placeholder_remains_unclear_despite_model_noise_label(self):
+        guard = noise.ReplyGuard()
+        guard.spoken(100, False)
+        result, clarify = guard.apply({'kind':'noise','remember':True}, '[Unverständliche Sprache]',101)
+        self.assertTrue(clarify)
+        self.assertEqual(result['kind'],'unclear')
+        self.assertFalse(result['remember'])
+
     def test_clear_room_question_needs_no_name(self):
         decision={'kind':'clear','reply':'Vier.','remember':False}
         self.assertEqual(noise.ReplyGuard().apply(decision,'Was ist zwei plus zwei?',100), (decision,False))
