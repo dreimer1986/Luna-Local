@@ -1,0 +1,33 @@
+remember:
+  name: Erinnerung speichern
+  description: Speichert einen ausdrücklich bestätigten Fakt dauerhaft lokal.
+  fields:
+    text:
+      required: true
+      selector:
+        text:
+    source:
+      selector:
+        text:
+recall:
+  name: Erinnerungen anzeigen
+  description: Gibt gespeicherte Fakten mit ID, Quelle und Zeitpunkt zurück.
+  fields:
+    query:
+      selector:
+        text:
+    limit:
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
+forget:
+  name: Erinnerung löschen
+  description: Löscht die angegebene Erinnerungs-ID dauerhaft.
+  fields:
+    memory_id:
+      required: true
+      selector:
+        text:

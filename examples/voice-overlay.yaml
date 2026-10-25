@@ -1,0 +1,7 @@
+# Merge into your existing Voice configuration; this is NOT a full firmware.
+substitutions:
+  luna_receiver_host: "192.0.2.10"  # LAN IP of Home Assistant
+  luna_stream_id: "1"             # unique per room
+  luna_audio_key: !secret luna_audio_key
+packages:
+  luna: !include packages/luna-ambient.yaml

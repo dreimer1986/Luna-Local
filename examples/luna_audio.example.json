@@ -1,0 +1,15 @@
+{
+  "rooms": [
+    {
+      "name": "Living room",
+      "stream_id": 1,
+      "key": "REPLACE_WITH_64_HEX_CHARACTERS",
+      "host": "192.0.2.20",
+      "device_id": "REPLACE_WITH_HOME_ASSISTANT_DEVICE_ID",
+      "switch": "switch.voice_luna_dauerhaft_mithoeren",
+      "mute": "switch.voice_mute",
+      "satellite": "assist_satellite.voice_assist_satellite",
+      "media_player": "media_player.voice_media_player"
+    }
+  ]
+}

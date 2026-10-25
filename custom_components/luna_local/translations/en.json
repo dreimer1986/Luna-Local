@@ -1,0 +1,29 @@
+{
+  "title": "Luna Local",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Luna Local",
+        "description": "Configure an existing Ollama conversation agent and its reachable server.",
+        "data": {
+          "agent_id": "Ollama conversation entity",
+          "url": "Ollama server URL",
+          "model": "Ollama model"
+        }
+      },
+      "reconfigure": {
+        "title": "Luna Local",
+        "description": "Configure an existing Ollama conversation agent and its reachable server.",
+        "data": {
+          "agent_id": "Ollama conversation entity",
+          "url": "Ollama server URL",
+          "model": "Ollama model"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Already configured",
+      "reconfigure_successful": "Configuration updated"
+    }
+  }
+}

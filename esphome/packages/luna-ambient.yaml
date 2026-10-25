@@ -1,0 +1,51 @@
+# Continuous capture is an independent microphone consumer, not an Assist loop.
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [luna_audio]
+
+luna_audio:
+  id: luna_audio_stream
+  microphone:
+    microphone: i2s_mics
+    channels: 0
+    bits_per_sample: 16
+  host: ${luna_receiver_host}
+  port: 12101
+  stream_id: ${luna_stream_id}
+  key: ${luna_audio_key}
+
+switch:
+  - platform: template
+    id: luna_dauerhaft_mithoeren
+    name: "Luna dauerhaft mithoeren"
+    icon: mdi:microphone-message
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_off:
+      - lambda: id(luna_audio_stream).set_enabled(false);
+
+# This only updates the permission gate. It never starts an Assist round and
+# does not stop capture during STT, model generation, speaker playback or Gemini.
+interval:
+  - interval: 100ms
+    then:
+      - lambda: |-
+          id(luna_audio_stream).set_enabled(
+            id(luna_dauerhaft_mithoeren).state &&
+            !id(master_mute_switch).state && !id(init_in_progress));
+
+sensor:
+  - platform: template
+    name: "Luna Audiopakete gesendet"
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 10s
+    lambda: return id(luna_audio_stream).sent();
+  - platform: template
+    name: "Luna Audiopakete verworfen"
+    entity_category: diagnostic
+    accuracy_decimals: 0
+    update_interval: 10s
+    lambda: return id(luna_audio_stream).dropped();

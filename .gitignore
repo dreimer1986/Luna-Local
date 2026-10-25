@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+.esphome/
+secrets.yaml
+luna_audio.json
+*.sqlite3*
+*.db
+*.bin
+.env

@@ -1,0 +1,24 @@
+{
+  "domain": "luna_local",
+  "name": "Luna Lokal",
+  "codeowners": [
+    "@dreimer1986"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "assist_pipeline",
+    "conversation",
+    "ollama",
+    "stt",
+    "tts"
+  ],
+  "documentation": "https://github.com/dreimer1986/Luna-Local",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/dreimer1986/Luna-Local/issues",
+  "requirements": [
+    "webrtcvad-wheels==2.0.14.post1",
+    "pysilero-vad==3.4.0"
+  ],
+  "version": "0.2.2"
+}

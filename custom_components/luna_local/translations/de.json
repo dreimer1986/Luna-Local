@@ -1,0 +1,29 @@
+{
+  "title": "Luna Local",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Luna Local",
+        "description": "Vorhandenen Ollama-Assistenten und seinen erreichbaren Server eintragen.",
+        "data": {
+          "agent_id": "Ollama-Konversationsentität",
+          "url": "Ollama-Server-URL",
+          "model": "Ollama-Modell"
+        }
+      },
+      "reconfigure": {
+        "title": "Luna Local",
+        "description": "Vorhandenen Ollama-Assistenten und seinen erreichbaren Server eintragen.",
+        "data": {
+          "agent_id": "Ollama-Konversationsentität",
+          "url": "Ollama-Server-URL",
+          "model": "Ollama-Modell"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Bereits eingerichtet",
+      "reconfigure_successful": "Konfiguration aktualisiert"
+    }
+  }
+}
