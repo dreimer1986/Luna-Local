@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Add idle-branch Voice ring feedback for continuous listening, processing and announcement playback.
+- Add persistent per-room home/media control mode: off, direct Luna address (default), or no name required.
+- Route permitted commands through native HA intents, including Music Assistant, preserving exposure checks.
+- Drop stale work after permission changes and suppress duplicate commands heard in multiple rooms.
+
 ## 0.2.2
 
 - Package integration, ESPHome overlay and generic setup examples for HACS custom-repository use.

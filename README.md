@@ -2,7 +2,7 @@
 
 Experimental Home Assistant conversation agent with persistent local memory and optional continuous room listening. German dialogue is currently the primary supported language. Ollama runs the conversation locally; speech recognition and voice output follow the selected Assist pipeline, so Whisper/Piper can keep speech local or you can explicitly choose cloud providers.
 
-**Version 0.2.2.** Tested with Home Assistant 2026.10.4, ESPHome 2026.10.0 and Home Assistant Voice hardware. This is not a robot, camera integration or speaker-identification system.
+**Version 0.3.0.** Tested with Home Assistant 2026.10.4, ESPHome 2026.10.0 and Home Assistant Voice hardware. This is not a robot, camera integration or speaker-identification system.
 
 ## Install with HACS
 
@@ -38,6 +38,20 @@ STT, TTS, language and voice are read from the device's **first selected assista
 
 The continuous conversation model remains the Ollama model configured in Luna. Changing speech settings does not replace that model with the pipeline's conversation agent. Unsupported or unavailable providers produce an error rather than silently switching to a different provider. Cloud providers send audio/text to their service and may require an account or credits.
 
+## Status ring and home / music control
+
+The Voice overlay adds a quiet cyan ring while continuous listening is enabled, the standard Thinking animation during processing and the standard Replying animation during actual announcement playback. Existing explicit Assist/Gemini, SIP, timers, physical controls, mute and startup indicators retain priority. This requires the 0.3.0 firmware overlay and the `luna_status_entity` substitution pointing to the room's Luna audio sensor. Firmware and integration must both be updated.
+
+Each Voice gets a **Luna Haussteuerung** select with three modes:
+
+- **Aus**: Luna does not execute native home/media commands.
+- **Nur mit Luna** (default): continuous-mode commands must start with “Luna” or “Hey Luna”. Ordinary room conversation still needs no name. An explicitly activated normal Assist turn already counts as addressed.
+- **Ohne Namensansprache**: recognised native commands may execute without a name.
+
+The mode is saved across restarts. Startup blocks commands until the saved mode is restored; changing modes invalidates queued work. The separate Gemini agent keeps its own permissions. These controls do not disable memory commands. There is no speaker authentication: television audio saying “Luna, …” can still satisfy the name requirement.
+
+Luna uses Home Assistant's native intent engine and exposed entities, not model-generated service calls. For example: “Luna, Licht Wohnzimmer an” or “Luna, spiele das Album Rumours auf Verstärker”. Music Assistant players must be exposed to Assist and have suitable names/area assignments. Search/play, pause/resume and volume support follow the installed HA sentences. Unsupported phrases cannot be executed merely because the language model understands them. See [Music Assistant voice control](https://www.music-assistant.io/integration/voice/).
+
 ## Persistent memory
 
 Facts are stored in `/config/luna_local_memory.sqlite3` and survive restarts. Automatic selection uses recognised personal statements and the local model; errors are possible. Stored text retains its source and original wording. Unknown speakers are not identified or assigned to the Home Assistant user.
@@ -58,7 +72,7 @@ pip install -r requirements-test.txt
 python -m unittest discover -s tests -v
 ```
 
-The unit suite covers transport authentication/replay rejection, segmentation, memory persistence/deletion, synthetic noise rejection and clarification rules. `tests/speech_adapter_ha.py` and `tests/continuous_cancellation.py` additionally run in a Home Assistant Python environment with the repository on `PYTHONPATH`; they do not activate microphones or speakers. Integration imports require the manifest requirements to be installed.
+The unit suite covers transport authentication/replay rejection, segmentation, memory persistence/deletion, synthetic noise rejection and clarification rules. `tests/speech_adapter_ha.py`, `tests/control_ha.py` and `tests/continuous_cancellation.py` additionally run in a Home Assistant Python environment with the repository on `PYTHONPATH`; they do not activate microphones or speakers. Integration imports require the manifest requirements to be installed.
 
 GitHub Actions are configured for unit tests, Hassfest and HACS validation. The custom-repository workflow skips the external brands check; this is not a claim of default-catalog approval. See [verification notes](docs/verification.md) for tested behaviour and remaining hardware checks.
 

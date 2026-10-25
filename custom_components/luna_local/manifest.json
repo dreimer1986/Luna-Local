@@ -20,5 +20,5 @@
     "webrtcvad-wheels==2.0.14.post1",
     "pysilero-vad==3.4.0"
   ],
-  "version": "0.2.2"
+  "version": "0.3.0"
 }

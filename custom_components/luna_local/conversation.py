@@ -4,6 +4,7 @@ import uuid
 
 from homeassistant.components import conversation
 from homeassistant.helpers import intent
+from .control import OFF, async_control
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -65,14 +66,17 @@ class LunaConversation(conversation.ConversationEntity):
             return answer("Die Erinnerung wurde gelöscht." if deleted else "Diese Erinnerung habe ich nicht gefunden.")
         # Keep routine home control on Home Assistant's local intent engine.
         # The LLM does not need thousands of entity descriptions for light commands.
-        local_result = await conversation.async_converse(
-            self.hass, cleaned, None, user_input.context, language=user_input.language,
-            agent_id="conversation.home_assistant", device_id=user_input.device_id,
-            satellite_id=user_input.satellite_id,
-        )
-        if local_result.response.response_type != intent.IntentResponseType.ERROR:
-            local_result.conversation_id = cid
-            return local_result
+        room = next((room for room in runtime.continuous.rooms.values()
+                     if room.config['device_id'] == user_input.device_id), None) if runtime.continuous else None
+        # A normal Assist turn is already explicitly activated; "Aus" still
+        # disables Luna's device commands. The separate Gemini agent is untouched.
+        allowed = lambda: room is None or room.control_mode != OFF
+        if allowed():
+            reply = await async_control(self.hass, cleaned, user_input.device_id,
+                                        user_input.satellite_id, allowed,
+                                        language=user_input.language, context=user_input.context)
+            if reply is not None:
+                return answer(reply)
         memories = await runtime.call("recall", text, 20)
         context_memories = []
         budget = 6000

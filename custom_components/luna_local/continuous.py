@@ -19,6 +19,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_state_change_event
 
 from .audio import Decoder, Segmenter
+from .control import OFF, permitted_text, async_control
 from .noise import SpeechGate, ReplyGuard
 from .speech import PipelineSpeech, SpeechConfigurationError
 from .dialogue import ROOM_PROMPT, is_echo, memory_command
@@ -39,6 +40,10 @@ class Room:
         self.guard = ReplyGuard()
         self.noise_segments = self.unclear_segments = 0
         self.speech_probability = None
+        self.control_mode = OFF  # Fail closed until the Select restores its saved permission.
+        self.stt_busy = self.dialog_busy = self.tts_busy = False
+        self.error_until = 0.0
+        self.commands = 0
         self.epoch = 0
         self.history = deque(maxlen=16)
         self.history_generation = self.runtime.generation
@@ -58,11 +63,53 @@ class Room:
         state = self.runtime.hass.states.get(self.config['satellite'])
         return state is None or state.state != 'idle'
 
+    def status_changed(self):
+        async_dispatcher_send(self.runtime.hass, 'luna_local_updated')
+
+    def activity(self):
+        if not self.active():
+            return 'off'
+        if time.monotonic() < self.error_until:
+            return 'error'
+        if self.tts_busy:
+            return 'responding'
+        if self.stt_busy or self.dialog_busy or self.audio.qsize() or self.text.qsize():
+            return 'processing'
+        if not self.decoder.last_packet or time.monotonic()-self.decoder.last_packet > 3:
+            return 'error'
+        return 'listening'
+
+    async def control(self, text, epoch, generation, ended):
+        mode = self.control_mode
+        command = permitted_text(text, mode)
+        if not command:
+            return None
+        def allowed():
+            return (self.active() and self.epoch == epoch and self.runtime.generation == generation
+                    and self.control_mode == mode and not self.busy()
+                    and time.monotonic()-ended <= 30)
+        async with self.hub.control_lock:
+            if not allowed():
+                return None
+            # One utterance heard by two rooms must not start playback twice.
+            key = ' '.join(command.casefold().split())
+            if time.monotonic()-self.hub.recent_commands.get(key, float('-inf')) < 5:
+                return ''
+            reply = await async_control(self.runtime.hass, command, self.config['device_id'],
+                                        self.config['satellite'], allowed)
+            if reply is not None:
+                now = time.monotonic()
+                self.hub.recent_commands = {k:v for k,v in self.hub.recent_commands.items() if now-v < 5}
+                self.hub.recent_commands[key] = now
+                self.commands += 1
+            return reply
+
     def reset(self):
         self.epoch += 1
         self.segmenter.reset()
         self.segment_busy = False
         self.history.clear()
+        self.stt_busy = self.dialog_busy = self.tts_busy = False
         self.guard = ReplyGuard()
         for queue in (self.audio, self.text):
             while not queue.empty():
@@ -104,6 +151,8 @@ class Room:
             try:
                 if epoch != self.epoch or not self.active():
                     continue
+                self.stt_busy = True
+                self.status_changed()
                 self.oldest_seconds = time.monotonic() - segment.ended
                 start = time.monotonic()
                 text = await self.transcribe(segment.audio)
@@ -126,10 +175,13 @@ class Room:
             except asyncio.CancelledError:
                 raise
             except Exception as err:
+                self.error_until = time.monotonic()+5
                 self.last_error = 'Spracherkennung: '+(str(err) if isinstance(err, SpeechConfigurationError) else type(err).__name__)
                 LOGGER.warning('Continuous STT failed for %s: %s', self.config['name'], type(err).__name__)
             finally:
                 self.audio.task_done()
+                self.stt_busy = False
+                self.status_changed()
 
     async def decide(self, text, utterances=None):
         if self.history_generation != self.runtime.generation:
@@ -168,8 +220,18 @@ class Room:
                 if not valid or not self.active() or valid[-1][4] != self.runtime.generation:
                     continue
                 epoch, ended, text, busy, generation = valid[-1]
+                self.dialog_busy = True
+                self.status_changed()
                 start = time.monotonic()
                 acknowledgement = None
+                # Process native commands individually, never let an LLM compose service calls.
+                controlled = False
+                for item_epoch, item_ended, value, item_busy, item_generation in valid:
+                    if not item_busy:
+                        result = await self.control(value, item_epoch, item_generation, item_ended)
+                        if result is not None:
+                            acknowledgement = result
+                            controlled = True
                 for item_epoch, _, value, _, item_generation in valid:
                     command = memory_command(value)
                     if command and command[0] == 'remember':
@@ -185,8 +247,8 @@ class Room:
                         generation = self.runtime.generation
                         acknowledgement = 'Die Erinnerung wurde gelöscht.' if deleted else 'Diese Erinnerung habe ich nicht gefunden.'
                     # Automatic memories are saved only after speech classification.
-                if len(valid) == 1 and acknowledgement:
-                    decision = {'reply':acknowledgement,'remember':False,'remember_indices':[]}
+                if controlled or (len(valid) == 1 and acknowledgement):
+                    decision = {'reply':acknowledgement or '', 'remember':False,'remember_indices':[]}
                 else:
                     decision = await self.decide(text, [item[2] for item in valid])
                 self.dialog_seconds = round(time.monotonic()-start, 2)
@@ -217,7 +279,10 @@ class Room:
                 # stale results over a newer turn or explicit Assist/Gemini.
                 if reply and not any(item[3] for item in valid) and not self.busy() and time.monotonic()-ended <= 90 and self.text.qsize() == 0:
                     self.outputs.append((time.monotonic(), reply))
+                    self.tts_busy = True
+                    self.status_changed()
                     await self.speech.speak(reply)
+                    self.tts_busy = False
                     self.guard.spoken(time.monotonic(), clarification)
                     self.responses += 1
                     self.last_decision = "Antwort an Sprachausgabe übergeben"
@@ -226,9 +291,12 @@ class Room:
             except asyncio.CancelledError:
                 raise
             except Exception as err:
+                self.error_until = time.monotonic()+5
                 self.last_error = 'Gespräch: '+(str(err) if isinstance(err, SpeechConfigurationError) else type(err).__name__)
                 LOGGER.warning('Continuous dialogue failed for %s: %s', self.config['name'], type(err).__name__)
             finally:
+                self.dialog_busy = self.tts_busy = False
+                self.status_changed()
                 for _ in batch:
                     self.text.task_done()
 
@@ -247,7 +315,8 @@ class Room:
                 'geraeuschfilter_verworfen':self.noise_segments,
                 'unklare_abschnitte':self.unclear_segments,
                 'sprachwahrscheinlichkeit_max':self.speech_probability,
-                'aktiv':self.active(), 'pakete':self.decoder.received,
+                'aktivitaet':self.activity(), 'haussteuerung':self.control_mode,
+                'hausbefehle':self.commands, 'aktiv':self.active(), 'pakete':self.decoder.received,
                 'letztes_paket_vor_s':age,'verlorene_samples':self.decoder.lost_samples,
                 'abgewiesene_pakete':self.decoder.rejected,'audio_warteschlange':self.audio.qsize(),
                 'text_warteschlange':self.text.qsize(),'audio_verworfen':self.dropped_audio,
@@ -262,6 +331,8 @@ class ContinuousHub(asyncio.DatagramProtocol):
         self.runtime = runtime
         self.rooms = {c['stream_id']:Room(self,c) for c in configs}
         self.stt_lock = asyncio.Lock()
+        self.control_lock = asyncio.Lock()
+        self.recent_commands = {}
         self.transport = None
         self.unsubscribe = None
         self.unsubscribe_stop = None
@@ -288,6 +359,7 @@ class ContinuousHub(asyncio.DatagramProtocol):
         for room in self.rooms.values():
             if event.data['entity_id'] in (room.config['switch'], room.config['mute']):
                 room.reset()
+                room.status_changed()
 
     def datagram_received(self, data, addr):
         if len(data) != 684 or data[:4] != b'LUN2':
@@ -299,7 +371,7 @@ class ContinuousHub(asyncio.DatagramProtocol):
     async def report(self):
         while True:
             async_dispatcher_send(self.runtime.hass,'luna_local_updated')
-            await asyncio.sleep(5)
+            await asyncio.sleep(1)
 
     async def stop(self):
         if self.transport:

@@ -9,3 +9,5 @@ Development baseline: Home Assistant 2026.10.4, ESPHome 2026.10.0, two Home Assi
 - Hosted HACS/Hassfest workflows must run after publication. Adding the repo as custom is separate from approval for the default catalog.
 
 Final 0.2.2 checks: 16 unit tests, eight HA adapter tests and cancellation checks passed. Silero accepted synthetic Amala speech, followed by a successful STT round trip. Three live Ollama cases passed: unintelligible/no-context silence, addressed clarification and an open room question without a name. Physical microphone/rain testing remains pending.
+
+Version 0.3.0: 16 core tests, eight speech-adapter tests, five control/status tests and cancellation checks passed. Native HA debug recognition resolved German light-on, named-player pause and album search/play requests to the intended exposed entities without executing them. Both Voice firmware builds compiled and uploaded successfully. Real ring appearance and acoustic end-to-end command execution still need user observation; no light or music state was changed by these tests.

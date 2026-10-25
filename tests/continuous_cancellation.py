@@ -20,6 +20,7 @@ async def main():
         entry=SimpleNamespace(data={}),call=call,changed=changed,generation=0,memory_lock=asyncio.Lock())
     config={'device_id':'test-device','stream_id':1,'key':'00'*32,'name':'Test','host':'127.0.0.1','switch':'switch.test','mute':'switch.mute','satellite':'satellite.test','media_player':'media.test'}
     hub=ContinuousHub(runtime,[config]);room=hub.rooms[1]
+    room.status_changed=lambda: None
     started=asyncio.Event();release=asyncio.Event()
     async def blocked_stt(audio):started.set();await release.wait();return 'Warum ist der Himmel blau?'
     room.transcribe=blocked_stt

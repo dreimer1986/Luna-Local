@@ -16,9 +16,10 @@ Other devices/base packages may require adaptation. The overlay is **not a compl
 2. Copy `esphome/packages/luna-ambient.yaml` into `/config/esphome/packages/`.
 3. Merge `examples/voice-overlay.yaml` into the existing device YAML in `/config/esphome/`. The local external-component path `components` is relative to the main YAML. Adjust it if your layout differs.
 4. Set `luna_receiver_host` to Home Assistant's LAN IPv4 address. Set a unique numeric `luna_stream_id` per device.
-5. Generate a **different key for each device** with `python3 -c 'import secrets; print(secrets.token_hex(32))'`. Add it to ESPHome `secrets.yaml`, e.g. `luna_audio_key: "<64 hex characters>"`. Multiple devices need different secret names in their substitutions.
-6. Validate and compile in ESPHome Device Builder. Confirm the required IDs and microphone format match your base configuration before flashing. Preserve your original firmware for rollback.
-7. After flashing, check that normal Assist and physical mute still work. Leave the new listening switch off until the receiver is configured.
+5. Set `luna_status_entity` to this room's Luna audio sensor entity ID (after adding the receiver/integration). The firmware reads its `aktivitaet` attribute for LED feedback. The overlay also expects the standard Voice LED scripts, `voice_assistant_leds`, `led_ring` and `external_media_player` IDs.
+6. Generate a **different key for each device** with `python3 -c 'import secrets; print(secrets.token_hex(32))'`. Add it to ESPHome `secrets.yaml`, e.g. `luna_audio_key: "<64 hex characters>"`. Multiple devices need different secret names in their substitutions.
+7. Validate and compile in ESPHome Device Builder. Confirm the required IDs and microphone format match your base configuration before flashing. Preserve your original firmware for rollback.
+8. After flashing, check that normal Assist and physical mute still work. Leave the new listening switch off until the receiver is configured.
 
 The switch is named `Luna dauerhaft mithoeren`. Its restore mode is `RESTORE_DEFAULT_OFF`: first boot defaults off, but a saved on-state can be restored after reboot. Hardware mute also gates transmission. Turning listening off clears receiver queues and prevents in-flight model results from becoming late spoken replies.
 

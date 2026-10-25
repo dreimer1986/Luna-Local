@@ -55,7 +55,8 @@ class AudioSensor(SensorEntity):
             return "kein Audiostream"
         if stats["audio_warteschlange"] > 3 or stats["text_warteschlange"] > 3:
             return "Verarbeitung im Rückstand"
-        return "empfängt"
+        return {"listening": "hört zu", "processing": "verarbeitet",
+                "responding": "bereitet Antwort vor", "error": "Fehler"}.get(stats["aktivitaet"], "empfängt")
 
     @property
     def extra_state_attributes(self):

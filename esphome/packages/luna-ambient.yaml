@@ -29,6 +29,17 @@ switch:
 # This only updates the permission gate. It never starts an Assist round and
 # does not stop capture during STT, model generation, speaker playback or Gemini.
 interval:
+  - interval: 250ms
+    then:
+      - lambda: |-
+          int state = !id(luna_dauerhaft_mithoeren).state ? 0 :
+                      id(external_media_player).state == media_player::MEDIA_PLAYER_STATE_ANNOUNCING ? 4 :
+                      id(luna_activity).state == "error" ? 3 :
+                      (id(luna_activity).state == "processing" || id(luna_activity).state == "responding") ? 2 : 1;
+          if (state != id(luna_led_last_state)) {
+            id(luna_led_last_state) = state;
+            id(control_leds).execute();
+          }
   - interval: 100ms
     then:
       - lambda: |-
@@ -49,3 +60,43 @@ sensor:
     accuracy_decimals: 0
     update_interval: 10s
     lambda: return id(luna_audio_stream).dropped();
+
+# Feed the integration's activity into the idle branch of the stock LED arbiter.
+# Explicit Assist, mute, startup, timers, dial and SIP keep their original priority.
+text_sensor:
+  - platform: homeassistant
+    id: luna_activity
+    entity_id: ${luna_status_entity}
+    attribute: aktivitaet
+    internal: true
+    on_value:
+      - script.execute: control_leds
+
+globals:
+  - id: luna_led_last_state
+    type: int
+    initial_value: '-1'
+
+script:
+  - id: !extend control_leds_voice_assistant_idle_phase
+    # A single-action mapping replaces the base action list during package merge.
+    then:
+      lambda: |-
+        if (id(luna_dauerhaft_mithoeren).state && !id(master_mute_switch).state) {
+          if (id(external_media_player).state == media_player::MEDIA_PLAYER_STATE_ANNOUNCING) {
+            id(control_leds_voice_assistant_replying_phase).execute();
+          } else if (id(luna_activity).state == "error") {
+            id(control_leds_voice_assistant_error_phase).execute();
+          } else if (id(luna_activity).state == "processing" || id(luna_activity).state == "responding") {
+            id(control_leds_voice_assistant_thinking_phase).execute();
+          } else {
+            auto call = id(voice_assistant_leds).turn_on();
+            call.set_effect("None");
+            call.set_rgb(0.0f, 0.55f, 1.0f);
+            call.set_brightness(0.15f);
+            call.perform();
+          }
+        } else {
+          id(voice_assistant_leds).turn_off().perform();
+          if (id(led_ring).remote_values.is_on()) id(led_ring).turn_on().perform();
+        }

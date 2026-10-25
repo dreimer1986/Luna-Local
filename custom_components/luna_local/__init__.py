@@ -143,12 +143,12 @@ async def async_setup_entry(hass, entry):
         configs = json.loads(await hass.async_add_executor_job(config_path.read_text))
         runtime.continuous = ContinuousHub(runtime, configs["rooms"])
         await runtime.continuous.start()
-    await hass.config_entries.async_forward_entry_setups(entry, [Platform.CONVERSATION, Platform.SENSOR])
+    await hass.config_entries.async_forward_entry_setups(entry, [Platform.CONVERSATION, Platform.SENSOR, Platform.SELECT])
     return True
 
 
 async def async_unload_entry(hass, entry):
-    if await hass.config_entries.async_unload_platforms(entry, [Platform.CONVERSATION, Platform.SENSOR]):
+    if await hass.config_entries.async_unload_platforms(entry, [Platform.CONVERSATION, Platform.SENSOR, Platform.SELECT]):
         if entry.runtime_data.continuous:
             await entry.runtime_data.continuous.stop()
         for name in ("remember", "recall", "forget"):
