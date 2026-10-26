@@ -52,6 +52,29 @@ The mode is saved across restarts. Startup blocks commands until the saved mode 
 
 Luna uses Home Assistant's native intent engine and exposed entities, not model-generated service calls. For example: “Luna, Licht Wohnzimmer an” or “Luna, spiele das Album Rumours auf Verstärker”. Music Assistant players must be exposed to Assist and have suitable names/area assignments. Search/play, pause/resume and volume support follow the installed HA sentences. Unsupported phrases cannot be executed merely because the language model understands them. See [Music Assistant voice control](https://www.music-assistant.io/integration/voice/).
 
+## Local model performance
+
+New installations suggest `qwen3:4b-instruct`; select an installed model and use the
+same model in the wrapped Ollama conversation agent and any local AI Task entries
+to avoid model swaps. Existing model selections are not migrated automatically.
+
+Luna preloads its configured model in a background task when the integration
+starts. It retries a late Ollama server twice and leaves an already loaded model
+alone, including runners configured with a larger context. This does not download
+models or generate a reply. Direct room and memory requests use `keep_alive: -1`
+so they no longer reset residency to ten minutes. This keeps model memory allocated;
+other clients, model swaps and server restarts can still unload it. Set the wrapped
+HA Ollama agent's Keep alive to `-1` too. A separate HA preload automation remains
+useful after an Ollama-only restart; startup preloading is not a periodic watchdog.
+
+GPU selection stays with the Ollama server. Luna does not force CPU inference or
+change prompts, speech providers or Google agents. Preloading removes cold-start
+delays; it does not make each generated token faster. In room sensor attributes,
+`letzte_llm_messwerte` separates the most recent direct request's `load_seconds`,
+`prompt_eval_seconds`, `eval_seconds` and `tokens_per_second`. These measurements
+exclude STT/TTS and do not contain transcript or reply text. They remain the last
+LLM sample when a subsequent native command bypasses the model.
+
 ## Persistent memory
 
 Facts are stored in `/config/luna_local_memory.sqlite3` and survive restarts. Automatic selection uses recognised personal statements and the local model; errors are possible. Stored text retains its source and original wording. Unknown speakers are not identified or assigned to the Home Assistant user.

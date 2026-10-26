@@ -3,6 +3,7 @@ import json
 import re
 import sqlite3
 import uuid
+from contextlib import contextmanager
 from datetime import datetime, timezone
 
 
@@ -36,10 +37,15 @@ class MemoryStore:
     def __init__(self, path):
         self.path = str(path)
 
+    @contextmanager
     def connect(self):
         db = sqlite3.connect(self.path, timeout=10)
-        db.row_factory = sqlite3.Row
-        return db
+        try:
+            db.row_factory = sqlite3.Row
+            with db:
+                yield db
+        finally:
+            db.close()
 
     def initialize(self):
         with self.connect() as db:

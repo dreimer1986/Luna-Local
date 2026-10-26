@@ -14,6 +14,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
 from .memory import MemoryStore, should_extract, explicit_personal_fact
+from .ollama_runtime import KEEP_ALIVE, preload_model
 
 DOMAIN = "luna_local"
 SIGNAL = "luna_local_updated"
@@ -82,7 +83,7 @@ class Runtime:
                 body = {"model": self.entry.data["model"], "stream": False, "think": False,
                         "messages": [{"role": "system", "content": prompt}, {"role": "user", "content": text}],
                         "format": {"type": "object", "properties": {"remember": {"type": "boolean"}}, "required": ["remember"]},
-                        "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 24}, "keep_alive": "10m"}
+                        "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 24}, "keep_alive": KEEP_ALIVE}
                 session = async_get_clientsession(self.hass)
                 async with session.post(self.entry.data["url"].rstrip("/")+"/api/chat", json=body, timeout=aiohttp.ClientTimeout(total=180)) as resp:
                     resp.raise_for_status()
@@ -144,6 +145,10 @@ async def async_setup_entry(hass, entry):
         runtime.continuous = ContinuousHub(runtime, configs["rooms"])
         await runtime.continuous.start()
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.CONVERSATION, Platform.SENSOR, Platform.SELECT])
+    entry.async_create_background_task(
+        hass, preload_model(async_get_clientsession(hass), entry.data["url"], entry.data["model"]),
+        "luna_model_preload",
+    )
     return True
 
 

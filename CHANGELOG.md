@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Keep direct Ollama dialogue and memory requests resident instead of expiring after ten minutes.
+- Preload the configured model in the background on integration startup, with bounded retries and without replacing an already loaded runner.
+- Suggest Qwen3 4B Instruct for new installations; existing model selections remain unchanged.
+- Expose separate load, prompt-evaluation and generation timings in room diagnostics.
+- Close memory database connections deterministically, including failed transactions.
+
 ## 0.3.0
 
 - Add idle-branch Voice ring feedback for continuous listening, processing and announcement playback.

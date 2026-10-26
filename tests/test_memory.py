@@ -1,6 +1,7 @@
 import importlib.util
 from pathlib import Path
 import tempfile
+import sqlite3
 import unittest
 
 spec = importlib.util.spec_from_file_location("memory", Path(__file__).parents[1]/"custom_components/luna_local/memory.py")
@@ -9,6 +10,18 @@ spec.loader.exec_module(memory)
 
 
 class MemoryTests(unittest.TestCase):
+    def test_connections_close_and_failed_transactions_roll_back(self):
+        with tempfile.TemporaryDirectory() as folder:
+            store = memory.MemoryStore(Path(folder) / "memory.db")
+            store.initialize()
+            with self.assertRaisesRegex(RuntimeError, "rollback"):
+                with store.connect() as db:
+                    db.execute("INSERT INTO memories VALUES ('test', 'fact', 'source', 'now', 0)")
+                    raise RuntimeError("rollback")
+            self.assertEqual(store.count(), 0)
+            with self.assertRaises(sqlite3.ProgrammingError):
+                db.execute("SELECT 1")
+
     def test_questions_and_commands_are_not_memories(self):
         for text in ["Wie heißt der temporäre Einrichtungstest?", "Luna, schalte das Licht aus", "Was weißt du über mich", "Mag ich Kaffee?"]:
             self.assertFalse(memory.should_extract(text))

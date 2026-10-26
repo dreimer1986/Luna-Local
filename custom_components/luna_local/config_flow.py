@@ -1,5 +1,6 @@
 import voluptuous as vol
 from homeassistant import config_entries
+from .ollama_runtime import DEFAULT_MODEL
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain="luna_local"):
@@ -23,5 +24,5 @@ class ConfigFlow(config_entries.ConfigFlow, domain="luna_local"):
         return self.async_show_form(step_id="user", data_schema=vol.Schema({
             vol.Required("agent_id", default="conversation.ollama_conversation"): str,
             vol.Required("url", default="http://127.0.0.1:11434"): str,
-            vol.Required("model", default="llama3.1:8b"): str,
+            vol.Required("model", default=DEFAULT_MODEL): str,
         }))

@@ -1,2 +1,3 @@
 cryptography
+aiohttp
 pysilero-vad==3.4.0

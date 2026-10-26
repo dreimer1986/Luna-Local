@@ -24,6 +24,7 @@ from .noise import SpeechGate, ReplyGuard
 from .speech import PipelineSpeech, SpeechConfigurationError
 from .dialogue import ROOM_PROMPT, is_echo, memory_command
 from .memory import explicit_personal_fact, should_extract
+from .ollama_runtime import KEEP_ALIVE, inference_timings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -53,6 +54,7 @@ class Room:
         self.last_error = None
         self.last_decision = 'noch keine Äußerung'
         self.stt_seconds = self.dialog_seconds = self.oldest_seconds = 0
+        self.model_timings = {}
         self.tasks = []
 
     def active(self):
@@ -198,11 +200,12 @@ class Room:
         ]
         body = {'model':self.runtime.entry.data['model'], 'stream':False, 'think':False,
                 'messages':messages, 'format':{'type':'object','properties':{'reply':{'type':'string'},'remember':{'type':'boolean'},'remember_indices':{'type':'array','items':{'type':'integer'}},'kind':{'type':'string','enum':['clear','unclear','noise']},'response_expected':{'type':'boolean'}},'required':['reply','remember','remember_indices','kind','response_expected']},
-                'options':{'temperature':.2,'num_ctx':4096,'num_predict':220},'keep_alive':'10m'}
+                'options':{'temperature':.2,'num_ctx':4096,'num_predict':220},'keep_alive':KEEP_ALIVE}
         session = async_get_clientsession(self.runtime.hass)
         async with session.post(self.runtime.entry.data['url'].rstrip('/')+'/api/chat', json=body, timeout=aiohttp.ClientTimeout(total=120)) as response:
             response.raise_for_status()
             result = await response.json()
+        self.model_timings = inference_timings(result)
         decision = json.loads(result['message']['content'])
         if (not isinstance(decision.get('reply'), str) or not isinstance(decision.get('remember'), bool)
                 or decision.get('kind') not in ('clear', 'unclear', 'noise')
@@ -323,6 +326,7 @@ class Room:
                 'text_verworfen':self.dropped_text,'transkripte':self.transcripts,'antworten':self.responses,
                 'echo_transkripte':self.echoes,'stt_sekunden':self.stt_seconds,
                 'modell_sekunden':self.dialog_seconds,'rueckstau_sekunden':round(self.oldest_seconds,1),
+                'letzte_llm_messwerte':self.model_timings,
                 'letzter_fehler':self.last_error,'letzte_entscheidung':self.last_decision}
 
 
