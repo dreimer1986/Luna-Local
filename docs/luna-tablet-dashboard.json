@@ -16,7 +16,7 @@
           "avatar": "live2d",
           "continuous": false,
           "expressions": false,
-          "background": "moon",
+          "background": "transparent",
           "live2d_runtime": "/local/luna/runtime-20261027-hands/runtime.mjs",
           "live2d_model": "/local/luna/model-20261027/luna-smile2.model3.json"
         }

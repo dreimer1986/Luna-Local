@@ -275,3 +275,20 @@ Live in Chrome geprüft: nur Luna mit Mondhintergrund, nach Antippen auch keine
 Browserleisten; `followingRooms: true`, `controls: none`, `wakeLock: true`.
 Backend bleibt b6, Frontend-Ressource für Cachewechsel auf
 `/luna-local/luna-avatar-card.js?v=0.4.0b6-tablet1`. Keine HA-Neustart erforderlich.
+
+
+## Transparenter Hintergrund und Esszimmer-Diagnose
+
+`background: transparent` ergänzt: Stage, Kartenhülle, Panel und Popup transparent,
+kein Mond/Backdrop. Display-only entfernt auch seine eigene Hintergrundfläche.
+Vollbild fordert bei transparent die gesamte Dokumentseite an, damit vorhandene
+animierte Dashboard-Hintergründe mit sichtbar bleiben. Im Tablet-Dashboard aktiviert
+und live mit vorhandenem animierten Hintergrund geprüft; Hauptdashboard unverändert.
+Ressource: `/luna-local/luna-avatar-card.js?v=0.4.0b6-transparent1`.
+
+Esszimmerlicht: Exponiert, Alias Esszimmerlicht vorhanden, verfügbar. Exakter Text
+`Schalte das Esszimmerlicht aus` über native HA-Conversation erfolgreich; Zustand
+wechselte tatsächlich auf off. Danach exakter Text `Luna schalte das Esszimmerlicht aus`
+über conversation.luna_lokal ebenfalls sofort erfolgreich. Sprachversuch weiterhin
+nicht eindeutig geklärt: damalige STT-Wortlaute nicht gespeichert. Nicht als behoben
+behaupten. Keine Änderungen am Steuerpfad auf Verdacht vorgenommen.

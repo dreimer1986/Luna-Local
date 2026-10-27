@@ -14,6 +14,7 @@ class LunaAvatarCard extends HTMLElement {
     }
     this.teardown();
     this.config = {...config};
+    this.toggleAttribute('transparent-background', config.background === 'transparent');
     if (this.isConnected) this.mount();
   }
   set hass(value) {
@@ -34,6 +35,10 @@ class LunaAvatarCard extends HTMLElement {
       .stage{height:390px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 70% 20%,#737ba4 0,#293556 35%,#131c31 85%)}
       .stage:before{content:'';position:absolute;width:135px;height:135px;border-radius:50%;right:10%;top:24px;background:#f5f0db;box-shadow:0 0 55px #e2e5ff75}
       .stage[data-background="plain"]{background:var(--secondary-background-color,#e7e9ef)}.stage[data-background="plain"]:before{display:none}
+      :host([transparent-background]){background:transparent!important}
+      :host([transparent-background]) ha-card,:host([transparent-background]) .panel,:host([transparent-background]) dialog,:host([transparent-background]) .stage{background:transparent!important;box-shadow:none;border:0}
+      :host([transparent-background]) .stage:before{display:none}
+      :host([transparent-background]) dialog::backdrop{background:transparent;backdrop-filter:none}
       .rig{height:100%;position:relative;z-index:1}.rig svg{width:100%;height:100%;display:block}
       .stage[data-avatar="illustration"],.stage[data-avatar="live2d"]{width:100%;height:auto;aspect-ratio:2/3;max-height:640px}
       .stage[data-avatar="live2d"] .rig{position:absolute;inset:0}
@@ -74,7 +79,7 @@ class LunaAvatarCard extends HTMLElement {
     root.querySelector('.launch').hidden = !this.popupOnly;
     this.dock.hidden = this.popupOnly;
     root.querySelector('.continuous').checked = this.config.continuous === true;
-    root.querySelector('.stage').dataset.background = this.config.background === 'plain' ? 'plain' : 'moon';
+    root.querySelector('.stage').dataset.background = ['plain', 'transparent'].includes(this.config.background) ? this.config.background : 'moon';
     root.querySelector('.stage').dataset.avatar = this.config.avatar || 'illustration';
     root.querySelector('.listen').onclick = () => this.session.listen(root.querySelector('.continuous').checked);
     root.querySelector('.finish').onclick = () => this.session.finishInput();
@@ -135,7 +140,7 @@ class LunaAvatarCard extends HTMLElement {
       this.panel.title = 'Antippen für Vollbild';
       this.panel.onclick = async () => {
         if (!document.fullscreenElement) {
-          try { await this.requestFullscreen?.(); } catch {}
+          try { await (this.config.background === 'transparent' ? document.documentElement : this).requestFullscreen?.(); } catch {}
         }
         this.keepAwake();
       };
