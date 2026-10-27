@@ -1,6 +1,20 @@
 # Changelog
 
-## Unreleased
+## 0.4.0b1
+
+- Add an experimental browser voice/text client, shared card/popup presentation,
+  local expression metadata and an original layered SVG preview rig.
+- Estimate several mouth shapes from actual playback audio; final illustration
+  rigging, phoneme alignment and live HA validation remain outstanding.
+- Keep backgrounds and outfits separate, with all future outfits strictly SFW.
+- Preserve the final short microphone buffer, handle delayed pipeline acknowledgements
+  and stop continuous mode when TTS output is unavailable.
+- Blend nine expression poses with head, eye, brow, blush and ear changes.
+- Validate avatar WebSocket payloads with Home Assistant 2026.10's schema API.
+
+- Add Luna-chan branding with local icon and light/dark logo variants, including high-resolution versions.
+- Load the optional ESPHome package and audio component from a shared Git ref instead of requiring manual copies.
+- Publish version-tagged releases after tests, Hassfest and HACS validation; enable local branding validation.
 
 - Keep direct Ollama dialogue and memory requests resident instead of expiring after ten minutes.
 - Preload the configured model in the background on integration startup, with bounded retries and without replacing an already loaded runner.

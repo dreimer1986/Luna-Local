@@ -109,6 +109,9 @@ class Runtime:
 
 
 async def async_setup_entry(hass, entry):
+    from .avatar import async_setup_avatar
+
+    await async_setup_avatar(hass)
     runtime = Runtime(hass, entry)
     await runtime.call("initialize")
     await runtime.changed()

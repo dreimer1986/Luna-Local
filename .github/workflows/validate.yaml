@@ -3,6 +3,7 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  workflow_call:
 permissions:
   contents: read
 jobs:
@@ -15,6 +16,10 @@ jobs:
           python-version: "3.14"
       - run: pip install -r requirements-test.txt
       - run: python -m unittest discover -s tests -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test tests/test_avatar_session.mjs
   hassfest:
     runs-on: ubuntu-latest
     steps:
@@ -27,5 +32,3 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
-          # Custom repository: catalog branding/submission is a separate step.
-          ignore: brands

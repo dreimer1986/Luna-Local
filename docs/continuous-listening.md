@@ -12,9 +12,9 @@ The supplied overlay was exercised with Home Assistant Voice and ESPHome 2026.10
 
 Other devices/base packages may require adaptation. The overlay is **not a complete flashable YAML**. Preserve your existing Wi-Fi, encryption, OTA, microphone/speaker and Assist configuration. Do not replace your whole device config with the example.
 
-1. Copy `esphome/components/luna_audio` into `/config/esphome/components/luna_audio`.
-2. Copy `esphome/packages/luna-ambient.yaml` into `/config/esphome/packages/`.
-3. Merge `examples/voice-overlay.yaml` into the existing device YAML in `/config/esphome/`. The local external-component path `components` is relative to the main YAML. Adjust it if your layout differs.
+1. Merge `examples/voice-overlay.yaml` into the existing device YAML in `/config/esphome/`. Its remote package loads `esphome/packages/luna-ambient.yaml` from this repository; that package fetches `luna_audio` from `esphome/components`.
+2. Choose `luna_source_ref`: `master` follows development; a published tag such as `v0.3.1` fixes the version. Both package and component use this value, so keep it in the main device YAML. Use a tag only after it exists on GitHub.
+3. No component/package copies are needed for this Git-based setup. ESPHome needs access to GitHub when fetching sources. The new overlay becomes available remotely only after these repository changes are published.
 4. Set `luna_receiver_host` to Home Assistant's LAN IPv4 address. Set a unique numeric `luna_stream_id` per device.
 5. Set `luna_status_entity` to this room's Luna audio sensor entity ID (after adding the receiver/integration). The firmware reads its `aktivitaet` attribute for LED feedback. The overlay also expects the standard Voice LED scripts, `voice_assistant_leds`, `led_ring` and `external_media_player` IDs.
 6. Generate a **different key for each device** with `python3 -c 'import secrets; print(secrets.token_hex(32))'`. Add it to ESPHome `secrets.yaml`, e.g. `luna_audio_key: "<64 hex characters>"`. Multiple devices need different secret names in their substitutions.
@@ -22,6 +22,32 @@ Other devices/base packages may require adaptation. The overlay is **not a compl
 8. After flashing, check that normal Assist and physical mute still work. Leave the new listening switch off until the receiver is configured.
 
 The switch is named `Luna dauerhaft mithoeren`. Its restore mode is `RESTORE_DEFAULT_OFF`: first boot defaults off, but a saved on-state can be restored after reboot. Hardware mute also gates transmission. Turning listening off clears receiver queues and prevents in-flight model results from becoming late spoken replies.
+
+## Updating the ESPHome sources
+
+ESPHome checks the package and external-component caches when processing the
+device configuration, with a `1d` refresh interval. This does not update running
+firmware automatically. Validate, build and install the firmware after fetching
+changes. To force a branch refresh immediately, temporarily use `refresh: 0s`
+on both Git sources (or clean the corresponding ESPHome Git caches).
+
+For reproducible builds, set `luna_source_ref` in the device YAML to a published
+tag such as `v0.3.1`; change it deliberately when upgrading. The same value selects
+both the package and the component. A branch can change between fetches, so use a
+fixed tag or commit when matching versions matters. Your Wi-Fi, secrets, receiver
+address and stream ID remain in your local device configuration.
+
+To migrate from the old copied setup, replace the local
+`luna: !include packages/luna-ambient.yaml` entry with the remote `packages.luna`
+mapping from the example and add `luna_source_ref` to your substitutions. Remove
+any separate local `external_components` entry for `luna_audio` to avoid loading
+two copies. Existing copied files can remain unused until you confirm the new
+firmware works.
+
+For offline/manual builds, keep the original local include, copy the package and
+component from the same repository revision, and replace the package's Git source
+with `type: local` / `path: components` (remove its Git-only `url`, `ref`, and
+`refresh` fields). That path is relative to the main device YAML.
 
 ## Home Assistant receiver
 

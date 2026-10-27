@@ -1,3 +1,4 @@
 cryptography
 aiohttp
+probatio==0.13.0
 pysilero-vad==3.4.0

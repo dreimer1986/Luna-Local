@@ -1,8 +1,14 @@
 # Continuous capture is an independent microphone consumer, not an Assist loop.
+substitutions:
+  luna_source_ref: master
+
 external_components:
   - source:
-      type: local
-      path: components
+      type: git
+      url: https://github.com/dreimer1986/Luna-Local
+      ref: ${luna_source_ref}
+      path: esphome/components
+    refresh: 1d
     components: [luna_audio]
 
 luna_audio:

@@ -1,5 +1,25 @@
 # Verification and limits
 
+Browser-avatar preview 0.4.0b1: eleven Node tests cover PCM framing, registered
+Luna pipeline selection, cancellation and late events/permissions, queued EOF,
+playback lifecycle, hidden tabs, final microphone buffers, acknowledgement timeout,
+missing TTS and spectral mouth estimates. Six Python avatar tests check payload
+validation, bounded metadata, timeout/busy fallback and static asset registration.
+Headless Edge passed
+module loading, SVG rendering and popup open/close with the same session; the
+screenshot was inspected. All 30 Python tests pass (including 24 existing tests). Python syntax
+and JS syntax were checked. No live HA/STT/TTS/browser-microphone end-to-end test
+has been performed for this new client. The SVG is a simplified preview, not the
+final rigged illustration; speech analysis is approximate, not phoneme alignment.
+
+Version 0.3.1 packaging: 24 existing unit tests pass locally. The release workflow's
+version check accepts the matching manifest/tag, rejects a mismatch and extracts
+the correct changelog section. ESPHome YAML syntax, shared Git-ref configuration
+and referenced repository paths were checked; remote fetching and a full device
+compile of the new overlay remain pending publication. Brand PNG dimensions and
+small-size appearance were inspected. No firmware was flashed and no Home Assistant
+configuration was changed for this packaging update.
+
 Development baseline: Home Assistant 2026.10.4, ESPHome 2026.10.0, two Home Assistant Voice devices, 25 October 2026.
 
 - Original continuous transport tests delivered 2543/2543 and 1770/1770 encrypted synthetic packets with no measured sample loss, including packets arriving during simulated playback. These were software tests, not acoustic full-duplex validation.

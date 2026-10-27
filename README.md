@@ -1,10 +1,21 @@
 # Luna Local
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="custom_components/luna_local/brand/dark_logo@2x.png">
+  <img src="custom_components/luna_local/brand/logo@2x.png" alt="Luna Local — Luna-chan, a blue-eyed Ragdoll catgirl in moonlight" width="480">
+</picture>
+
 Experimental Home Assistant conversation agent with persistent local memory and optional continuous room listening. German dialogue is currently the primary supported language. Ollama runs the conversation locally; speech recognition and voice output follow the selected Assist pipeline, so Whisper/Piper can keep speech local or you can explicitly choose cloud providers.
 
-**Version 0.3.0.** Tested with Home Assistant 2026.10.4, ESPHome 2026.10.0 and Home Assistant Voice hardware. This is not a robot, camera integration or speaker-identification system.
+**Version 0.4.0b1 (browser preview).** The pre-existing voice runtime was tested with Home Assistant 2026.10.4, ESPHome 2026.10.0 and Home Assistant Voice hardware. The new browser client has local automated and browser-rendering tests; live HA microphone/STT/TTS validation is still pending. Branding and Git-based packaging are validated locally; the updated remote overlay still needs a device build. This is not a robot, camera integration or speaker-identification system.
 
 ## Install with HACS
+
+For the experimental browser microphone, speech output and avatar card/popup, see
+[Browser avatar setup and current limitations](docs/browser-avatar.md).
+The approved illustration is retained as the design reference; the animated SVG
+is a simplified preview rig. Live HA validation and final illustration rigging are
+still pending.
 
 1. In HACS, add `https://github.com/dreimer1986/Luna-Local` as a **custom repository**, type **Integration**.
 2. Download Luna Local and restart Home Assistant.
@@ -14,7 +25,13 @@ Experimental Home Assistant conversation agent with persistent local memory and 
 
 For manual installation, copy `custom_components/luna_local` into your Home Assistant configuration directory and follow steps 2–5. HACS installs the integration only; it does not install Ollama models, STT/TTS providers or flash Voice hardware.
 
-This repository is prepared for HACS custom-repository installation. It is not included in the default HACS catalog. Catalog submission, branding and hosted validation are separate steps. See [HACS integration requirements](https://www.hacs.xyz/docs/publish/integration/).
+This repository is prepared for HACS custom-repository installation. It is not included in the default HACS catalog. Luna-chan icons and logos are included under `custom_components/luna_local/brand/` and installed with the integration. Catalog submission and successful hosted validation remain separate steps. See [HACS integration requirements](https://www.hacs.xyz/docs/publish/integration/).
+
+### Updates and releases
+
+Install integration updates through HACS/Marketplace and restart Home Assistant. Releases are built from tags matching the manifest version, such as `v0.3.1`, after unit tests, Hassfest and HACS validation succeed. The release contains the repository sources; HACS installs `custom_components/luna_local/`, including its branding. Publishing the first release requires committing/pushing these files and the matching tag.
+
+The optional ESPHome overlay and audio component can both be fetched from Git, using the same `luna_source_ref` in your device YAML. See [continuous listening setup](docs/continuous-listening.md) for upgrades, fixed-version tags and migration from local copies. HACS never flashes devices or overwrites `/config/luna_audio.json`, ESPHome secrets or the memory database.
 
 ## Continuous listening (optional)
 
@@ -97,7 +114,7 @@ python -m unittest discover -s tests -v
 
 The unit suite covers transport authentication/replay rejection, segmentation, memory persistence/deletion, synthetic noise rejection and clarification rules. `tests/speech_adapter_ha.py`, `tests/control_ha.py` and `tests/continuous_cancellation.py` additionally run in a Home Assistant Python environment with the repository on `PYTHONPATH`; they do not activate microphones or speakers. Integration imports require the manifest requirements to be installed.
 
-GitHub Actions are configured for unit tests, Hassfest and HACS validation. The custom-repository workflow skips the external brands check; this is not a claim of default-catalog approval. See [verification notes](docs/verification.md) for tested behaviour and remaining hardware checks.
+GitHub Actions are configured for unit tests, Hassfest and HACS validation, including the local brand assets check. This is not a claim of default-catalog approval. See [verification notes](docs/verification.md) for tested behaviour and remaining hardware checks.
 
 ## License and dependencies
 

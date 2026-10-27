@@ -8,9 +8,11 @@
   "dependencies": [
     "assist_pipeline",
     "conversation",
+    "http",
     "ollama",
     "stt",
-    "tts"
+    "tts",
+    "websocket_api"
   ],
   "documentation": "https://github.com/dreimer1986/Luna-Local",
   "integration_type": "service",
@@ -20,5 +22,5 @@
     "webrtcvad-wheels==2.0.14.post1",
     "pysilero-vad==3.4.0"
   ],
-  "version": "0.3.0"
+  "version": "0.4.0b1"
 }

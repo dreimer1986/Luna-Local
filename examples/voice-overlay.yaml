@@ -1,8 +1,15 @@
 # Merge into your existing Voice configuration; this is NOT a full firmware.
 substitutions:
+  # Set this to a published tag (for example v0.3.1) for a fixed version.
+  # Both package and C++ component use the same ref.
+  luna_source_ref: master
   luna_receiver_host: "192.0.2.10"  # LAN IP of Home Assistant
   luna_status_entity: sensor.luna_audiostream_living_room  # actual HA sensor entity ID
   luna_stream_id: "1"             # unique per room
   luna_audio_key: !secret luna_audio_key
 packages:
-  luna: !include packages/luna-ambient.yaml
+  luna:
+    url: https://github.com/dreimer1986/Luna-Local
+    ref: ${luna_source_ref}
+    files: [esphome/packages/luna-ambient.yaml]
+    refresh: 1d
