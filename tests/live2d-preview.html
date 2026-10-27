@@ -1,0 +1,31 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><title>Live2D SDK-Prüfung</title>
+<style>body{background:#20283b;color:white;font:16px system-ui}canvas{width:420px;height:630px;background:#374760}pre{white-space:pre-wrap}</style>
+<h1>SDK-Funktionstest — Beispielmodell, nicht Luna</h1>
+<canvas width="630" height="945" aria-label="Offizielles SDK-Beispielmodell"></canvas><pre id="status">Lädt …</pre>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+const status=document.querySelector('#status'), canvas=document.querySelector('canvas');
+const failure=e=>{document.body.dataset.test='failed';status.textContent=String(e?.stack||e);};
+addEventListener('error',e=>failure(e.error||e.message));
+addEventListener('unhandledrejection',e=>failure(e.reason));
+try {
+ const player=await mountLuna(canvas,'../tools/live2d/dist/Sample/Hiyori.model3.json');
+ window.player=player;
+ if(!player.parameterIds.includes('ParamMouthOpenY'))throw Error('Mouth parameter not found');
+ let frames=0, last=performance.now();
+ function tick(now){
+  try{
+   player.draw((now-last)/1000,{parameters:{ParamAngleX:10,ParamMouthOpenY:.55}});last=now;
+   frames++;
+   if(frames%10===0){
+    const gl=canvas.getContext('webgl'),pixels=new Uint8Array(canvas.width*canvas.height*4);
+    gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+    let visible=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]>100)visible++;
+    if(visible>10000){document.body.dataset.test='passed';status.textContent=`Core + model + textures + shaders: OK\n${player.parameterIds.length} parameters, ${visible} visible pixels\nMotion group: ${player.motionGroups.join(', ')}`;}
+   }
+   requestAnimationFrame(tick);
+  }catch(e){failure(e);}
+ }
+ requestAnimationFrame(tick);
+}catch(e){failure(e);}
+</script></html>

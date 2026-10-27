@@ -1,0 +1,12 @@
+{
+  "name": "luna-live2d-development",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "playwright-core": "1.56.1"
+  }
+}

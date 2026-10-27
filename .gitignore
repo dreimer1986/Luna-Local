@@ -8,3 +8,6 @@ luna_audio.json
 *.db
 *.bin
 .env
+node_modules/
+# Local licensed Cubism runtime and authoring/export scratch files.
+tools/live2d/dist/

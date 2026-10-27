@@ -1,7 +1,11 @@
 # Luna: Live2D-Arbeitsstand
 
-Live2D Cubism ist die gewählte Zieltechnik. **Es gibt noch kein fertiges Luna-Modell
-(`.cmo3`/`.moc3`) und keinen getesteten Live2D-Player in der HA-Kachel.** Die
+Live2D Cubism ist die gewählte Zieltechnik. **Es gibt noch kein fertig geriggtes
+Luna-Modell und keinen Live2D-Player in der HA-Kachel.** Ein lokaler SDK-Adapter
+rendert inzwischen ein offizielles Beispielmodell im Browser; die
+[Build- und Testanleitung](../../tools/live2d/README.md) beschreibt den Stand.
+`source/luna-reference-only.cmo3` ist ein echtes Cubism-Editor-Projekt mit dem
+Original als Zeichenreferenz, ausdrücklich noch kein animierbares Luna-Rig. Die
 freigegebene Illustration bleibt deshalb die Standarddarstellung. Das bisherige
 SVG-Rig und der Versuch mit verformten PNGs sind kein Ersatz für das Cubism-Modell.
 
@@ -83,18 +87,29 @@ Eine umbenannte PNG-Datei oder selbst erfundene MOC3-Datei ist kein Modell.
 - Beide Darstellungen, Tabwechsel, Kontextverlust und fehlende Assets testen.
 - Jedes Outfit durch dieselbe Prüfung schicken.
 
-## Offene Voraussetzungen (27.10.2026)
+## Voraussetzungen und tatsächlicher Stand (27.10.2026)
 
-Cubism Editor ist auf dem Arbeits-PC nicht installiert. Der offizielle Download
-des Web-SDK R5 und des separat angebotenen Core lieferte hier HTTP 403. Die
-Framework-Quellen konnten als Referenz abgerufen werden (Tag `5-r.5`, Commit
-`198a3769c26ca3d7b600e932590433badd392edd`); ohne Core ist damit kein Renderlauf
-möglich. Keine fremde Figur wird als fertige Luna ausgegeben.
+Der Nutzer hat den Cubism Editor 5.3.05 beta1 installiert und das Web-SDK 5 R5
+einschließlich Core unter `Downloads/Cubism` bereitgestellt. Der frühere
+Download-Blocker ist damit erledigt. Der Editor wurde im FREE-Modus gestartet;
+kein kostenpflichtiger Vertrag und keine Testlizenz wurden aktiviert.
 
-Benötigt werden der [Cubism Editor](https://www.live2d.com/en/cubism/download/editor/),
-das [Web-SDK](https://www.live2d.com/en/sdk/download/web/) und für die Ziel-Lippen-
-synchronisation das [MotionSync-Paket](https://www.live2d.com/en/sdk/download/motionsync/).
-SDKs/Core werden nicht ungeprüft ins öffentliche Repository aufgenommen.
+Der lokale Adapter lädt echte MOC3-Dateien mit Core-Konsistenzprüfung, Texturen,
+Bewegungen, Ausdrücke und Physik. Ein Headless-Edge-Test rendert das offizielle
+Hiyori-Testmodell mit 70 Parametern; das Ergebnis wurde auch visuell kontrolliert.
+Hiyori ist nur eine lokale Testdatei, wird nicht mit Git ausgeliefert und ist
+ausdrücklich nicht Luna. Dieser Test beweist keine fertige Lippensynchronisation
+oder die optische Qualität eines noch nicht vorhandenen Luna-Rigs.
+
+Offen bleiben die getrennte Zeichnung und das künstlerische Rigging. Die
+automatisierte Editorbedienung hat bislang nur das Referenzprojekt erstellt.
+Die zugesagte ausdrucksstarke Luna ist damit **nicht fertig**. Für eine verlässlich
+hochwertige Umsetzung braucht dieser Schritt gezielte Illustrator-/Rigger-Arbeit.
+
+Für die Ziel-Lippensynchronisation fehlt außerdem das separate
+[MotionSync-Paket](https://www.live2d.com/en/sdk/download/motionsync/). Es ist nicht
+Bestandteil des bereitgestellten normalen Web-SDKs. SDKs/Core werden nicht
+ungeprüft ins öffentliche Repository aufgenommen.
 
 Die Veröffentlichung eines erweiterbaren Avatar-Systems kann nach den
 [Live2D-Bedingungen](https://www.live2d.com/en/sdk/license/expandable/) eine gesonderte
