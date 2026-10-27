@@ -1,0 +1,5 @@
+Generated with the built-in image_gen tool, 2026-10-27.
+Input: docs/branding/luna-waist-reference.png (approved identity reference).
+Purpose: expression reference for rigging; not a layered or compiled model.
+
+Precise expression keyframe EDIT of the approved Luna portrait. Preserve the same entire 1024x1536 composition and original character identity, head position and angle, face proportions, nose, hair, fluffy Ragdoll ears, cream closed turtleneck cable-knit sweater, relaxed arms, hands, trousers and alpha transparency. Change ONLY the facial expression to a natural delighted LAUGH: eyes gently smile closed with curved delicate lashes, cheeks lift subtly, and a warmly smiling open mouth shows a small upper tooth line and soft tongue, correctly proportioned to her delicate painted anime face. Keep the laugh modest and convincing, not a huge caricature, not hysterical. Do not move her head or change the body pose. Keep all pixels outside the face as unchanged as possible. This will be used as an aligned animation keyframe with the original artwork. Fully clothed, wholesome and age-appropriate. No text or effects.

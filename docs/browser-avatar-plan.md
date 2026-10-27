@@ -1,9 +1,11 @@
 # Luna in the browser: implementation design
 
-Status: an experimental browser client and SVG preview rig are implemented locally;
-see [setup and limitations](browser-avatar.md). End-to-end Home Assistant validation
-and the final illustration rig remain outstanding. Frigate and robot support are
-design only.
+Status: the browser client uses the approved static illustration by default (b3).
+Live2D Cubism is the chosen animation system; the PNG deformation experiment will
+not become the production renderer. See [Live2D preparation and open prerequisites](live2d/README.md)
+and [setup and limitations](browser-avatar.md). A layered Luna source, compiled rig,
+SDK integration and visual acceptance remain outstanding. Frigate and robot support
+are design only.
 
 ## Agreed scope
 
@@ -80,8 +82,9 @@ nor a CSS scale animation supplies it automatically. Live2D is a suitable candid
 with a layered Canvas renderer as an alternative if its quality proves sufficient.
 Keep the renderer replaceable so a later 3D avatar does not replace dialogue logic.
 
-Initial expression vocabulary: neutral, joyful, amused, shy/embarrassed, curious,
-thoughtful, surprised, concerned and sad. Distinguish listening/thinking/speaking
+Target expression vocabulary: neutral, joyful, amused, laughing, angry,
+shy/embarrassed, curious, thoughtful, surprised, concerned and sad. The current
+backend does not yet emit laughing or angry. Distinguish listening/thinking/speaking
 states from emotional expression. Blend expression intensity over time; combine
 blush, brow/eye shape, gaze and head/ear posture. Do not switch the whole face
 abruptly on every word or randomly choose emotions from keywords.

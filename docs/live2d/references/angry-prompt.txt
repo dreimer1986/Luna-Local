@@ -1,0 +1,5 @@
+Generated with the built-in image_gen tool, 2026-10-27.
+Input: docs/branding/luna-waist-reference.png (approved identity reference).
+Purpose: expression reference for rigging; not a layered or compiled model.
+
+Precise expression keyframe EDIT of the approved Luna illustration supplied as edit target. Keep the whole original portrait pixel-aligned: same full 1024x1536 framing, head angle, face proportions, nose position, hair strands, Ragdoll cat ears, closed cream turtleneck cable-knit sweater, body, arms, hands, trousers, painting technique and lighting. Preserve alpha transparency. Change ONLY her facial expression to restrained, believable ANNOYANCE / ANGER: inner eyebrows draw down and inward, upper eyelids narrow slightly while her deep-blue irises remain recognizable, a small closed tense mouth with subtly lowered corners. No bared fangs, no enormous cartoon symbols, no red face, no tears, no screaming. Her identity, age and gentle painterly anime style must remain exactly recognizable. This is an aligned animation expression keyframe, not a new character drawing or new pose. One portrait, no labels. Fully clothed, wholesome character.

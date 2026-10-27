@@ -9,6 +9,11 @@ standardmäßig die unveränderte, freigegebene Luna-Illustration. Dieses Bild h
 noch keine Gesichtsanimation oder Lippensynchronisation. Das dafür benötigte
 Ebenen-Rig muss die Qualität und Identität dieser Illustration erhalten.
 
+Als Zielsystem ist jetzt **Live2D Cubism** festgelegt. Die
+[Modellvorbereitung und offenen Voraussetzungen](live2d/README.md) sind separat
+dokumentiert. Noch keine Live2D-Option in YAML setzen: Modell und Player sind
+noch nicht fertig und werden nicht durch einen automatischen PNG-Import ersetzt.
+
 ## Einrichten
 
 1. Integration auf **0.4.0b3 oder neuer** aktualisieren und HA neu starten. Die
