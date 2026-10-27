@@ -1,0 +1,16 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><title>Luna Session-Renderer-Test</title>
+<style>body{background:#20283b;color:white;font:16px system-ui}.host{width:420px;height:630px;position:relative}.portrait{width:100%;height:100%;object-fit:contain}</style>
+<p>Technischer Integrationstest mit SDK-Beispielmodell, nicht Luna.</p><div class="host"></div>
+<script type="module">
+import {LunaLive2DRig} from '../custom_components/luna_local/frontend/live2d-rig.mjs';
+window.host=document.querySelector('.host');
+window.session={generation:1,phase:'idle',expression:{name:'neutral',intensity:0}};
+window.statuses=[];
+window.makeRig=(config={})=>new LunaLive2DRig(host,session,{
+ live2d_runtime:'/tools/live2d/dist/runtime.mjs',
+ live2d_model:'/tools/live2d/dist/Sample/Hiyori.model3.json',...config
+},(state,message)=>statuses.push({state,message}));
+window.rig=makeRig();
+await rig.ready;
+window.ready=true;
+</script></html>

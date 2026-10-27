@@ -1,13 +1,22 @@
 # Luna: Live2D-Arbeitsstand
 
-Live2D Cubism ist die gewählte Zieltechnik. **Es gibt noch kein fertig geriggtes
-Luna-Modell und keinen Live2D-Player in der HA-Kachel.** Ein lokaler SDK-Adapter
-rendert inzwischen ein offizielles Beispielmodell im Browser; die
-[Build- und Testanleitung](../../tools/live2d/README.md) beschreibt den Stand.
-`source/luna-reference-only.cmo3` ist ein echtes Cubism-Editor-Projekt mit dem
-Original als Zeichenreferenz, ausdrücklich noch kein animierbares Luna-Rig. Die
-freigegebene Illustration bleibt deshalb die Standarddarstellung. Das bisherige
-SVG-Rig und der Versuch mit verformten PNGs sind kein Ersatz für das Cubism-Modell.
+Live2D Cubism läuft jetzt mit einem echten Luna-MOC3 in der HA-Karte. Das erste
+Portrait-Rig hat bewegliche Augen und Mund; Atmen, Gewichtsverlagerung und kleine
+Kopfneigungen bewegen alle Ebenen zusammen. Die Lippen folgen dem tatsächlichen
+Wiedergabeaudio. Das volle Ausdrucks-/Outfit-Konzept ist noch nicht umgesetzt.
+
+Das Blinzeln wurde vom Nutzer positiv beurteilt. Der erste Sprechmund wurde wegen
+sichtbarer heller Reste überarbeitet: `tools/polish_luna_mouth.py` bereinigt nur die
+Mundteile des geprüften Original-Texturatlasses. Die Augen bleiben unverändert.
+Die Quelldateien und Exporte liegen im privaten Paket `Luna-portrait-v1`; Pfade und
+Installation stehen in [HANDOFF.md](../../HANDOFF.md). Die
+[Build- und Testanleitung](../../tools/live2d/README.md) beschreibt den Web-Adapter.
+
+Die [pixelgenaue Gesichtszerlegung](source/original-separation/README.md) ist eine
+Vorstufe. Neutral erhält sie die Originalpixel; der bewegliche Mund benötigt
+zusätzlich ergänzte und bereinigte Materialien. `luna-reference-only.cmo3` bleibt
+das ursprüngliche Referenzprojekt und darf nicht mit dem Laufzeit-Rig verwechselt
+werden.
 
 ## Verbindliche Vorlage
 
@@ -101,8 +110,9 @@ Hiyori ist nur eine lokale Testdatei, wird nicht mit Git ausgeliefert und ist
 ausdrücklich nicht Luna. Dieser Test beweist keine fertige Lippensynchronisation
 oder die optische Qualität eines noch nicht vorhandenen Luna-Rigs.
 
-Offen bleiben die getrennte Zeichnung und das künstlerische Rigging. Die
-automatisierte Editorbedienung hat bislang nur das Referenzprojekt erstellt.
+Die erste Gesichtszerlegung ist inzwischen vorhanden (siehe oben); offen bleiben
+die vollständige Materialaufteilung und das künstlerische Rigging. Die
+Editorbedienung hat das Referenzprojekt und die importierte Materialstudie erstellt.
 Die zugesagte ausdrucksstarke Luna ist damit **nicht fertig**. Für eine verlässlich
 hochwertige Umsetzung braucht dieser Schritt gezielte Illustrator-/Rigger-Arbeit.
 

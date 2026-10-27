@@ -31,7 +31,9 @@ async def async_control(hass, text, device_id, satellite_id, allowed, language='
         text=text, context=context, conversation_id=None, device_id=device_id,
         satellite_id=satellite_id, language=language, agent_id=conversation.HOME_ASSISTANT_AGENT,
     )
-    result = await agent.async_recognize_intent(user_input)
+    # Unknown-name fallback also matches ordinary conversation as a device name.
+    # Only a strict match against exposed entities belongs in the control path.
+    result = await agent.async_recognize_intent(user_input, strict_intents_only=True)
     if result is None or not allowed():
         return None
     # Recognition alone never toggles devices. Execution remains in native HA,

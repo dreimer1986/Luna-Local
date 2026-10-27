@@ -44,3 +44,18 @@ Development baseline: Home Assistant 2026.10.4, ESPHome 2026.10.0, two Home Assi
 Final 0.2.2 checks: 16 unit tests, eight HA adapter tests and cancellation checks passed. Silero accepted synthetic Amala speech, followed by a successful STT round trip. Three live Ollama cases passed: unintelligible/no-context silence, addressed clarification and an open room question without a name. Physical microphone/rain testing remains pending.
 
 Version 0.3.0: 16 core tests, eight speech-adapter tests, five control/status tests and cancellation checks passed. Native HA debug recognition resolved German light-on, named-player pause and album search/play requests to the intended exposed entities without executing them. Both Voice firmware builds compiled and uploaded successfully. Real ring appearance and acoustic end-to-end command execution still need user observation; no light or music state was changed by these tests.
+
+
+2026-10-27, 0.4.0b4 development: real Luna MOC3 rendered in the installed HA
+card and popup. Text -> Luna conversation agent -> configured Amala TTS ->
+Web Audio -> mouth animation succeeded after fixing native intent pre-recognition.
+First successful free reply: 1236 speaking frames, max mouth 0.849, final mouth 0.
+Popup retained the same session. A separate popup story produced 736 speaking
+frames (max 0.84998); stopping playback yielded idle, mouth 0 and no audio source.
+The user approved blinking and requested mouth cleanup, teeth/canine and gentle
+idle movement, which are installed. Physical microphone/STT remains untested.
+
+Validation: 37 Python tests, 5 HA-control tests against HA 2026.10.3, 17 Node tests,
+official SDK rendering/lifecycle smoke and actual Luna pixel tests passed. Luna
+pixel checks cover mouth, blink, idle movement and exact restoration with reduced
+motion. Lip shapes use real-audio spectral approximation, not integrated MotionSync.

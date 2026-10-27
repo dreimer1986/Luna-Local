@@ -33,6 +33,7 @@ export class LunaSession extends EventTarget {
     this.continuous = false;
     this.muted = false;
     this.viseme = 'sil';
+    this.mouthCues = null;
     this.playbackTime = 0;
     this.pendingChunks = [];
     this.pipeline = null;
@@ -299,6 +300,7 @@ export class LunaSession extends EventTarget {
     if (turn !== this.generation || this.completed) return;
     this.completed = true;
     this.viseme = 'sil';
+    this.mouthCues = null;
     this.playbackTime = 0;
     this.source?.disconnect();
     this.source = null;
@@ -333,6 +335,7 @@ export class LunaSession extends EventTarget {
     this.source = null;
     this.closeCapture();
     this.viseme = 'sil';
+    this.mouthCues = null;
     this.playbackTime = 0;
     this.phase = 'idle';
     this.emit();

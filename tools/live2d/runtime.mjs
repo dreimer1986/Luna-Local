@@ -1,5 +1,6 @@
 // Luna-owned adapter to the official Cubism Web Framework, built locally.
 // No sample model or proprietary Core is embedded in this source file.
+import {movePortrait} from './portrait-motion.mjs';
 import {CubismFramework} from '@framework/live2dcubismframework';
 import {CubismUserModel} from '@framework/model/cubismusermodel';
 import {CubismModelSettingJson} from '@framework/cubismmodelsettingjson';
@@ -46,6 +47,7 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
   const gl = canvas.getContext('webgl', {alpha: true, premultipliedAlpha: true, antialias: true});
   if (!gl) {setting.release(); throw Error('WebGL ist nicht verfügbar.');}
   const model = new CubismUserModel(), textures = [], motions = new Map(), expressions = new Map();
+  let portraitTime = 0, cleanVertices = null;
   let disposed = false, activeGroup = '', activeExpression = '', contextLost = false;
   const lost = event => {event.preventDefault(); contextLost = true;};
   canvas.addEventListener('webglcontextlost', lost);
@@ -119,6 +121,8 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         if (contextLost) throw Error('Grafikkontext verloren; Ansicht neu öffnen.');
         dt = Math.max(0, Math.min(.05, Number.isFinite(dt) ? dt : 0));
         const core = model._model;
+        // Restore Core outputs before its next update; never accumulate our offsets.
+        if (cleanVertices) cleanVertices.forEach((v, i) => core.getDrawableVertices(i).set(v));
         core.loadParameters();
         if (!reducedMotion) {
           const desired = motions.has(group) ? group : 'Idle';
@@ -137,8 +141,26 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         for (const [name, value] of Object.entries(parameters)) {
           if (ids.has(name) && Number.isFinite(value)) core.setParameterValueById(ids.get(name), value);
         }
+        // This first Luna rig has a fixed original-illustration foreground. Head and
+        // brow translation would move the facial patches outside their apertures.
+        if (data.LunaRig?.Profile === 'portrait-face-v1') {
+          if (ids.has('ParamMouthForm')) core.setParameterValueById(ids.get('ParamMouthForm'), Math.max(-.35, Math.min(.35, parameters.ParamMouthForm || 0)));
+          for (const name of ['ParamAngleX','ParamAngleY','ParamAngleZ',
+            'ParamBodyAngleX','ParamBodyAngleY','ParamBodyAngleZ','ParamBrowLY','ParamBrowRY',
+            'ParamEyeBallX','ParamEyeBallY']) {
+            if (ids.has(name)) core.setParameterValueById(ids.get(name), 0);
+          }
+        }
         if (!reducedMotion) model._physics?.evaluate(core, dt);
         model._pose?.updateParameters(core, dt); core.update();
+        if (data.LunaRig?.Profile === 'portrait-face-v1') {
+          portraitTime += dt;
+          cleanVertices = Array.from({length: core.getDrawableCount()}, (_, i) => {
+            const vertices = core.getDrawableVertices(i), clean = vertices.slice();
+            movePortrait(vertices, portraitTime, reducedMotion);
+            return clean;
+          });
+        }
         const w = canvas.width, h = canvas.height;
         model.setRenderTargetSize(w, h);
         const matrix = new CubismMatrix44(); matrix.scale(h / w, 1);

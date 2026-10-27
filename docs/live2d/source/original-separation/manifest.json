@@ -1,0 +1,43 @@
+{
+  "source": "docs/branding/luna-waist-reference.png",
+  "source_sha256": "b9bbeccadbb938ba52c04712b2a3680221e1728e41a078e8156f59c32797d7fc",
+  "contours_sha256": "177d62991d7d8eb5781661288decfb393b357cea1c00931c559640d2709c7602",
+  "canvas": [
+    1024,
+    1536
+  ],
+  "coordinate_system": "viewer L/R, original pixel positions, no scaling",
+  "visible_layers": [
+    "base_original_cut",
+    "eye_viewer_left_upper_lid_skin_patch",
+    "eye_viewer_left_highlight",
+    "eye_viewer_left_iris_pupil",
+    "eye_viewer_left_sclera_visible",
+    "eye_viewer_left_lower_lid_skin_patch",
+    "eye_viewer_right_upper_lid_skin_patch",
+    "eye_viewer_right_highlight",
+    "eye_viewer_right_iris_pupil",
+    "eye_viewer_right_sclera_visible",
+    "eye_viewer_right_lower_lid_skin_patch",
+    "brow_viewer_left",
+    "brow_viewer_right",
+    "mouth_closed_original"
+  ],
+  "hidden_layers": [
+    "DRAFT_skin_repair_hidden"
+  ],
+  "validation": {
+    "visible_rgb_mismatched_pixels": 0,
+    "alpha_mismatched_pixels": 0,
+    "psd_layer_pixels_exact": true,
+    "source_unchanged": true
+  },
+  "limitations": [
+    "No keyforms, blink animation, mouth opening, physics or MOC3 export.",
+    "Visible iris/sclera only; occluded areas are not fully reconstructed.",
+    "Lid layers include adjacent skin; contours need motion review.",
+    "Only the principal eye highlights have separate layers.",
+    "Skin repair is an inpainting draft, hidden in the PSD by default.",
+    "Transparent RGB is retained but excluded from visual equality checks."
+  ]
+}

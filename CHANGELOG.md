@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0b4 (development)
+
+- Add optional Live2D card/popup rendering with actual playback-driven mouth controls,
+  blinking, same-origin model loading, portrait fallback and cancellation handling.
+- Add a private Luna portrait model workflow, mouth cleanup and coherent subtle
+  breathing, head tilt and weight shift; honor reduced-motion preferences.
+- Restrict native intent pre-recognition to exposed-entity matches so normal
+  conversation reaches Luna instead of receiving unknown-device errors.
+- Version frontend module imports to avoid stale session code after upgrades.
+- Cubism Core, compiled runtime and template-derived authoring files remain private.
+
 ## 0.4.0b3
 
 - Display the approved waist-up Luna illustration by default in cards and popups,

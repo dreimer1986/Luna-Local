@@ -1,11 +1,16 @@
-import {LunaSession, PHASES} from './session.mjs';
-import {LunaRig} from './rig.mjs';
+import {LunaSession, PHASES} from './session.mjs?v=0.4.0b4';
+import {LunaRig} from './rig.mjs?v=0.4.0b4';
+import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=0.4.0b4';
 
 class LunaAvatarCard extends HTMLElement {
   constructor() { super(); this.attachShadow({mode: 'open'}); }
   setConfig(config) {
     if (!['card', 'popup'].includes(config.presentation || 'card')) throw Error('presentation: card oder popup');
-    if (!['illustration', 'technical'].includes(config.avatar || 'illustration')) throw Error('avatar: illustration oder technical');
+    if (!['illustration', 'technical', 'live2d'].includes(config.avatar || 'illustration')) throw Error('avatar: illustration, live2d oder technical');
+    if (config.avatar === 'live2d') {
+      if (config.live2d_model) localAssetURL(config.live2d_model);
+      if (config.live2d_runtime) localAssetURL(config.live2d_runtime);
+    }
     this.teardown();
     this.config = {...config};
     if (this.isConnected) this.mount();
@@ -29,7 +34,8 @@ class LunaAvatarCard extends HTMLElement {
       .stage:before{content:'';position:absolute;width:135px;height:135px;border-radius:50%;right:10%;top:24px;background:#f5f0db;box-shadow:0 0 55px #e2e5ff75}
       .stage[data-background="plain"]{background:var(--secondary-background-color,#e7e9ef)}.stage[data-background="plain"]:before{display:none}
       .rig{height:100%;position:relative;z-index:1}.rig svg{width:100%;height:100%;display:block}
-      .stage[data-avatar="illustration"]{width:100%;height:auto;aspect-ratio:2/3;max-height:640px}
+      .stage[data-avatar="illustration"],.stage[data-avatar="live2d"]{width:100%;height:auto;aspect-ratio:2/3;max-height:640px}
+      .stage[data-avatar="live2d"] .rig{position:absolute;inset:0}
       .portrait{display:block;width:100%;height:100%;object-fit:contain;object-position:center;position:relative;z-index:1}
       .badge{position:absolute;bottom:10px;left:12px;background:#121a30d9;color:#fff;padding:5px 10px;border-radius:16px;font:12px system-ui;z-index:2}
       .controls{padding:14px;display:grid;gap:10px} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -55,10 +61,11 @@ class LunaAvatarCard extends HTMLElement {
         <form><input type="text" maxlength="2000" aria-label="Nachricht an Luna" placeholder="Oder schreibe Luna …"><button type="submit">Senden</button></form>
         <details><summary>Gespräch</summary><div class="transcript" aria-live="polite"></div></details>
         <p class="note">Audio-basierte Lippen-Näherung · Das Mikrofon stoppt beim Verlassen dieser Ansicht.</p>
+        <button class="retry-animation" hidden>Animation erneut laden</button>
       </div>
     </section>`;
     this.session = new LunaSession(this._hass, {
-      ...this.config, expressions: this.config.avatar === 'technical' && this.config.expressions !== false,
+      ...this.config, expressions: ['technical', 'live2d'].includes(this.config.avatar) && this.config.expressions !== false,
     });
     this.panel = root.querySelector('.panel'); this.dialog = root.querySelector('dialog');
     this.dock = root.querySelector('.dock'); this.dock.append(this.panel);
@@ -89,6 +96,20 @@ class LunaAvatarCard extends HTMLElement {
     });
     if (this.config.avatar === 'technical') {
       this.rig = new LunaRig(root.querySelector('.rig'), this.session);
+    } else if (this.config.avatar === 'live2d') {
+      const startRig = () => {
+        this.rig?.destroy();
+        root.querySelector('.retry-animation').hidden = true;
+        this.rig = new LunaLive2DRig(root.querySelector('.rig'), this.session, this.config, (state, message) => {
+          root.querySelector('.badge').textContent = state === 'loading' ? 'Luna lädt …' : 'Luna';
+          root.querySelector('.note').textContent = state === 'error'
+            ? `Animation nicht verfügbar: ${message} Gespräche sind weiterhin möglich.`
+            : 'Das Mikrofon stoppt beim Verlassen dieser Ansicht.';
+          root.querySelector('.retry-animation').hidden = state !== 'error';
+        });
+      };
+      root.querySelector('.retry-animation').onclick = startRig;
+      startRig();
     } else {
       const portrait = document.createElement('img');
       portrait.className = 'portrait';

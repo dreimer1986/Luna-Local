@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><title>Luna – Sprachprobe</title>
+<style>
+body{margin:0;background:#20283b;color:#fff;font:16px system-ui;display:grid;place-items:center}
+main{display:flex;align-items:center;gap:2rem;max-width:960px;padding:1rem}
+.host{width:min(52vw,420px);height:min(78vw,630px);position:relative}
+.portrait{width:100%;height:100%;object-fit:contain}button{padding:.8rem;margin:.25rem;border:0;border-radius:.5rem;cursor:pointer}
+p{max-width:400px;line-height:1.5}#status{min-height:3em}
+</style>
+<main><div class="host"></div><section><h1>Luna – Sprachprobe</h1>
+<p>Echtes Live2D-Modell mit einer lokal erzeugten deutschen Piper-Sprachprobe. Der Mund folgt dem abgespielten Audio. Diese Probe verwendet noch keine Home-Assistant-Unterhaltung.</p>
+<button id="speak" disabled>Sprachprobe abspielen</button><button id="stop">Anhalten</button>
+<p id="status">Luna wird geladen …</p></section></main>
+<script type="module">
+import {LunaSession, PHASES} from '../custom_components/luna_local/frontend/session.mjs';
+import {LunaLive2DRig} from '../custom_components/luna_local/frontend/live2d-rig.mjs';
+const status=document.querySelector('#status');
+window.session=new LunaSession({connection:new EventTarget()});
+window.rig=new LunaLive2DRig(document.querySelector('.host'),session,{
+ live2d_runtime:'/tools/live2d/dist/runtime.mjs',live2d_model:'/tools/live2d/dist/Luna/luna.model3.json'
+},(state,message)=>{status.textContent=message||(state==='ready'?'Bereit.':'Luna wird geladen …');});
+session.addEventListener('change',()=>{status.textContent=session.error||PHASES[session.phase];});
+document.querySelector('#stop').onclick=()=>session.stop();
+document.querySelector('#speak').onclick=async()=>{
+ session.stop();session.completed=false;session.error='';session.abort=new AbortController();
+ await session.unlockAudio();await session.playAudio('/tools/live2d/dist/luna-test-de.wav',session.generation);
+};
+await rig.ready;
+if(rig.player){document.querySelector('#speak').disabled=false;window.ready=true;}
+addEventListener('pagehide',()=>{rig.destroy();session.destroy();});
+</script></html>

@@ -1,5 +1,30 @@
 # Luna im Browser – experimentelle Vorschau
 
+## Live2D-Stand 0.4.0b4
+
+`avatar: live2d` ist jetzt verfügbar und wurde mit dem privaten Luna-Modell in HA
+gegen echte KI-Antworten und TTS geprüft. Die Illustration bleibt der Standard;
+SDK/Core und Modell werden separat lokal bereitgestellt. Beispiel:
+
+```yaml
+type: custom:luna-avatar-card
+avatar: live2d
+presentation: card
+continuous: false
+background: moon
+live2d_runtime: /local/luna/runtime-20261027/runtime.mjs
+live2d_model: /local/luna/model-20261027/luna-smile2.model3.json
+```
+
+Blinzeln, audioabhängige Mundformen und dezente Leerlaufbewegungen sind vorhanden.
+Der Mund hat einen oberen Zahnrand und einen kleinen Eckzahn. Audioanalyse ist
+weiterhin eine Näherung; MotionSync und das volle Ausdrucksset sind nicht fertig.
+Die bestehenden Einstellungen für STT/TTS und Stimme werden verwendet.
+Installations-/Sicherungspfade und Testnachweise: [HANDOFF.md](../HANDOFF.md).
+
+## Historische Einrichtung der Illustrationsvorschau (0.4.0b3)
+
+
 Lovelace-Kachel und eigenes Popup verwenden dieselbe Sprachsitzung. Beim
 Vergrößern läuft das Gespräch weiter; Browser Mod ist nicht nötig.
 

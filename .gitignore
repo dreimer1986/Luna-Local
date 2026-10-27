@@ -11,3 +11,11 @@ luna_audio.json
 node_modules/
 # Local licensed Cubism runtime and authoring/export scratch files.
 tools/live2d/dist/
+
+# Private Cubism authoring studies and generated material exports (see HANDOFF.md).
+docs/live2d/source/*.cmo3
+docs/live2d/source/materials/*.png
+docs/live2d/source/materials/*.psd
+docs/live2d/source/original-separation/*.png
+docs/live2d/source/original-separation/*.psd
+docs/live2d/source/original-separation/layers/

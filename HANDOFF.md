@@ -35,6 +35,8 @@ Roboterplattform. Letztere sind bisher Konzept.
 | Freigegebenes Original | `docs/branding/luna-waist-reference.png` |
 | Weitere Bildquellen/Prompts | `docs/branding/`, `docs/live2d/references/` |
 | Cubism-Editor-Projekt | `docs/live2d/source/luna-reference-only.cmo3` |
+| Pixelgenaue Gesichtszerlegung | `docs/live2d/source/original-separation/luna-face-separated.psd` |
+| Importierte Originalebenen | `docs/live2d/source/luna-face-separated.cmo3` |
 | Rig-/Ebenenvorgabe | `docs/live2d/rig-contract.json` |
 | Modell-Dateiprüfung | `tools/validate_live2d_model.py` |
 | Echter Cubism-Web-Adapter + Build | `tools/live2d/` |
@@ -42,16 +44,28 @@ Roboterplattform. Letztere sind bisher Konzept.
 | Früherer PNG-Versuch, archiviert | `tools/experiments/png-rig/` |
 | Aktuelle HA-Karte/Sprachsitzung | `custom_components/luna_local/frontend/` |
 
-**Das CMO3 enthält nur die unveränderte Zeichenreferenz und die Editor-Grundstruktur.**
-Es ist kein fertig geriggtes Modell; eine getrennte PSD und ein Luna-MOC3-Export
-existieren noch nicht. Der Adapter wurde mit dem offiziellen Hiyori-SDK-Beispiel
-getestet, niemals als Luna ausgegeben. Die SDK-/Beispieldateien liegen nur lokal.
+**Aktueller Stand 27.10.2026 abends:** Ein echtes Luna-MOC3 ist unter Wine in
+Cubism FREE erstellt, im Browser geprüft und in der vorhandenen HA-Testkarte
+aktiviert. Augen blinzeln, der Mund folgt der tatsächlichen TTS-Wiedergabe.
+Der Nutzer hat das Blinzeln ausdrücklich gutgeheißen und den Sprechmund kritisiert;
+dessen helle Lippenreste/Zahnstreifen wurden daraufhin bereinigt. Auf weiteren
+Nutzerwunsch besitzt die überarbeitete Mundtextur einen oberen Zahnrand, einen
+kleinen Anime-Eckzahn und einen rosigen Zungenbereich, angelehnt an das Logo. Auf Wunsch kamen
+sanftes Atmen, Gewichtsverlagerung und kleine gemeinsame Kopf-/Haarneigungen dazu.
+Die komplette Ausdrucks-/Outfit-Vorgabe ist damit noch nicht erfüllt.
 
-Die optische Qualität des ersten SVG-Rigs wurde vom Nutzer verworfen. Der spätere
-PNG-Verformungsversuch zeigte beim halben Blinzeln Doppelkonturen. Beide nicht als
-fertigen Avatar aktivieren. Live2D ist die gewählte Richtung. Die hochwertige
-Aufteilung/Ergänzung der Zeichnung und das eigentliche Rigging sind offen; die
-bisherige Editor-Automation hat diese künstlerische Arbeit nicht erledigt.
+Private Arbeitsdateien: `/home/dreimer/shares/music/Luna/Luna-Local-home-tools/Luna-portrait-v1/`.
+Darin liegen `luna-face-runtime.cmo3`, `source-layers`, `original-export` und `model`.
+Das CMO3 ist der Editorstand mit 2048er Atlas; die letzte Mundbereinigung erfolgt
+reproduzierbar **nach** dem Export mit `tools/polish_luna_mouth.py`. Ein erneuter
+CMO3-Export allein enthält diese Bereinigung nicht. Das Skript prüft den SHA256 des
+Originalatlases, damit es nicht versehentlich einen anderen Atlas beschädigt.
+`model/luna.model3.json` benötigt `LunaRig.Profile = portrait-face-v1`.
+
+Der Nutzer hat lokale pixelgenaue Bildbearbeitung ausdrücklich autorisiert.
+Die verworfenen SVG-/PNG-Verformungsversuche nicht reaktivieren. Die bisherigen
+Materialstudien sind Zwischenstände; für Fortsetzung das aktuelle private Paket
+verwenden. Fremde Vorlagen, SDK/Core und daraus abgeleitete Studien bleiben privat.
 
 ## Rechner einrichten
 
@@ -63,17 +77,16 @@ verwenden und späteres Speichern mit anderen Versionen an einer Kopie testen.
 [Offizieller Download](https://www.live2d.com/en/cubism/download/editor/).
 Live2D bietet den Editor offiziell für Windows/macOS, nicht Linux an.
 
-Das Projekt direkt in Cubism öffnen: `docs/live2d/source/luna-reference-only.cmo3`.
-Die 25-%-Deckkraft der Referenz ist die normale Zeichenhilfen-Darstellung im Editor,
-kein Verlust der Originalbildqualität. Noch keine Textur-/Modellfreigabe exportieren.
+Das aktuelle private `Luna-portrait-v1/luna-face-runtime.cmo3` öffnen.
+`luna-reference-only.cmo3` ist nur das historische Referenzprojekt.
 
 ### Windows oder Linux für Code und Browser
 
 - Node.js 24 (lokal geprüft mit 24.20.0), npm; Python 3.14 für bestehende HA-Tests.
 - Offizielles **Cubism SDK for Web 5 R5**, vollständig entpackt, inklusive `Core`,
   `Framework`, `Samples`. Auf dem bisherigen PC: `Downloads/Cubism/CubismSdkForWeb-5-r.5`.
-- Das separate MotionSync-Paket wurde **noch nicht bereitgestellt**. Der normale
-  SDK-Ordner enthält keine fertige MotionSync-Lippensynchronisation.
+- MotionSync Web R3 liegt im privaten Cubism-Tools-Ordner, ist aber noch nicht
+  integriert. Aktuell wird das reale Wiedergabeaudio spektral angenähert.
 
 ```sh
 cd tools/live2d
@@ -129,32 +142,39 @@ Die Prüfsummen des Archivs, Installers und Core stehen in
 
 ## HA-Stand und nächste Schritte
 
-- Zuletzt auf HA verifiziert: `0.4.0b3`, Originalbild als Standard, Commit `0fb5119`.
-  Die Live2D-Branch-Commits wurden nicht nach HA ausgerollt.
-- Ressourcenpfad `/luna-local/luna-avatar-card.js`; zuletzt manuelle Lovelace-
-  Ressource mit `?v=0.4.0b3`. Backend registriert seit b2 ebenfalls automatisch.
-  Bei späteren Updates tatsächlichen HA-/HACS-/Ressourcenstand erneut prüfen.
-- Sprachagent zuletzt `conversation.luna_lokal`, HACS-Entity `update.luna_local_update`.
-- Vollständiger Browser-Mikrofon → Assist → TTS-Test mit realen Anbietern bleibt offen.
+- Manuell installiert: Entwicklungsversion **0.4.0b4**. HA wurde neu gestartet.
+- Vorhandene Karte: Hauptdashboard `/lovelace/test`, `views[4].cards[5]`.
+  `avatar: live2d`, Laufzeit `/local/luna/runtime-20261027/runtime.mjs`, Modell
+  `/local/luna/model-20261027/luna-smile2.model3.json`. Die neuen Verzeichnisse vermeiden
+  alte Browser-/Service-Worker-Caches. Andere Kartenlayouts wurden nicht geändert.
+- Sicherung vor Deployment: `/home/dreimer/shares/music/Luna/backups/20261027-live2d-ha/`
+  mit altem `frontend`, `control.py`, `manifest.json`, `lovelace.lovelace`.
+- Pipeline: `conversation.luna_lokal`, vorhandene HA-Cloud-STT/TTS, Stimme AmalaNeural.
+  Der lokale Piper/Kerstin-Test ist nur ein Entwicklerfixture und ersetzt die
+  konfigurierte Produktionsstimme nicht. Kein Offline-Sprachversprechen.
+- Entdeckter und korrigierter Fehler: `async_recognize_intent` ohne
+  `strict_intents_only=True` behandelte normale Fragen als unbekannte Geräte.
+  Jetzt gehen nur strikte Treffer auf exponierte Entitäten in den Steuerpfad.
+- 17 Node-Tests bestanden; 5 HA-Control-Tests gegen HA 2026.10.3 bestanden.
+  Hiyori-Smoke testet Kontextverlust/Fallback/Abbruch. Luna-Smoke prüft echte
+  gerenderte Pixeländerungen für Mund, Blinzeln und Leerlauf sowie exakte
+  Wiederherstellung ohne Bewegungsdrift bei reduzierter Bewegung.
+- Lokaler deutscher WAV-Test mit echter LunaSession bestand: Mundbewegung während
+  Audio, Mund sofort geschlossen nach Stopp. Erste echte HA-TTS-Wiedergabe ebenfalls
+  gemessen (245 sprechende Frames, maximale Mundöffnung ca. 0.65, danach 0).
+  Diese erste Antwort war noch der oben beschriebene Gerätefehler; nicht mit einer
+  erfolgreichen freien KI-Antwort verwechseln. Nach Korrektur gelang die freie
+  KI-Antwort auf „Wer bist du?“ mit 1236 sprechenden Frames, max. Mundöffnung
+  0.849 und anschließend geschlossenem Mund (0), ohne Sitzungsfehler.
+- Vergrößerte Ansicht gegen echte KI/TTS geprüft: gleiche LunaSession, 736
+  sprechende Frames, max. Mundöffnung 0.84998. Gezielter Stopp während der
+  Wiedergabe: Phase idle, Mund 0, Audioquelle gestoppt. Nutzerfeedback zur
+  Zahnkante anschließend umgesetzt: Zahnrand liegt direkt unter der Oberlippe.
+- Physisches Browser-Mikrofon/STT wurde in diesem Durchlauf noch nicht geprüft.
+- Ausdrucksvielfalt, eigenständige Haarphysik, echte Kopfdrehungen und MotionSync
+  bleiben weitere Arbeiten; keine vollständige Rig-Contract-Erfüllung behaupten.
 
-1. Rigging-Arbeitsweg realistisch festlegen: aufgeteilte/ergänzte PSD erstellen,
-   dann Augen, Mund, Kopf und Körper im Editor riggen. Hohe Qualität nicht als
-   automatische PNG-Konvertierung versprechen.
-2. Frühe bewegte Probe mit neutral, Lachen, Ärger, halbem Lidschluss und Mundformen
-   prüfen. Erst nach überzeugendem Ergebnis die weiteren Posen/Outfits ergänzen.
-3. MotionSync-Paket und deutsche Sprachzuordnung ergänzen; tatsächliche Audiozeit
-   nutzen und bei Abbruch sämtliche alten Mund-Cues verwerfen.
-4. Adapter mit derselben `LunaSession` in Kachel/Popup anbinden, Fallback, Context-
-   Loss, Sichtbarkeit und mehrere Instanzen prüfen; keine zweite Audiospur starten.
-5. Lizenzlage für öffentliche SDK-Auslieferung klären, dann erst Release/HA-Update.
-
-Bei Desktop-Automation muss Windows entsperrt bleiben. Bildschirm ausschalten
-ist etwas anderes als die Sitzung sperren. Sperr-/Sicherheitseinstellungen wurden
-nicht verändert. Falls gesperrt: Bedienung anhalten und lokal entsperren lassen.
-
-## Einstiegstext für die nächste Sitzung
-
-> Lies `HANDOFF.md` im Branch `work/luna-live2d-preparation` von Luna-Local.
-> Setze die dort dokumentierte Arbeit fort. Bewahre Lunas freigegebene Identität;
-> das Referenz-CMO3 ist noch kein Rig. Prüfe den aktuellen lokalen und HA-Stand,
-> bevor du Dateien ersetzt oder eine neue Darstellung aktivierst.
+Nach dem Weiterarbeiten Code/Tests/Dokumentation committen und auf
+`work/luna-live2d-preparation` pushen. Private SDK-/Vorlagen-/Runtime-Dateien nicht
+in das öffentliche Repository aufnehmen. Die private Modelldatei muss beim
+Rechnerwechsel zusätzlich über das gemeinsame Luna-Verzeichnis verfügbar sein.

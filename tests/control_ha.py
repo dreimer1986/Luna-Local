@@ -4,10 +4,11 @@ import importlib
 import os
 import sys
 import time
+from pathlib import Path
 import unittest
 from types import SimpleNamespace as NS
 from unittest.mock import AsyncMock, Mock, patch
-sys.path.insert(0, '/config')
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 pkg=os.environ.get('LUNA_TEST_PACKAGE','custom_components.luna_local')
 mod=importlib.import_module(pkg+'.control')
 continuous=importlib.import_module(pkg+'.continuous')
@@ -30,6 +31,7 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
         with patch.object(mod.conversation,'async_get_agent',return_value=agent), patch.object(mod.conversation,'async_converse',AsyncMock(return_value=response)) as execute:
             reply=await mod.async_control(NS(),'Licht an','device','satellite',lambda:True)
             self.assertEqual(reply,'Licht eingeschaltet.')
+            self.assertTrue(agent.async_recognize_intent.call_args.kwargs['strict_intents_only'])
             self.assertEqual(execute.call_args.kwargs['device_id'],'device')
             self.assertEqual(execute.call_args.kwargs['agent_id'],mod.conversation.HOME_ASSISTANT_AGENT)
 
