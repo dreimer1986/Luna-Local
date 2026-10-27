@@ -12,7 +12,7 @@ avatar: live2d
 presentation: card
 continuous: false
 background: moon
-live2d_runtime: /local/luna/runtime-20261027/runtime.mjs
+live2d_runtime: /local/luna/runtime-20261027-hands/runtime.mjs
 live2d_model: /local/luna/model-20261027/luna-smile2.model3.json
 ```
 

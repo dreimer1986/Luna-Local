@@ -144,7 +144,7 @@ Die Prüfsummen des Archivs, Installers und Core stehen in
 
 - Manuell installiert: Entwicklungsversion **0.4.0b4**. HA wurde neu gestartet.
 - Vorhandene Karte: Hauptdashboard `/lovelace/test`, `views[4].cards[5]`.
-  `avatar: live2d`, Laufzeit `/local/luna/runtime-20261027/runtime.mjs`, Modell
+  `avatar: live2d`, Laufzeit `/local/luna/runtime-20261027-hands/runtime.mjs`, Modell
   `/local/luna/model-20261027/luna-smile2.model3.json`. Die neuen Verzeichnisse vermeiden
   alte Browser-/Service-Worker-Caches. Andere Kartenlayouts wurden nicht geändert.
 - Sicherung vor Deployment: `/home/dreimer/shares/music/Luna/backups/20261027-live2d-ha/`
@@ -155,7 +155,7 @@ Die Prüfsummen des Archivs, Installers und Core stehen in
 - Entdeckter und korrigierter Fehler: `async_recognize_intent` ohne
   `strict_intents_only=True` behandelte normale Fragen als unbekannte Geräte.
   Jetzt gehen nur strikte Treffer auf exponierte Entitäten in den Steuerpfad.
-- 17 Node-Tests bestanden; 5 HA-Control-Tests gegen HA 2026.10.3 bestanden.
+- 19 Node-Tests bestanden; 5 HA-Control-Tests gegen HA 2026.10.3 bestanden.
   Hiyori-Smoke testet Kontextverlust/Fallback/Abbruch. Luna-Smoke prüft echte
   gerenderte Pixeländerungen für Mund, Blinzeln und Leerlauf sowie exakte
   Wiederherstellung ohne Bewegungsdrift bei reduzierter Bewegung.
@@ -178,3 +178,14 @@ Nach dem Weiterarbeiten Code/Tests/Dokumentation committen und auf
 `work/luna-live2d-preparation` pushen. Private SDK-/Vorlagen-/Runtime-Dateien nicht
 in das öffentliche Repository aufnehmen. Die private Modelldatei muss beim
 Rechnerwechsel zusätzlich über das gemeinsame Luna-Verzeichnis verfügbar sein.
+
+Letzte Ergänzung auf Nutzerwunsch: sanfte Handgelenk- und Fingerbewegungen im
+Leerlauf. Die zwei Illustrationsmeshes werden zur Laufzeit unterteilt, UVs bleiben
+registriert. Bewegungen sind klein und zeitlich versetzt; Winken ist nicht Teil
+dieses Stands. Mundtextur und Blinzeln bleiben unverändert. Alle 19 Node-Tests,
+SDK-Smoke und Luna-Pixeltest bestanden. Der Nutzer möchte jetzt selbst testen;
+keine weiteren Funktionen hinzufügen.
+
+Git-Push scheiterte an fehlender HTTPS-Anmeldung; SSH war ebenfalls nicht
+vorbereitet. Lokale Commits und zusätzliche Git-Bundle-Sicherung im privaten
+Luna-Verzeichnis erhalten den Stand unabhängig von der Anmeldung.

@@ -59,3 +59,8 @@ Validation: 37 Python tests, 5 HA-control tests against HA 2026.10.3, 17 Node te
 official SDK rendering/lifecycle smoke and actual Luna pixel tests passed. Luna
 pixel checks cover mouth, blink, idle movement and exact restoration with reduced
 motion. Lip shapes use real-audio spectral approximation, not integrated MotionSync.
+
+Final idle update: 19 Node tests passed including mesh topology/UV registration
+and bounded independent hand/finger motion. SDK smoke and actual Luna mouth,
+blink, idle and restoration pixel checks passed again. Hand contours inspected
+at two animation times. The accepted mouth texture was unchanged.

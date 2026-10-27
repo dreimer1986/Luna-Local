@@ -81,3 +81,8 @@ been downloaded privately but is not integrated.
 Still outstanding: richer authored expressions, independent hair/body rigging,
 phonetic calibration, physical microphone validation and publication/license
 review before distributing the private template-derived model or Cubism runtime.
+
+The portrait profile also adds small asynchronous wrist and fingertip movements.
+`portrait-mesh.mjs` refines the two illustration meshes with shared midpoints and
+interpolated UVs; each frame is recomputed from Core geometry to prevent drift.
+This is idle relaxation, not a waving animation. Reduced motion disables it.

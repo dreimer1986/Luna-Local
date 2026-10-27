@@ -1,6 +1,7 @@
 // Luna-owned adapter to the official Cubism Web Framework, built locally.
 // No sample model or proprietary Core is embedded in this source file.
 import {movePortrait} from './portrait-motion.mjs';
+import {refinePortraitMeshes} from './portrait-mesh.mjs';
 import {CubismFramework} from '@framework/live2dcubismframework';
 import {CubismUserModel} from '@framework/model/cubismusermodel';
 import {CubismModelSettingJson} from '@framework/cubismmodelsettingjson';
@@ -112,6 +113,7 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
       const id = model._model.getParameterId(i); ids.set(id.getString(), id);
     }
     model._model.saveParameters();
+    const portraitMeshes = data.LunaRig?.Profile === 'portrait-face-v1' ? refinePortraitMeshes(model._model) : null;
     const shaderPath = new URL('./Shaders/WebGL/', import.meta.url).href;
     return {
       parameterIds: [...ids.keys()], expressionNames: [...expressions.keys()],
@@ -153,6 +155,7 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         }
         if (!reducedMotion) model._physics?.evaluate(core, dt);
         model._pose?.updateParameters(core, dt); core.update();
+        portraitMeshes?.refresh();
         if (data.LunaRig?.Profile === 'portrait-face-v1') {
           portraitTime += dt;
           cleanVertices = Array.from({length: core.getDrawableCount()}, (_, i) => {
