@@ -282,8 +282,9 @@ Backend bleibt b6, Frontend-Ressource für Cachewechsel auf
 `background: transparent` ergänzt: Stage, Kartenhülle, Panel und Popup transparent,
 kein Mond/Backdrop. Display-only entfernt auch seine eigene Hintergrundfläche.
 Vollbild fordert bei transparent die gesamte Dokumentseite an, damit vorhandene
-animierte Dashboard-Hintergründe mit sichtbar bleiben. Im Tablet-Dashboard aktiviert
-und live mit vorhandenem animierten Hintergrund geprüft; Hauptdashboard unverändert.
+animierte Dashboard-Hintergründe mit sichtbar bleiben. Als optionale Einstellung live mit vorhandenem animierten Hintergrund geprüft.
+Auf Nutzerkorrektur bleibt Mond im Tablet-Dashboard eingestellt; transparent ist
+ausschließlich mit `background: transparent` zu wählen. Hauptdashboard unverändert.
 Ressource: `/luna-local/luna-avatar-card.js?v=0.4.0b6-transparent1`.
 
 Esszimmerlicht: Exponiert, Alias Esszimmerlicht vorhanden, verfügbar. Exakter Text
