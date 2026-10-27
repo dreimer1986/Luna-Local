@@ -248,3 +248,11 @@ nicht das Gesprächsfenster. Diagnose ergänzt um
 Room.receive-/STT-Worker-Tests für Fremdraum-Ausgabe, Nachhall, Wiederaufnahme und
 leeres STT. Backend b6 installiert; Frontend/Modell unverändert. Backup der drei
 ersetzten Dateien: `/home/dreimer/shares/music/Luna/backups/20261027-listening-b5/`.
+
+Live-Prüfung nach bestätigtem Neustart: b6-Diagnosezähler vorhanden, Wohnzimmer
+weiterhin aktiv. Ein gesprochenes Testsignal führte zu genau einem Transkript und
+einer Antwort. 230 eigene Ausgabe-/Nachhall-Frames verworfen; danach wieder
+`listening`, leere Warteschlangen, kein Fehler. Noch 97 Sekunden nach Übergabe der
+Antwort unverändert ein Transkript/eine Antwort, keine Rückfrage-Schleife.
+Modelllaufzeit dieser Antwort 48.08 s (Prompt 35.699 s, Generierung 7.916 s).
+Eine zweite Nutzerfrage zur praktischen Wiederaufnahme steht noch aus.
