@@ -189,3 +189,37 @@ keine weiteren Funktionen hinzufügen.
 Git-Push scheiterte an fehlender HTTPS-Anmeldung; SSH war ebenfalls nicht
 vorbereitet. Lokale Commits und zusätzliche Git-Bundle-Sicherung im privaten
 Luna-Verzeichnis erhalten den Stand unabhängig von der Anmeldung.
+
+
+## Ergänzung 27.10.2026: Raumantworten und Smileys (0.4.0b5)
+
+Auf weiteren Nutzerwunsch folgt der geöffnete Avatar jetzt den Antworten aus
+Lunas dauerhaftem Lauschen im Wohnzimmer und Schlafzimmer. PipelineSpeech
+verwendet für Lautsprecher und Browseranalyse denselben aufgelösten TTS-Stream.
+Der tatsächliche Player-Zustand startet/stoppt die Animation; der Browser decodiert
+nur stumm per OfflineAudioContext. Physische Lautsprecherpuffer können einen kleinen
+Zeitversatz verursachen. Eine lokale Browserunterhaltung hat Vorrang. Optional
+lässt sich das Folgen mit `follow_rooms: false` pro Karte ausschalten.
+Dies betrifft den Luna-Lauschen-Pfad, nicht beliebige fremde Assistenten/TTS-Ausgaben.
+
+Unicode-Emojis und übliche ASCII-Smileys werden vor TTS herausgefiltert, sowohl im
+Luna-Conversation-Agent als auch defensiv im Raum-Sprachadapter. Originalantwort
+und Marker bleiben in Metadaten erhalten; die Zuordnung dieser Marker zu neuen
+Avatar-Launen ist ausdrücklich noch nicht umgesetzt. Das akzeptierte Modell,
+Blinzeln, Zähne und die Handbewegungen bleiben unverändert.
+
+Validierung: 43 Python-Tests, 22 Node-Tests und 10 Sprachadapter-Tests gegen
+HA 2026.10.3 bestanden. Echter Luna-WebGL-Test mit stummer WAV-Auswertung:
+maximale Mundöffnung 0.7345, nach Abbruch 0, kein hörbarer AudioContext erzeugt.
+Zusätzlich 5 HA-Control-Tests bestanden. Nach Installation und HA-Neustart ist
+das b5-Frontend geladen und die Raum-WebSocket-Verbindung erfolgreich abonniert.
+Ein echter Conversation-Aufruf lieferte drei Emojis im Original; alle drei waren
+aus `speech.plain.speech` entfernt und in `extra_data.luna` erhalten.
+Die Prüfung des tatsächlichen Raumlautsprecher-Timings steht noch aus; beide
+Lausch-Schalter waren beim Abschluss aus. Der Nutzer wurde um den Praxistest gebeten.
+
+Backup vor Installation: `/home/dreimer/shares/music/Luna/backups/20261027-room-playback-b4/`.
+Für Rollback die dortige `luna_local`-Integration wiederherstellen, HA neu starten
+und die manuelle Lovelace-Ressource auf die vorherige Version zurückstellen.
+Die manuelle Ressource wurde für b5 auf `/luna-local/luna-avatar-card.js?v=0.4.0b5`
+aktualisiert; bestehendes Dashboardlayout und private Modell-/Runtime-Pfade bleiben.

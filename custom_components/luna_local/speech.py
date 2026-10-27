@@ -5,10 +5,14 @@ that would both ignore the UI and potentially change local/cloud routing.
 """
 import asyncio
 
-from homeassistant.components import assist_pipeline, stt, tts
+from homeassistant.components import assist_pipeline, stt, tts, media_source
+from homeassistant.components.media_player import async_process_play_media_url
 from homeassistant.components.tts.media_source import generate_media_source_id
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
+
+
+from .speech_text import prepare_speech
 
 
 class SpeechConfigurationError(HomeAssistantError):
@@ -92,17 +96,32 @@ class PipelineSpeech:
             raise SpeechConfigurationError('Ausgewählte TTS-Engine nicht verfügbar: '+pipeline.tts_engine)
         options = {} if pipeline.tts_voice is None else {tts.ATTR_VOICE: pipeline.tts_voice}
         source = generate_media_source_id(
-            self.hass, message=text, engine=engine, language=pipeline.tts_language,
+            self.hass, message=prepare_speech(text)["text"], engine=engine, language=pipeline.tts_language,
             options=options, cache=False,
         )
         self.last_tts_engine, self.last_tts_voice = engine, pipeline.tts_voice
         return source
 
     async def speak(self, text):
-        # Same media-source route as HA's tts.speak, including announcement
-        # playback. Works for both current TTS entities and legacy providers.
-        source = self.media_source(text)
-        await self.hass.services.async_call('media_player', 'play_media', {
-            'entity_id': self.media_player, 'media_content_id': source,
-            'media_content_type': 'music', 'announce': True,
-        }, blocking=True)
+        prepared = prepare_speech(text)
+        if not prepared['text']:
+            return  # Emoji-only replies must not synthesize or announce anything.
+        source = self.media_source(prepared['text'])
+        relay = getattr(self.hass, 'data', {}).get('luna_local_avatar', {}).get('playback')
+        job = None
+        if relay is not None:
+            # Resolve exactly once and send that same TTS stream to both consumers.
+            media = await media_source.async_resolve_media(self.hass, source, self.media_player)
+            job = relay.prepare(self.device_id, self.media_player, media.url, prepared)
+            source = async_process_play_media_url(self.hass, media.url)
+        try:
+            await self.hass.services.async_call('media_player', 'play_media', {
+                'entity_id': self.media_player, 'media_content_id': source,
+                'media_content_type': 'music', 'announce': True,
+            }, blocking=True)
+            if job is not None:
+                relay.dispatched(job)
+        except BaseException:
+            if job is not None:
+                relay.stop(job)
+            raise

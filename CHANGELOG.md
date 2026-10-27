@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0b5 (development)
+
+- Follow continuous-listening replies from configured room voice assistants with
+  silent audio analysis and playback-state-driven avatar lip sync. No duplicate
+  browser audio; local browser conversations take priority.
+- Strip emoji and common ASCII smileys before TTS, retaining original reply text
+  and emotion markers as metadata for future avatar expression mapping.
+- Cancel room animation on playback end, mute, listening disable or disconnect;
+  support reconnects and joining an ongoing reply.
+- Add backend, frontend and actual Luna rendering tests for room playback.
+
 ## 0.4.0b4 (development)
 
 - Add optional Live2D card/popup rendering with actual playback-driven mouth controls,

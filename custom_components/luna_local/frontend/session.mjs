@@ -1,4 +1,4 @@
-export const VERSION = '0.4.0b3';
+export const VERSION = '0.4.0b5';
 export const PHASES = {
   idle: 'Bereit', starting: 'Mikrofon wird gestartet', listening: 'Ich höre zu',
   thinking: 'Ich denke nach', preparing: 'Antwort wird vorbereitet',
@@ -190,8 +190,9 @@ export class LunaSession extends EventTarget {
         const result = data.intent_output;
         this.conversationId = result?.conversation_id || this.conversationId;
         const reply = speechText(result);
-        this.addMessage('luna', reply);
-        if (reply) this.getExpression(reply, turn);
+        const originalReply = result?.response?.speech?.plain?.extra_data?.luna?.original_reply || reply;
+        this.addMessage('luna', originalReply);
+        if (originalReply) this.getExpression(originalReply, turn);
         this.setPhase('preparing');
         break;
       }

@@ -5,6 +5,7 @@ import uuid
 from homeassistant.components import conversation
 from homeassistant.helpers import intent
 from .control import OFF, async_control
+from .speech_text import clean_response
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -46,6 +47,7 @@ class LunaConversation(conversation.ConversationEntity):
         def answer(message):
             response = intent.IntentResponse(language=user_input.language)
             response.async_set_speech(message)
+            clean_response(response)
             return conversation.ConversationResult(response=response, conversation_id=cid)
 
         # Explicit Assist/Gemini-wake-word turns use this agent normally.
@@ -107,6 +109,7 @@ class LunaConversation(conversation.ConversationEntity):
         )
         # Empty means end this turn; firmware is responsible for the next capture.
         result.continue_conversation = False
+        clean_response(result.response)
         if not ambient:
             runtime.enqueue(text, source, user_input.device_id, False)
         return result

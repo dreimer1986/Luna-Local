@@ -22,6 +22,7 @@ from .audio import Decoder, Segmenter
 from .control import OFF, permitted_text, async_control
 from .noise import SpeechGate, ReplyGuard
 from .speech import PipelineSpeech, SpeechConfigurationError
+from .room_playback import RoomPlaybackRelay
 from .dialogue import ROOM_PROMPT, is_echo, memory_command
 from .memory import explicit_personal_fact, should_extract
 from .ollama_runtime import KEEP_ALIVE, inference_timings
@@ -107,6 +108,9 @@ class Room:
             return reply
 
     def reset(self):
+        relay = getattr(self.hub, "playback", None)
+        if relay is not None:
+            relay.cancel_device(self.config["device_id"])
         self.epoch += 1
         self.segmenter.reset()
         self.segment_busy = False
@@ -343,6 +347,8 @@ class ContinuousHub(asyncio.DatagramProtocol):
         self.tasks = []
 
     async def start(self):
+        self.playback = RoomPlaybackRelay(self.runtime.hass, [r.config for r in self.rooms.values()])
+        self.runtime.hass.data['luna_local_avatar']['playback'] = self.playback
         self.transport, _ = await asyncio.get_running_loop().create_datagram_endpoint(lambda:self, local_addr=('0.0.0.0',12101))
         entities = [r.config[key] for r in self.rooms.values() for key in ('switch','mute')]
         self.unsubscribe = async_track_state_change_event(self.runtime.hass, entities, self.state_changed)
@@ -378,6 +384,9 @@ class ContinuousHub(asyncio.DatagramProtocol):
             await asyncio.sleep(1)
 
     async def stop(self):
+        if getattr(self, 'playback', None) is not None:
+            self.playback.close()
+            self.runtime.hass.data['luna_local_avatar'].pop('playback', None)
         if self.transport:
             self.transport.close()
         if self.unsubscribe:

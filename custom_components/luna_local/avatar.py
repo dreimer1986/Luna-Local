@@ -81,6 +81,21 @@ async def avatar_expression(hass, connection, msg):
     connection.send_result(msg["id"], result)
 
 
+@websocket_api.websocket_command({vol.Required("type"): "luna_local/avatar/room_playback"})
+@callback
+def avatar_room_playback(hass, connection, msg):
+    relay = hass.data.get("luna_local_avatar", {}).get("playback")
+    if relay is None:
+        connection.send_error(msg["id"], "not_ready", "Lunas Raumwiedergabe ist noch nicht bereit.")
+        return
+    def send(event):
+        connection.send_message(websocket_api.event_message(msg["id"], event))
+    connection.subscriptions[msg["id"]] = relay.subscribe(send)
+    connection.send_result(msg["id"])
+    for event in relay.snapshot():
+        send(event)
+
+
 async def async_setup_avatar(hass):
     if "luna_local_avatar" in hass.data:
         return
@@ -93,4 +108,5 @@ async def async_setup_avatar(hass):
     )
     hass.data["luna_local_avatar"] = {"expression_lock": asyncio.Lock()}
     websocket_api.async_register_command(hass, avatar_config)
+    websocket_api.async_register_command(hass, avatar_room_playback)
     websocket_api.async_register_command(hass, avatar_expression)

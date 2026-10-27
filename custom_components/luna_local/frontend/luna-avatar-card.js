@@ -1,6 +1,7 @@
-import {LunaSession, PHASES} from './session.mjs?v=0.4.0b4';
-import {LunaRig} from './rig.mjs?v=0.4.0b4';
-import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=0.4.0b4';
+import {RoomPlayback} from './room-playback.mjs?v=0.4.0b5';
+import {LunaSession, PHASES} from './session.mjs?v=0.4.0b5';
+import {LunaRig} from './rig.mjs?v=0.4.0b5';
+import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=0.4.0b5';
 
 class LunaAvatarCard extends HTMLElement {
   constructor() { super(); this.attachShadow({mode: 'open'}); }
@@ -121,6 +122,8 @@ class LunaAvatarCard extends HTMLElement {
       root.querySelector('.note').textContent = 'Das Mikrofon stoppt beim Verlassen dieser Ansicht.';
     }
     this.render = this.render.bind(this); this.session.addEventListener('change', this.render);
+    if (this.config.follow_rooms !== false)
+      this.session.roomPlayback = new RoomPlayback(this._hass, () => this.render());
     this.render();
   }
   openPopup() {
@@ -132,7 +135,8 @@ class LunaAvatarCard extends HTMLElement {
   }
   render() {
     const s = this.session, root = this.shadowRoot;
-    root.querySelector('.status').textContent = PHASES[s.phase];
+    const remote = s.phase === 'idle' ? s.roomPlayback?.sample() : null;
+    root.querySelector('.status').textContent = remote ? `Luna spricht · ${remote.room}` : PHASES[s.phase];
     const error = root.querySelector('.error'); error.textContent = s.error; error.hidden = !s.error;
     root.querySelector('.finish').disabled = s.phase !== 'listening';
     root.querySelector('.stop').disabled = s.phase === 'idle' || s.phase === 'error';
@@ -149,6 +153,7 @@ class LunaAvatarCard extends HTMLElement {
   }
   teardown() {
     this.rig?.destroy(); this.rig = null;
+    this.session?.roomPlayback?.destroy();
     this.session?.destroy(); this.session = null;
     this.shadowRoot.replaceChildren();
   }

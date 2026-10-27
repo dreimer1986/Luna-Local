@@ -4,7 +4,8 @@ import sys
 from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
-sys.path.insert(0,'/config')
+from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import importlib, os
 mod = importlib.import_module(os.environ.get('LUNA_TEST_PACKAGE','custom_components.luna_local')+'.speech')
 
@@ -88,6 +89,22 @@ class SpeechAdapterTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(call.args[:2],('media_player','play_media'))
         self.assertTrue(call.args[2]['announce'])
         self.assertEqual(call.args[2]['entity_id'],'media_player.room')
+
+    async def test_relay_and_speaker_receive_the_same_single_resolved_audio(self):
+        relay=Mock();job={'id':'reply'};relay.prepare.return_value=job
+        self.hass.data={'luna_local_avatar':{'playback':relay}}
+        with patch.object(mod.tts,'async_resolve_engine',return_value='tts.piper'), patch.object(mod,'generate_media_source_id',return_value='media-source://tts/id') as generate, patch.object(mod.media_source,'async_resolve_media',AsyncMock(return_value=NS(url='/api/tts_proxy/audio'))) as resolve, patch.object(mod,'async_process_play_media_url',return_value='http://ha/api/tts_proxy/audio'):
+            await self.adapter.speak('Hallo 😸!')
+        self.assertEqual(generate.call_args.kwargs['message'],'Hallo!')
+        resolve.assert_awaited_once()
+        self.assertEqual(relay.prepare.call_args.args[2],'/api/tts_proxy/audio')
+        self.assertEqual(relay.prepare.call_args.args[3]['markers'],['😸'])
+        self.assertEqual(self.hass.services.async_call.call_args.args[2]['media_content_id'],'http://ha/api/tts_proxy/audio')
+        relay.dispatched.assert_called_once_with(job)
+
+    async def test_emoji_only_reply_is_silent(self):
+        await self.adapter.speak('😸 ❤️')
+        self.hass.services.async_call.assert_not_awaited()
 
     def test_tts_missing_engine_is_an_error(self):
         with patch.object(mod.tts,'async_resolve_engine',return_value=None),patch.object(mod,'generate_media_source_id') as generate:

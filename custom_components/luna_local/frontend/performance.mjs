@@ -1,6 +1,6 @@
 // Bounded performance controls driven by the existing Assist/TTS session.
 // The spectral fallback is an approximation; timed visemes take precedence.
-import {estimateViseme} from './rig.mjs?v=0.4.0b4';
+import {estimateViseme} from './rig.mjs?v=0.4.0b5';
 
 const clamp = (value, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, value));
 const POSES = {
@@ -26,9 +26,11 @@ export class LunaPerformance {
   }
   sample(session, time, dt, reducedMotion = false) {
     dt = clamp(Number.isFinite(dt) ? dt : 0, 0, .05);
-    const newTurn = this.generation !== session.generation;
+    const remote = session.phase === 'idle' ? session.roomPlayback?.sample() : null;
+    const generation = remote ? `room:${remote.id}` : session.generation;
+    const newTurn = this.generation !== generation;
     if (newTurn) {
-      this.generation = session.generation;
+      this.generation = generation;
       this.mouth = this.form = 0;
     }
     const expression = POSES[session.expression?.name] || POSES.neutral;
@@ -38,13 +40,15 @@ export class LunaPerformance {
     this.pose = this.pose.map((n, i) => n + (target[i] - n) * blend);
 
     let shape = 'sil', openness = 0;
-    const speaking = session.phase === 'speaking' && session.source && session.audioContext?.state === 'running';
+    const speaking = remote?.speaking || (session.phase === 'speaking' && session.source && session.audioContext?.state === 'running');
     if (speaking) {
-      const clock = Math.max(0, session.audioContext.currentTime - session.playbackStarted);
+      const clock = remote ? 0 : Math.max(0, session.audioContext.currentTime - session.playbackStarted);
       session.playbackTime = clock;
       // Cues must explicitly belong to this turn; late analysis cannot animate a newer reply.
       const cues = session.mouthCues?.generation === session.generation ? session.mouthCues.cues : null;
-      if (cues) {
+      if (remote) {
+        shape = remote.mouth > .01 ? 'aa' : 'sil'; openness = remote.mouth;
+      } else if (cues) {
         const cue = cues.find(c => clock >= c.start && clock < c.end);
         shape = cue?.shape in SHAPES ? cue.shape : 'sil';
         openness = SHAPES[shape].open;
