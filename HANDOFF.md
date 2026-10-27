@@ -293,3 +293,12 @@ wechselte tatsächlich auf off. Danach exakter Text `Luna schalte das Esszimmerl
 über conversation.luna_lokal ebenfalls sofort erfolgreich. Sprachversuch weiterhin
 nicht eindeutig geklärt: damalige STT-Wortlaute nicht gespeichert. Nicht als behoben
 behaupten. Keine Änderungen am Steuerpfad auf Verdacht vorgenommen.
+
+## Bearbeitungszugang für die Vollbildkarte
+
+`/luna-vollbild/luna?disable_km` deaktiviert jetzt zusätzlich zur vorhandenen
+kiosk-mode-Oberfläche die fest positionierte display-only-Darstellung der Karte.
+Gespeichertes `display_only` bleibt unverändert. Ohne Parameter gilt weiterhin
+Vollbild. Live geprüft: Header und Stift erreichbar, Karten-YAML-Editor geöffnet,
+Vorschau bleibt innerhalb des Editors. Hintergrundwahl bleibt beim Nutzer.
+Frontend-Ressource auf `0.4.0b6-edit1` aktualisiert.

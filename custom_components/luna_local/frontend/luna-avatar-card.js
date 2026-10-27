@@ -14,6 +14,8 @@ class LunaAvatarCard extends HTMLElement {
     }
     this.teardown();
     this.config = {...config};
+    // Match kiosk-mode's explicit maintenance URL without changing saved config.
+    this.displayOnly = config.display_only === true && !new URLSearchParams(location.search).has('disable_km');
     this.toggleAttribute('transparent-background', config.background === 'transparent');
     if (this.isConnected) this.mount();
   }
@@ -129,7 +131,7 @@ class LunaAvatarCard extends HTMLElement {
     this.render = this.render.bind(this); this.session.addEventListener('change', this.render);
     if (this.config.follow_rooms !== false)
       this.session.roomPlayback = new RoomPlayback(this._hass, () => this.render());
-    if (this.config.display_only === true) {
+    if (this.displayOnly) {
       const style = document.createElement('style');
       style.textContent = `:host{position:fixed;inset:0;z-index:100;display:block;background:#131c31}
         ha-card,.panel,.dock{height:100%;border:0;border-radius:0;box-shadow:none}
@@ -151,11 +153,11 @@ class LunaAvatarCard extends HTMLElement {
     this.render();
   }
   async keepAwake() {
-    if (!this.isConnected || this.config?.display_only !== true || document.visibilityState !== 'visible' || this.wakeLock || this.wakePending) return;
+    if (!this.isConnected || !this.displayOnly || document.visibilityState !== 'visible' || this.wakeLock || this.wakePending) return;
     this.wakePending = true;
     try {
       const lock = await navigator.wakeLock?.request('screen');
-      if (!this.isConnected || this.config?.display_only !== true) { await lock?.release(); return; }
+      if (!this.isConnected || !this.displayOnly) { await lock?.release(); return; }
       this.wakeLock = lock;
       lock?.addEventListener('release', () => { if (this.wakeLock === lock) this.wakeLock = null; });
     } catch {} finally { this.wakePending = false; }
