@@ -223,3 +223,28 @@ Für Rollback die dortige `luna_local`-Integration wiederherstellen, HA neu star
 und die manuelle Lovelace-Ressource auf die vorherige Version zurückstellen.
 Die manuelle Ressource wurde für b5 auf `/luna-local/luna-avatar-card.js?v=0.4.0b5`
 aktualisiert; bestehendes Dashboardlayout und private Modell-/Runtime-Pfade bleiben.
+
+
+## Korrektur 0.4.0b6: Rückfragen ohne neue Äußerung
+
+Nutzer bestätigt Mundbewegung bei Raumantworten, meldet aber wiederholte
+Rückfragen und eine unpassende Antwort nach nur einer Äußerung. Live-Zähler im
+Wohnzimmer: sechs Transkripte, vier Antworten, vier unklare Abschnitte, null
+textuell erkannte Echos. Kein Audiomitschnitt: die genaue Herkunft der zusätzlichen
+Transkripte lässt sich rückwirkend nicht beweisen.
+
+Korrigiert: Eingehende PCM-Frames während TTS-Vorbereitung/physischer Wiedergabe
+und einer Sekunde Nachhall werden vor der Segmentierung verworfen. Transport und
+Lausch-Schalter laufen weiter. Alle konfigurierten Räume berücksichtigen Lunas
+Ausgabe, damit sich nahe Geräte nicht gegenseitig anregen. Damit ist kein
+Dazwischensprechen während Luna-Ausgaben möglich. Das ist eine zeitliche Sperre,
+keine akustische Echo-Unterdrückung. Fremde Gespräche/Fernsehen bleiben eine Grenze
+des offenen Lauschens. Leere STT-Texte gehen nicht mehr an das Gesprächsmodell.
+Nur eine Rückfrage bis zur nächsten klaren Äußerung; eine Rückfrage verlängert
+nicht das Gesprächsfenster. Diagnose ergänzt um
+`eigene_ausgabe_frames_verworfen` und `leere_transkripte_verworfen`.
+
+45 Python-Tests und sieben Tests mit HA 2026.10.3 bestanden, darunter echte
+Room.receive-/STT-Worker-Tests für Fremdraum-Ausgabe, Nachhall, Wiederaufnahme und
+leeres STT. Backend b6 installiert; Frontend/Modell unverändert. Backup der drei
+ersetzten Dateien: `/home/dreimer/shares/music/Luna/backups/20261027-listening-b5/`.

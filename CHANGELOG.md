@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0b6 (development)
+
+- Discard microphone segments during Luna room TTS preparation/playback and a
+  one-second acoustic tail, across configured rooms, while keeping transport on.
+- Ignore empty STT results instead of asking for repetition. Allow only one
+  clarification until a clear utterance; clarifications no longer renew context.
+- Expose discarded playback-frame and empty-transcript counters for diagnosis.
+
 ## 0.4.0b5 (development)
 
 - Follow continuous-listening replies from configured room voice assistants with

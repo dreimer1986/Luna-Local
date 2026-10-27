@@ -20,7 +20,7 @@ from homeassistant.helpers.event import async_track_state_change_event
 
 from .audio import Decoder, Segmenter
 from .control import OFF, permitted_text, async_control
-from .noise import SpeechGate, ReplyGuard
+from .noise import SpeechGate, ReplyGuard, PlaybackGate
 from .speech import PipelineSpeech, SpeechConfigurationError
 from .room_playback import RoomPlaybackRelay
 from .dialogue import ROOM_PROMPT, is_echo, memory_command
@@ -40,6 +40,8 @@ class Room:
         self.segmenter = Segmenter(webrtcvad.Vad(2), self.segment)
         self.gate = SpeechGate()
         self.guard = ReplyGuard()
+        self.playback_gate = PlaybackGate()
+        self.playback_frames = self.empty_transcripts = 0
         self.noise_segments = self.unclear_segments = 0
         self.speech_probability = None
         self.control_mode = OFF  # Fail closed until the Select restores its saved permission.
@@ -126,6 +128,16 @@ class Room:
         if result is None or not self.active():
             return
         pcm, fresh, gap = result
+        # TTS service completion does not mean the physical speaker is finished.
+        # The relay follows the real player state; include preparation and other
+        # rooms so two nearby satellites cannot keep one another talking.
+        relay = getattr(self.hub, 'playback', None)
+        output_active = bool(relay and relay.jobs) or any(r.tts_busy for r in self.hub.rooms.values())
+        if self.playback_gate.blocked(output_active, time.monotonic()):
+            self.playback_frames += 1
+            self.segmenter.reset()
+            self.segment_busy = False
+            return
         if fresh or gap:
             self.segmenter.reset()
             self.segment_busy = False
@@ -165,8 +177,10 @@ class Room:
                 self.stt_seconds = round(time.monotonic()-start, 2)
                 if epoch != self.epoch or not self.active() or text is None:
                     continue
-                if not text:
-                    text = '[Unverständliche Sprache]'
+                if not text.strip():
+                    self.empty_transcripts += 1
+                    self.last_decision = 'Leere Spracherkennung: keine Antwort'
+                    continue
                 self.transcripts += 1
                 recent = [value for room in self.hub.rooms.values() for stamp,value in room.outputs if time.monotonic()-stamp < 90]
                 if is_echo(text, recent):
@@ -320,6 +334,8 @@ class Room:
                 'zuletzt_tts_engine':self.speech.last_tts_engine,
                 'zuletzt_tts_stimme':self.speech.last_tts_voice,
                 'geraeuschfilter_verworfen':self.noise_segments,
+                'eigene_ausgabe_frames_verworfen':self.playback_frames,
+                'leere_transkripte_verworfen':self.empty_transcripts,
                 'unklare_abschnitte':self.unclear_segments,
                 'sprachwahrscheinlichkeit_max':self.speech_probability,
                 'aktivitaet':self.activity(), 'haussteuerung':self.control_mode,

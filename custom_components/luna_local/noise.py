@@ -24,31 +24,46 @@ class SpeechGate:
         return voiced >= 5 and longest >= 3, round(max(probabilities, default=0), 3)
 
 
+class PlaybackGate:
+    """Discard acoustic self-echo while capture/transport keep running."""
+    def __init__(self, tail=1.0):
+        self.tail = tail
+        self.until = float('-inf')
+
+    def blocked(self, playing, now):
+        if playing:
+            self.until = now + self.tail
+        return playing or now < self.until
+
+
 class ReplyGuard:
     def __init__(self):
         self.last_clarification = float('-inf')
         self.last_reply = float('-inf')
+        self.clarification_pending = False
 
     def apply(self, decision, text, now):
         kind = decision.get('kind', 'clear')
-        # A locally verified speech segment with empty STT is uncertain speech,
-        # even if the LLM calls our placeholder noise. Never remember it.
+        # Empty STT is not evidence of an addressed utterance. Stay silent.
         if re.search(r'\[unverst(?:ä|ae)ndlich(?:e sprache)?\]', text, re.I):
-            kind = 'unclear'
+            kind = 'noise'
             decision = dict(decision, kind=kind)
         if kind not in ('clear', 'unclear', 'noise'):
             raise ValueError('Invalid speech classification')
         if kind == 'clear':
+            self.clarification_pending = False
             return decision, False
         result = dict(decision, reply='', remember=False, remember_indices=[])
         addressed = bool(re.search(r'\b(?:luna|jarvis)\b', text, re.I))
         expected = addressed or now-self.last_reply < 45 or decision.get('response_expected') is True
-        clarify = kind == 'unclear' and expected and now-self.last_clarification >= 30
+        clarify = kind == 'unclear' and expected and not self.clarification_pending and now-self.last_clarification >= 30
         if clarify:
             result['reply'] = 'Das habe ich akustisch nicht verstanden. Kannst du es bitte wiederholen?'
         return result, clarify
 
     def spoken(self, now, clarification):
-        self.last_reply = now
+        if not clarification:
+            self.last_reply = now
         if clarification:
+            self.clarification_pending = True
             self.last_clarification = now

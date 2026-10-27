@@ -25,6 +25,36 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(mod.permitted_text('Licht an',mod.ADDRESSED,True),'Licht an')
         self.assertIsNone(mod.permitted_text('Licht an',mod.OFF,True))
 
+    def test_self_playback_is_discarded_before_stt_and_resumes_after_tail(self):
+        room = self.room()
+        room.decoder.decode = Mock(return_value=(b'pcm', False, 0))
+        room.segmenter = NS(reset=Mock(), feed=Mock(), frames=[])
+        room.hub.playback = NS(jobs={'other-room': {'phase': 'speaking'}})
+        with patch.object(continuous.time, 'monotonic', return_value=10):
+            room.receive(b'packet')
+        room.segmenter.feed.assert_not_called()
+        room.hub.playback.jobs.clear()
+        with patch.object(continuous.time, 'monotonic', return_value=10.5):
+            room.receive(b'packet')
+        room.segmenter.feed.assert_not_called()
+        with patch.object(continuous.time, 'monotonic', return_value=11.1):
+            room.receive(b'packet')
+        room.segmenter.feed.assert_called_once_with(b'pcm')
+        self.assertEqual(room.playback_frames, 2)
+
+    async def test_empty_stt_never_reaches_dialogue(self):
+        room = self.room()
+        room.transcribe = AsyncMock(return_value='   ')
+        segment = NS(audio=b'pcm', ended=time.monotonic())
+        await room.audio.put((room.epoch, segment, False, 0))
+        task = asyncio.create_task(room.stt_worker())
+        await asyncio.wait_for(room.audio.join(), 1)
+        task.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await task
+        self.assertTrue(room.text.empty())
+        self.assertEqual(room.empty_transcripts, 1)
+
     async def test_recognition_then_native_execution_with_room_context(self):
         agent=NS(async_recognize_intent=AsyncMock(return_value=object()))
         response=NS(response=NS(speech={'plain':{'speech':'Licht eingeschaltet.'}},response_type='action_done'))
