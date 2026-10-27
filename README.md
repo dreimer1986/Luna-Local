@@ -7,13 +7,13 @@
 
 Experimental Home Assistant conversation agent with persistent local memory and optional continuous room listening. German dialogue is currently the primary supported language. Ollama runs the conversation locally; speech recognition and voice output follow the selected Assist pipeline, so Whisper/Piper can keep speech local or you can explicitly choose cloud providers.
 
-**Version 0.4.0b2 (browser preview).** The pre-existing voice runtime was tested with Home Assistant 2026.10.4, ESPHome 2026.10.0 and Home Assistant Voice hardware. The new browser client has local automated and browser-rendering tests; live HA microphone/STT/TTS validation is still pending. Branding and Git-based packaging are validated locally; the updated remote overlay still needs a device build. This is not a robot, camera integration or speaker-identification system.
+**Version 0.4.0b3 (browser preview).** The pre-existing voice runtime was tested with Home Assistant 2026.10.4, ESPHome 2026.10.0 and Home Assistant Voice hardware. The new browser client has local automated and browser-rendering tests; live HA microphone/STT/TTS validation is still pending. Branding and Git-based packaging are validated locally; the updated remote overlay still needs a device build. This is not a robot, camera integration or speaker-identification system.
 
 ## Install with HACS
 
 For the experimental browser microphone, speech output and avatar card/popup, see
 [Browser avatar setup and current limitations](docs/browser-avatar.md).
-The approved illustration is retained as the design reference; the animated SVG
+The approved illustration is the default avatar; the optional animated SVG
 is a simplified preview rig. Live HA validation and final illustration rigging are
 still pending.
 

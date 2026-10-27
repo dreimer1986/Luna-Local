@@ -4,13 +4,14 @@ Lovelace-Kachel und eigenes Popup verwenden dieselbe Sprachsitzung. Beim
 Vergrößern läuft das Gespräch weiter; Browser Mod ist nicht nötig.
 
 **Stand:** lokal getesteter Prototyp. Der vollständige Mikrofon–Assist–TTS-Test
-in einer laufenden HA-Instanz steht aus. Die bewegliche SVG-Figur ist ein
-vereinfachtes Vorschau-Rig. Die freigegebene Luna-Illustration bleibt die
-verbindliche Gestaltungsreferenz und benötigt noch ein hochwertiges Ebenen-Rig.
+in einer laufenden HA-Instanz steht aus. Seit 0.4.0b3 zeigen Kachel und Popup
+standardmäßig die unveränderte, freigegebene Luna-Illustration. Dieses Bild hat
+noch keine Gesichtsanimation oder Lippensynchronisation. Das dafür benötigte
+Ebenen-Rig muss die Qualität und Identität dieser Illustration erhalten.
 
 ## Einrichten
 
-1. Integration auf **0.4.0b2 oder neuer** aktualisieren und HA neu starten. Die
+1. Integration auf **0.4.0b3 oder neuer** aktualisieren und HA neu starten. Die
    Browser-Vorschau muss tatsächlich installiert sein; ein Git-Push auf `master`
    aktualisiert deine HA-Installation nicht automatisch. Solange es dafür kein
    veröffentlichtes Release gibt, in HACS beim erneuten Herunterladen `master`
@@ -27,9 +28,10 @@ verbindliche Gestaltungsreferenz und benötigt noch ein hochwertiges Ebenen-Rig.
 ```yaml
 type: custom:luna-avatar-card
 presentation: card  # card oder popup
+avatar: illustration  # freigegebenes Originalbild; Standard seit b3
 continuous: false  # nach Lunas Antwort automatisch wieder zuhören
 background: moon   # moon oder plain
-expressions: true  # zusätzliche lokale Ollama-Abfrage für Mimik
+expressions: true  # Mimik-Abfrage; derzeit nur im technischen SVG-Modus verwendet
 # pipeline: 01...  # Assist-Pipeline-ID bei mehreren passenden Pipelines
 ```
 
@@ -53,7 +55,14 @@ globale Übertragung an andere Browser. Mehrere Karten/Tabs haben eigene Sitzung
 
 ## Darstellung und Grenzen
 
-Die SVG-Vorschau zeigt Luna bis zur Hüfte mit geschlossenem cremefarbenem Pullover,
+Die Standardansicht zeigt das freigegebene Originalbild bis zur Hüfte. Es wird
+unverändert mit HACS ausgeliefert; Gesicht und Zeichenstil werden nicht durch
+programmatisch gezeichnete Formen ersetzt. Der vorhandene transparente Hintergrund
+lässt sich mit `moon` oder `plain` hinterlegen. Gespräche, Mikrofon, Sprachausgabe und Popup funktionieren
+unabhängig davon. Eine Animation dieser Illustration ist noch nicht enthalten.
+
+Nur mit `avatar: technical` wird das bisherige vereinfachte SVG-Test-Rig angezeigt.
+Es zeigt Luna bis zur Hüfte mit geschlossenem cremefarbenem Pullover,
 Ragdoll-Ohren und blauen Augen. Blinzeln, Kopfneigung, leichtes Atmen, Erröten und
 mehrere Mundformen sind vorhanden. Neun Gesichtsausdrücke gehen weich ineinander
 über, einschließlich Augen-, Brauen- und Ohrstellungen. Das lokale Ollama-Modell wählt eine zurückhaltende

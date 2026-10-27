@@ -1,13 +1,22 @@
 <!doctype html><html lang="de"><meta charset="utf-8"><title>Luna Vorschau</title>
 <style>body{margin:30px;background:#e6e9f2;font-family:system-ui}main{max-width:440px;margin:auto}h1{font-size:20px}ha-card{display:block;border-radius:18px;box-shadow:0 8px 30px #20264220}</style>
-<main><h1>Luna · lokaler Animationstest</h1><luna-avatar-card></luna-avatar-card><p>Offline-Vorschau ohne Mikrofon oder HA-Verbindung.</p></main>
+<main><h1>Luna · lokale Vorschau</h1><luna-avatar-card></luna-avatar-card><p>Offline-Vorschau ohne Mikrofon oder HA-Verbindung.</p></main>
 <script type="module">
+window.addEventListener('error', event => { document.body.dataset.error = event.message; });
+window.addEventListener('unhandledrejection', event => { document.body.dataset.error = String(event.reason); });
 import '../custom_components/luna_local/frontend/luna-avatar-card.js';
 const card = document.querySelector('luna-avatar-card');
 card.setConfig({presentation:'card'});
 card.hass = {states:{},connection:{},callWS:async()=>{throw Error('Offline-Vorschau')}};
 await new Promise(resolve=>setTimeout(resolve,200));
 const firstSession=card.session;
+const portrait=card.shadowRoot.querySelector('.portrait');
+if(!portrait || card.shadowRoot.querySelector('svg')) throw Error('Default must display approved illustration');
+if (!portrait.complete) await new Promise((resolve, reject) => {
+  portrait.addEventListener('load', resolve, {once:true});
+  portrait.addEventListener('error', reject, {once:true});
+});
+if(portrait.naturalWidth!==1024 || portrait.naturalHeight!==1536) throw Error('Unexpected illustration dimensions');
 card.openPopup();
 if(card.session!==firstSession || !card.dialog.open) throw Error('Popup lost session');
 card.dialog.close();
@@ -16,5 +25,10 @@ card.session.addMessage('user','Schön, dich zu sehen, Luna!');
 card.session.addMessage('luna','Ich freue mich auch!');
 card.session.expression={name:'shy',intensity:.8};
 card.session.emit();
+const technical=document.createElement('luna-avatar-card');
+technical.setConfig({avatar:'technical'}); technical.hass={states:{},connection:{}};
+document.body.append(technical);
+if(!technical.shadowRoot.querySelector('svg')) throw Error('Explicit technical preview unavailable');
+technical.remove();
 document.body.dataset.test='passed';
 </script></html>

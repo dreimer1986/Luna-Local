@@ -1,5 +1,12 @@
 # Verification and limits
 
+0.4.0b3: the default view uses a byte-identical copy of the approved waist-up
+illustration. Browser regression checks verify that it decodes at its original
+dimensions, that the default contains no SVG rig, that popup switching retains
+the session, and that the technical rig remains opt-in. The original illustration
+does not yet have facial animation or lip sync; the UI no longer advertises those
+capabilities for the illustration view.
+
 0.4.0b2: the registration regression test verifies that the frontend module is
 automatically registered exactly once, after static serving is set up, with the
 installed integration version in its URL. All 30 Python tests pass. The reported

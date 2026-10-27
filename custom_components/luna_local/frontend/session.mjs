@@ -1,4 +1,4 @@
-export const VERSION = '0.4.0b2';
+export const VERSION = '0.4.0b3';
 export const PHASES = {
   idle: 'Bereit', starting: 'Mikrofon wird gestartet', listening: 'Ich höre zu',
   thinking: 'Ich denke nach', preparing: 'Antwort wird vorbereitet',

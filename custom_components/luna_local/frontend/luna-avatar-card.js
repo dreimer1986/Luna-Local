@@ -5,6 +5,7 @@ class LunaAvatarCard extends HTMLElement {
   constructor() { super(); this.attachShadow({mode: 'open'}); }
   setConfig(config) {
     if (!['card', 'popup'].includes(config.presentation || 'card')) throw Error('presentation: card oder popup');
+    if (!['illustration', 'technical'].includes(config.avatar || 'illustration')) throw Error('avatar: illustration oder technical');
     this.teardown();
     this.config = {...config};
     if (this.isConnected) this.mount();
@@ -17,7 +18,7 @@ class LunaAvatarCard extends HTMLElement {
   connectedCallback() { this.mount(); }
   disconnectedCallback() { this.teardown(); }
   getCardSize() { return this.config?.presentation === 'popup' ? 1 : 8; }
-  static getStubConfig() { return {presentation: 'card', continuous: false}; }
+  static getStubConfig() { return {presentation: 'card', avatar: 'illustration', continuous: false}; }
   mount() {
     if (this.session || !this._hass || !this.config) return;
     const root = this.shadowRoot;
@@ -28,6 +29,8 @@ class LunaAvatarCard extends HTMLElement {
       .stage:before{content:'';position:absolute;width:135px;height:135px;border-radius:50%;right:10%;top:24px;background:#f5f0db;box-shadow:0 0 55px #e2e5ff75}
       .stage[data-background="plain"]{background:var(--secondary-background-color,#e7e9ef)}.stage[data-background="plain"]:before{display:none}
       .rig{height:100%;position:relative;z-index:1}.rig svg{width:100%;height:100%;display:block}
+      .stage[data-avatar="illustration"]{width:100%;height:auto;aspect-ratio:2/3;max-height:640px}
+      .portrait{display:block;width:100%;height:100%;object-fit:contain;object-position:center;position:relative;z-index:1}
       .badge{position:absolute;bottom:10px;left:12px;background:#121a30d9;color:#fff;padding:5px 10px;border-radius:16px;font:12px system-ui;z-index:2}
       .controls{padding:14px;display:grid;gap:10px} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
       button,input{font:inherit}button{cursor:pointer;border:1px solid var(--divider-color,#ccd0db);border-radius:12px;padding:9px 12px;background:var(--secondary-background-color,#eef0f7);color:inherit}
@@ -54,7 +57,9 @@ class LunaAvatarCard extends HTMLElement {
         <p class="note">Audio-basierte Lippen-Näherung · Das Mikrofon stoppt beim Verlassen dieser Ansicht.</p>
       </div>
     </section>`;
-    this.session = new LunaSession(this._hass, this.config);
+    this.session = new LunaSession(this._hass, {
+      ...this.config, expressions: this.config.avatar === 'technical' && this.config.expressions !== false,
+    });
     this.panel = root.querySelector('.panel'); this.dialog = root.querySelector('dialog');
     this.dock = root.querySelector('.dock'); this.dock.append(this.panel);
     this.popupOnly = this.config.presentation === 'popup';
@@ -62,6 +67,7 @@ class LunaAvatarCard extends HTMLElement {
     this.dock.hidden = this.popupOnly;
     root.querySelector('.continuous').checked = this.config.continuous === true;
     root.querySelector('.stage').dataset.background = this.config.background === 'plain' ? 'plain' : 'moon';
+    root.querySelector('.stage').dataset.avatar = this.config.avatar || 'illustration';
     root.querySelector('.listen').onclick = () => this.session.listen(root.querySelector('.continuous').checked);
     root.querySelector('.finish').onclick = () => this.session.finishInput();
     root.querySelector('.stop').onclick = () => this.session.stop();
@@ -81,7 +87,18 @@ class LunaAvatarCard extends HTMLElement {
       if (this.popupOnly) this.session.stop();
       (root.querySelector(this.popupOnly ? '.launch' : '.expand')).focus();
     });
-    this.rig = new LunaRig(root.querySelector('.rig'), this.session);
+    if (this.config.avatar === 'technical') {
+      this.rig = new LunaRig(root.querySelector('.rig'), this.session);
+    } else {
+      const portrait = document.createElement('img');
+      portrait.className = 'portrait';
+      portrait.alt = 'Luna mit tiefblauen Augen, Ragdoll-Ohren und cremefarbenem Pullover';
+      portrait.src = new URL('./assets/luna-waist.png', import.meta.url).href;
+      portrait.decoding = 'async';
+      root.querySelector('.rig').replaceWith(portrait);
+      root.querySelector('.badge').textContent = 'Luna';
+      root.querySelector('.note').textContent = 'Das Mikrofon stoppt beim Verlassen dieser Ansicht.';
+    }
     this.render = this.render.bind(this); this.session.addEventListener('change', this.render);
     this.render();
   }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0b3
+
+- Display the approved waist-up Luna illustration by default in cards and popups,
+  preserving the original artwork exactly and shipping it with the integration.
+- Keep the simplified SVG animation rig available only through `avatar: technical`.
+  The illustration view currently has no facial animation or lip sync; conversation,
+  microphone, playback and popup behavior are unchanged.
+
 ## 0.4.0b2
 
 - Register the avatar module automatically with the Home Assistant frontend using
