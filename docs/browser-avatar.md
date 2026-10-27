@@ -10,12 +10,18 @@ verbindliche Gestaltungsreferenz und benötigt noch ein hochwertiges Ebenen-Rig.
 
 ## Einrichten
 
-1. Integration aktualisieren und HA neu starten. HACS liefert den Frontend-Ordner
-   zusammen mit der Integration aus; es sind keine Kopien nach `www` nötig.
+1. Integration auf **0.4.0b2 oder neuer** aktualisieren und HA neu starten. Die
+   Browser-Vorschau muss tatsächlich installiert sein; ein Git-Push auf `master`
+   aktualisiert deine HA-Installation nicht automatisch. Solange es dafür kein
+   veröffentlichtes Release gibt, in HACS beim erneuten Herunterladen `master`
+   wählen, sofern angeboten, oder `custom_components/luna_local` aus diesem Stand
+   manuell in HA übernehmen. Der enthaltene Ordner `frontend` muss mitkopiert werden.
 2. Eine Assist-Pipeline mit **Luna Lokal**, Spracherkennung und Sprachausgabe
    einrichten. Ihre Stimme und Sprache werden auch im Browser verwendet.
-3. Unter Dashboard-Ressourcen als **JavaScript-Modul** hinzufügen:
-   `/luna-local/luna-avatar-card.js?v=0.4.0b1`.
+3. Die Integration meldet das Kartenmodul seit 0.4.0b2 **automatisch** im Frontend
+   an. Die HA-Seite anschließend vollständig neu laden (`Strg` + `F5`). Es ist
+   weder ein Dashboard-Ressourceneintrag noch eine Kopie nach `www` nötig. Einen
+   vorher manuell angelegten Luna-Ressourceneintrag kannst du entfernen.
 4. Eine manuelle Karte hinzufügen:
 
 ```yaml
@@ -71,8 +77,30 @@ Robotersteuerung sind bislang Konzept, siehe [Umsetzungsplan](browser-avatar-pla
 ## Updates und Tests
 
 Der Static-Endpunkt setzt keinen Langzeit-Cache. Nach Updates HA neu starten und
-die Seite neu laden; gegebenenfalls den `v`-Parameter der Ressource ändern.
+die Seite neu laden. Den `v`-Parameter setzt die Integration automatisch auf ihre
+installierte Versionsnummer.
 Externe CDN-Skripte werden nicht benötigt.
+
+### „Custom element doesn't exist: luna-avatar-card“
+
+Diese Meldung bedeutet, dass der Browser das Kartenmodul noch nicht erfolgreich
+geladen hat. Sie entsteht vor Mikrofon-, Pipeline- oder Ollama-Zugriffen.
+
+1. Prüfen, dass in HA mindestens Luna **0.4.0b2** installiert und die Integration
+   erfolgreich eingerichtet ist. Auch nach einer manuellen Dateikopie HA neu starten.
+2. In demselben Browser die eigene HA-Adresse mit
+   `/luna-local/luna-avatar-card.js` am Ende öffnen. Es muss JavaScript erscheinen.
+   Bei **404** fehlen die neuen Dateien oder der Static-Endpunkt wurde nicht
+   registriert. Dann Installation und HA-Protokoll auf Luna-Setupfehler prüfen.
+3. Wird JavaScript angezeigt, die Dashboard-Seite vollständig neu laden. Seit b2
+   registriert die Integration das Modul automatisch. Bei der älteren b1 war noch
+   ein Ressourceneintrag als **JavaScript-Modul** nötig; YAML allein genügte nicht.
+4. Bleibt der Fehler, in den Browser-Entwicklerwerkzeugen unter Netzwerk/Konsole
+   nach dem ersten Ladefehler für `luna-avatar-card.js`, `session.mjs` oder `rig.mjs`
+   suchen. HTTP-Status, MIME-Fehler oder JavaScript-Fehler unterscheiden die Ursache.
+
+Ein erfolgreicher Abruf der Hauptdatei allein beweist noch nicht, dass ihre beiden
+importierten Module geladen und ausgeführt wurden.
 
 Frontend-Tests: `node --test tests/test_avatar_session.mjs`. Die Seite
 `tests/avatar-preview.html` zeigt das Rig ohne HA-Verbindung über einen lokalen

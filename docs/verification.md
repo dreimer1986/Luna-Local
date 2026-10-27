@@ -1,5 +1,11 @@
 # Verification and limits
 
+0.4.0b2: the registration regression test verifies that the frontend module is
+automatically registered exactly once, after static serving is set up, with the
+installed integration version in its URL. All 30 Python tests pass. The reported
+missing-element error still requires verification in the affected HA installation;
+automatic registration addresses the previously manual loading step.
+
 Browser-avatar preview 0.4.0b1: eleven Node tests cover PCM framing, registered
 Luna pipeline selection, cancellation and late events/permissions, queued EOF,
 playback lifecycle, hidden tabs, final microphone buffers, acknowledgement timeout,

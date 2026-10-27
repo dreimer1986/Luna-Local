@@ -6,11 +6,12 @@ from pathlib import Path
 
 import aiohttp
 import probatio as vol
-from homeassistant.components import websocket_api
+from homeassistant.components import frontend, websocket_api
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.loader import async_get_integration
 
 from .ollama_runtime import KEEP_ALIVE
 
@@ -86,6 +87,10 @@ async def async_setup_avatar(hass):
     await hass.http.async_register_static_paths([
         StaticPathConfig("/luna-local", str(Path(__file__).parent / "frontend"), False),
     ])
+    integration = await async_get_integration(hass, "luna_local")
+    frontend.add_extra_js_url(
+        hass, f"/luna-local/luna-avatar-card.js?v={integration.version}",
+    )
     hass.data["luna_local_avatar"] = {"expression_lock": asyncio.Lock()}
     websocket_api.async_register_command(hass, avatar_config)
     websocket_api.async_register_command(hass, avatar_expression)

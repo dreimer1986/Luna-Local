@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0b2
+
+- Register the avatar module automatically with the Home Assistant frontend using
+  the installed integration version; no manual Lovelace resource is required.
+- Declare the frontend dependency so registration happens after frontend setup.
+- Explain how to diagnose missing card modules and install the current preview.
+
 ## 0.4.0b1
 
 - Add an experimental browser voice/text client, shared card/popup presentation,

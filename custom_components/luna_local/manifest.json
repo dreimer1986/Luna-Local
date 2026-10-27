@@ -8,6 +8,7 @@
   "dependencies": [
     "assist_pipeline",
     "conversation",
+    "frontend",
     "http",
     "ollama",
     "stt",
@@ -22,5 +23,5 @@
     "webrtcvad-wheels==2.0.14.post1",
     "pysilero-vad==3.4.0"
   ],
-  "version": "0.4.0b1"
+  "version": "0.4.0b2"
 }

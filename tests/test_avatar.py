@@ -25,6 +25,7 @@ stubs = {
     "avatar_test_package": package,
     "homeassistant": ModuleType("homeassistant"),
     "homeassistant.components": ModuleType("homeassistant.components"),
+    "homeassistant.components.frontend": SimpleNamespace(add_extra_js_url=Mock()),
     "homeassistant.components.websocket_api": SimpleNamespace(
         websocket_command=command, async_response=lambda function: function,
         async_register_command=Mock()),
@@ -33,6 +34,8 @@ stubs = {
     "homeassistant.helpers": ModuleType("homeassistant.helpers"),
     "homeassistant.helpers.entity_registry": SimpleNamespace(async_get=Mock()),
     "homeassistant.helpers.aiohttp_client": SimpleNamespace(async_get_clientsession=Mock()),
+    "homeassistant.loader": SimpleNamespace(async_get_integration=AsyncMock(
+        return_value=SimpleNamespace(version="0.4.0b2"))),
 }
 with patch.dict(sys.modules, stubs):
     spec = importlib.util.spec_from_file_location("avatar_test_package.avatar", root / "avatar.py")
@@ -88,11 +91,14 @@ class AvatarTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_static_registration_is_idempotent_and_scoped_to_frontend(self):
         hass = SimpleNamespace(data={}, http=SimpleNamespace(async_register_static_paths=AsyncMock()))
+        avatar.frontend.add_extra_js_url.reset_mock()
         await avatar.async_setup_avatar(hass)
         await avatar.async_setup_avatar(hass)
         hass.http.async_register_static_paths.assert_awaited_once()
         config = hass.http.async_register_static_paths.call_args.args[0][0]
         self.assertEqual(config, ("/luna-local", str(root / "frontend"), False))
+        avatar.frontend.add_extra_js_url.assert_called_once_with(
+            hass, "/luna-local/luna-avatar-card.js?v=0.4.0b2")
 
     def test_websocket_schema_rejects_oversized_or_missing_messages(self):
         schema = avatar.avatar_expression.schema
