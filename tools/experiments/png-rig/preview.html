@@ -1,0 +1,29 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><title>Luna – Animationsprüfung</title>
+<style>
+body{background:#151d30;color:#ecedf3;font:15px system-ui;margin:18px}h1{font-size:20px}
+main{display:grid;grid-template-columns:repeat(3,300px);gap:16px}.panel{background:#273650;border-radius:14px;overflow:hidden}
+.host{width:300px;height:290px;overflow:hidden;position:relative}.host canvas,.host img{width:300px;height:450px;object-fit:contain;transform:translateY(-80px) scale(1.7);transform-origin:50% 25%}h2{font-size:15px;margin:10px 14px}
+</style><h1>Luna – Zwischenbilder und Mundformen</h1><main></main>
+<script type="module">
+import {IllustrationRig} from './illustration-rig.mjs';
+window.addEventListener('error', e=>document.body.dataset.error=e.message);
+window.addEventListener('unhandledrejection', e=>document.body.dataset.error=String(e.reason));
+const cases=[['Neutral',{}],['Lidschluss 50%',{blink:.5}],['Lidschluss vollständig',{blink:1}],
+ ['Ah',{shape:'aa'}],['E',{shape:'E'}],['O',{shape:'O'}],['Verlegen',{expression:'shy',intensity:1}],
+ ['Lachen',{expression:'laughing',intensity:1}],['Ärger',{expression:'angry',intensity:1}]];
+const rigs=[];
+for(const [name,options] of cases){
+ const panel=document.createElement('section');panel.className='panel';
+ const title=document.createElement('h2');title.textContent=name;
+ const host=document.createElement('div');host.className='host';panel.append(title,host);document.querySelector('main').append(panel);
+ const session={phase:'idle',expression:{name:'neutral',intensity:0},emit(){}};
+ const rig=new IllustrationRig(host,session);rig.preview={blink:0,shape:'sil',...options};rigs.push(rig);
+}
+await Promise.all(rigs.map(rig=>rig.ready));
+for(const rig of rigs){
+ if(rig.failed)throw Error('Illustration renderer failed: '+(rig.session.avatarWarning||''));
+ for(let i=0;i<80;i++)rig.draw(1,{dt:1/60,...rig.preview});
+}
+document.body.dataset.test='passed';
+window.lunaPreviewRigs=rigs;
+</script></html>

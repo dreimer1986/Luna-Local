@@ -15,14 +15,18 @@ The local output is `dist/runtime.mjs`, `dist/player.mjs`, `dist/Core/` and
 Framework evaluates its enums. Models and textures must be served from the same
 origin; dependencies must remain inside the model directory.
 
-For the **SDK smoke test only**, copy the SDK's `Samples/Resources/Hiyori` directory
-to `dist/Sample` (the contents of `Sample` must include `Hiyori.model3.json`). Then:
+For the **SDK smoke test only**, add `--sample` after the SDK path in the build
+command. This copies the SDK's `Samples/Resources/Hiyori` directory to `dist/Sample`
+(ignored by Git). Then:
 
 ```powershell
 node smoke.mjs
 ```
 
-The test starts its own loopback HTTP server and an isolated headless Edge. It
+The test starts its own loopback HTTP server and an isolated headless Edge on
+Windows. On Linux it uses Chromium (install locally with
+`npx playwright-core install chromium`; required OS libraries must be available).
+`LUNA_BROWSER_CHANNEL` overrides the default browser. Linux is not locally tested. It
 loads an actual MOC3 through Core, renders pixels with software WebGL, checks
 parameter IDs, captures `dist/smoke.png` and checks idempotent disposal. It does
 not use a logged-in browser profile, microphone, HA or TTS. Inspect the screenshot

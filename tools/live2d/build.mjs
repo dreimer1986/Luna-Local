@@ -21,4 +21,7 @@ await cp(join(source, 'Core'), join(output, 'Core'), {recursive: true});
 await cp(join(source, 'Framework/Shaders'), join(output, 'Shaders'), {recursive: true});
 await cp(join(source, 'LICENSE.md'), join(output, 'SDK-LICENSE.md'));
 await cp(join(source, 'NOTICE.md'), join(output, 'SDK-NOTICE.md'));
+if (process.argv.includes('--sample')) {
+  await cp(join(source, 'Samples/Resources/Hiyori'), join(output, 'Sample'), {recursive: true});
+}
 console.log('Built local Cubism runtime. dist is excluded from Git; publication review remains required.');

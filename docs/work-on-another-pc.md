@@ -1,5 +1,10 @@
 # Auf einem anderen PC weiterarbeiten
 
+**Aktueller vollständiger Übergabestand:** [HANDOFF.md](../HANDOFF.md).
+Die Live2D-Arbeit liegt im Branch `work/luna-live2d-preparation`, nicht in `master`.
+Für den Wechsel diesen Branch auschecken; dort stehen auch die SDK-Versionen,
+das Cubism-Referenzprojekt, die Tests und die noch offenen Schritte.
+
 Der Projektstand wird über GitHub synchronisiert. Das umfasst Quellcode, Tests,
 Dokumentation, die freigegebenen Luna-Bilder und die Bildgenerierungs-Prompts.
 Ein Export des Chatverlaufs ist dafür nicht erforderlich. Der Chat allein kopiert

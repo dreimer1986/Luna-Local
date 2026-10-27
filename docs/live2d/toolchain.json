@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-27",
+  "editor_version": "5.3.05 beta1 FREE",
+  "sdk_version": "Cubism SDK for Web 5 R5",
+  "node_version_tested": "24.20.0",
+  "python_version_tested": "3.14",
+  "installer_sha256": "4bda8b30b5dee398771bbe53cfa48690f04ce936f5a4c4b3e636b2d7d1c9c67f",
+  "core_min_js_sha256": "8741f739779b5d5210872bd3d7d99f0f1e56e6c87409e7d26d6bb4b80aa1ef47",
+  "private_tools_archive": "Luna-Local-home-tools.zip",
+  "private_tools_archive_sha256": "cb62af464bc9868369e67f71fbcee369637362afc4c1844d3cfb7ddf4f192173",
+  "sdk_files_in_archive": 291,
+  "note": "Installer/SDK archive is local only; not uploaded to the public Git repository."
+}
