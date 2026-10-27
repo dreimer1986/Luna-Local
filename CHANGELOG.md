@@ -2,6 +2,9 @@
 
 ## 0.4.0b6 (development)
 
+- Add optional display-only avatar card for a dedicated tablet dashboard, with
+  tap-to-fullscreen and supported-browser screen wake lock.
+
 - Discard microphone segments during Luna room TTS preparation/playback and a
   one-second acoustic tail, across configured rooms, while keeping transport on.
 - Ignore empty STT results instead of asking for repetition. Allow only one

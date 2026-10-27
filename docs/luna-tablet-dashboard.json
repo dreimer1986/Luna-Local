@@ -1,0 +1,26 @@
+{
+  "title": "Luna",
+  "kiosk_mode": {
+    "hide_header": true,
+    "hide_sidebar": true
+  },
+  "views": [
+    {
+      "title": "Luna",
+      "path": "luna",
+      "type": "panel",
+      "cards": [
+        {
+          "type": "custom:luna-avatar-card",
+          "display_only": true,
+          "avatar": "live2d",
+          "continuous": false,
+          "expressions": false,
+          "background": "moon",
+          "live2d_runtime": "/local/luna/runtime-20261027-hands/runtime.mjs",
+          "live2d_model": "/local/luna/model-20261027/luna-smile2.model3.json"
+        }
+      ]
+    }
+  ]
+}

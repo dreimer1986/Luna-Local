@@ -124,7 +124,36 @@ class LunaAvatarCard extends HTMLElement {
     this.render = this.render.bind(this); this.session.addEventListener('change', this.render);
     if (this.config.follow_rooms !== false)
       this.session.roomPlayback = new RoomPlayback(this._hass, () => this.render());
+    if (this.config.display_only === true) {
+      const style = document.createElement('style');
+      style.textContent = `:host{position:fixed;inset:0;z-index:100;display:block;background:#131c31}
+        ha-card,.panel,.dock{height:100%;border:0;border-radius:0;box-shadow:none}
+        .controls,.badge,.launch{display:none!important}
+        .stage[data-avatar],.stage{height:100%;width:100%;max-height:none;aspect-ratio:auto}
+        .stage:before{width:min(22vw,22vh);height:min(22vw,22vh);right:18%;top:6%}`;
+      root.append(style);
+      this.panel.title = 'Antippen für Vollbild';
+      this.panel.onclick = async () => {
+        if (!document.fullscreenElement) {
+          try { await this.requestFullscreen?.(); } catch {}
+        }
+        this.keepAwake();
+      };
+      this.onVisibility = () => { if (document.visibilityState === 'visible') this.keepAwake(); };
+      document.addEventListener('visibilitychange', this.onVisibility);
+      this.keepAwake();
+    }
     this.render();
+  }
+  async keepAwake() {
+    if (!this.isConnected || this.config?.display_only !== true || document.visibilityState !== 'visible' || this.wakeLock || this.wakePending) return;
+    this.wakePending = true;
+    try {
+      const lock = await navigator.wakeLock?.request('screen');
+      if (!this.isConnected || this.config?.display_only !== true) { await lock?.release(); return; }
+      this.wakeLock = lock;
+      lock?.addEventListener('release', () => { if (this.wakeLock === lock) this.wakeLock = null; });
+    } catch {} finally { this.wakePending = false; }
   }
   openPopup() {
     if (this.dialog.open) return;
@@ -152,6 +181,9 @@ class LunaAvatarCard extends HTMLElement {
     transcript.scrollTop = transcript.scrollHeight;
   }
   teardown() {
+    if (this.onVisibility) document.removeEventListener('visibilitychange', this.onVisibility);
+    this.onVisibility = null;
+    this.wakeLock?.release().catch(() => {}); this.wakeLock = null;
     this.rig?.destroy(); this.rig = null;
     this.session?.roomPlayback?.destroy();
     this.session?.destroy(); this.session = null;

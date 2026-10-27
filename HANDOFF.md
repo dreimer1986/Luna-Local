@@ -256,3 +256,22 @@ einer Antwort. 230 eigene Ausgabe-/Nachhall-Frames verworfen; danach wieder
 Antwort unverändert ein Transkript/eine Antwort, keine Rückfrage-Schleife.
 Modelllaufzeit dieser Antwort 48.08 s (Prompt 35.699 s, Generierung 7.916 s).
 Eine zweite Nutzerfrage zur praktischen Wiederaufnahme steht noch aus.
+
+
+## Tablet-Link: reine Luna-Ansicht
+
+Direkter Link: https://ha.dreimer.de/luna-vollbild/luna
+Separates Storage-Dashboard `luna-vollbild`, nicht in der Seitenleiste, normale
+HA-Anmeldung auch für Nicht-Admins. Konfiguration in `docs/luna-tablet-dashboard.json`.
+Vorhandenes kiosk-mode blendet Header/Sidebar nur in diesem Dashboard aus.
+Die Karte unterstützt `display_only: true`: volle Fensterfläche, keine Bedienelemente,
+kein Browser-Mikrofon und keine doppelte Tonausgabe; Raumantworten werden weiter
+stumm analysiert. Antippen fordert Browser-Vollbild an. Screen Wake Lock wird
+bei unterstützenden Browsern angefordert, bei Rückkehr erneut erworben und beim
+Verlassen freigegeben. Tablet-/Browser-Unterstützung kann variieren; für iPad o.ä.
+kann eine Homescreen-Verknüpfung zweckmäßig sein.
+
+Live in Chrome geprüft: nur Luna mit Mondhintergrund, nach Antippen auch keine
+Browserleisten; `followingRooms: true`, `controls: none`, `wakeLock: true`.
+Backend bleibt b6, Frontend-Ressource für Cachewechsel auf
+`/luna-local/luna-avatar-card.js?v=0.4.0b6-tablet1`. Keine HA-Neustart erforderlich.
