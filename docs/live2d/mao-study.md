@@ -32,16 +32,19 @@ Keep the original and its ReadMe intact. Work on the sibling `working` copy.
 The archive also includes animation source `.can3` and a 4096-texture runtime;
 the automated browser study currently uses the SDK's 2048-texture runtime.
 
-**No template transfer or adapted CMO3 has been completed.** Both available native
-app interfaces failed with `Computer Use native pipe is unavailable ... os error 2`,
-including a helper-session reset. Restore app control before editor work. This is
-an unavailable automation connection, not evidence that the desktop is locked.
+**No template transfer or adapted CMO3 has been completed.** Native app control
+was restored after the user's restart/retry on 28 October. The working Mao CMO3
+was opened successfully in Cubism and exported through Modeling > Model Template
+as `Mao - private Luna rig study`, with Live2D Inc. credited as original author.
+The export contains CMO3, JSON metadata and thumbnail, installed in
+`%APPDATA%/Live2D/Cubism5.3_Editor/template_local/Mao - private Luna rig study/`.
+A portable private copy is in `Downloads/Cubism/Mao-test/template/`.
 The package is PRO. The user has now activated the PRO trial. The running editor's
 window title confirms `Trial version 43 days remaining` (28 October 2026).
-The license prerequisite is therefore resolved. Native app access still fails
-through both interfaces, including a fresh helper-session reset.
+Both the license prerequisite and native app connection are now resolved;
+the successful template export also verifies writing from the PRO editor.
 
-Next: restore the native app connection, import/separate Luna's full-body art,
+Next: import/separate Luna's full-body art,
 then apply Mao's template on a copy with manual part/deformer correspondence.
 Keep ears, hair, sweater, hands, trousers and shoes separate; redraw occluded
 areas before deforming. Check head turns, closed eyes, mouth corners, overlapping

@@ -3,8 +3,9 @@
 **Nachtrag 28.10.:** Nutzer möchte Mao als Rig-Vorlage testen und Luna künftig
 ganzkörperlich einschließlich Beinen/Füßen vorbereiten. Der lokale Browser-Test
 ist unter [Mao-Studie](docs/live2d/mao-study.md) dokumentiert. Mao-Quelldatei liegt
-privat vor, aber der Editorzugriff ist aktuell gestört; die eigentliche Übertragung
-ist noch nicht erfolgt. HA bleibt auf dem unten dokumentierten Portraitmodell.
+privat vor. Editorzugriff und PRO Trial sind inzwischen bestätigt, eine portable
+Mao-Modellvorlage wurde exportiert; die eigentliche Übertragung ist noch nicht
+erfolgt. HA bleibt auf dem unten dokumentierten Portraitmodell.
 
 ## Den richtigen Branch holen
 
