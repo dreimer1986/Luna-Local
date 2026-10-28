@@ -1,5 +1,18 @@
 # Luna im Browser – experimentelle Vorschau
 
+## Bildausschnitt wechseln
+
+Oben rechts am Avatar schaltet **Bis zur Hüfte / Ganz zeigen** den Bildausschnitt
+um – auch im Popup und auf der Vollbildseite. Die Sprachsitzung bleibt bestehen.
+Die Auswahl wird pro Dashboard-Pfad und Modell im Browser gespeichert; sie hat
+Vorrang vor dem YAML-Startwert `framing: full` oder `framing: waist`.
+
+`waist_zoom: 1.2` ist der Standard für das derzeitige Porträtmodell. Für ein späteres
+Ganzkörpermodell lässt sich der Faktor anpassen, beispielsweise auf `1.8`
+(zulässig 1–3). „Ganz zeigen“ zeigt den gesamten vorhandenen Modellinhalt. Das
+aktuelle HA-Porträt endet an den Oberschenkeln; V8 ist noch eine Körperstudie mit
+statischem Kopf und ersetzt den funktionierenden Sprachavatar derzeit nicht.
+
 ## Live2D-Stand 0.4.0b4
 
 `avatar: live2d` ist jetzt verfügbar und wurde mit dem privaten Luna-Modell in HA

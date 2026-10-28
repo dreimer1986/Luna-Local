@@ -1,5 +1,103 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## HA-Zoom und Zusammenführung nach master, 28.10.2026
+
+Die V8-Körperstudie ist NICHT als Ersatz für den laufenden Sprachavatar geeignet:
+`Luna Head Reference` ist weiterhin ein statisches Bild ohne Gesichts-Keyforms.
+Ein Austausch würde Blinzeln und Lippenbewegung verlieren. Deshalb verbleibt das
+bewährte Porträtmodell in HA; die neue Kartenoberfläche ergänzt Ganz-/Hüftansicht.
+Button oben rechts auch im Vollbild, Browser-Speicherung pro Pfad/Modell;
+`framing: full|waist`, `waist_zoom: 1.2` (Porträt; Ganzkörper später etwa 1.8).
+„Ganz“ bedeutet beim bisherigen Modell gesamtes Porträt bis Oberschenkel, keine Beine.
+
+45 Python-Tests und alle 22 Node-Tests bestanden. Echter Cubism-Browsertest
+prüft Umschalten, bestehende Sitzung, kein versehentliches Vollbild, Speicherung
+über Neuladen und Rückschalten. Reproduzierbar: `node tools/live2d/zoom-smoke.mjs`
+mit lokalem Runtime-Build und `dist/Luna/luna.model3.json`.
+HA-Frontend-Sicherung: `/home/dreimer/shares/music/Luna/backups/20261028-zoom/`.
+Nach Deployment Browser neu laden, ggf. Strg+F5; kein HA-Neustart nötig.
+Körperstudie/SDK bleiben privat; Git enthält Code, Tests und Übergabe.
+HA liefert die aktualisierte JS-Datei per HTTPS bytegleich aus. Lokaler master
+ist per Fast-forward zusammengeführt, Arbeitsbaum sauber. Push zu origin/master
+scheitert an fehlender GitHub-Anmeldung (could not read Username); gh ist nicht
+installiert. Nach Anmeldung `git push origin master` ausführen.
+
+## V8: alle letzten Armänderungen zusammen, 28.10.2026
+
+Gemeinsames Modell: `/home/dreimer/shares/music/Luna/arm-finish-20261028/luna-body-v8-arms.cmo3`.
+Ein Paket: `/home/dreimer/shares/music/Luna/Luna-Arme-V8-2026-10-28.zip`.
+Enthält V6-Schulterkorrekturen, beide Unterarmüberlappungen und bereinigtes
+Hoodie-Body-Mesh (lose Manschettenreste entfernt). Rechte Textur auf bestehendes
+ArtMesh6 gemappt, ohne zusätzliche statische ArtMeshes. Überstehende rechte Kappe
+nach Kombitest gekürzt. Speichern 19:59:05 mit Verify after save: SUCCESS bestätigt.
+Testbilder, PNG/PSD-Quellen, SHA256SUMS und genaue Grenzen in STATUS.md im Paket.
+
+Noch sichtbare Nähte/kleine Spalten und unnatürliche Ärmelkonturen in Extremposen,
+besonders rechts; kein vollständig fertiges Rig. Hand-/Arm-Y-/Körperkombinationen
+nicht vollständig geprüft. Kein Runtime-Export, HA unverändert. Die folgenden
+V6/V7-Abschnitte sind historische Zwischenstände. Bei GUI-Eingaben einzelne
+Tastenaktionen getrennt senden und Parameterwert im Screenshot prüfen; gebündelte
+Eingaben wurden vereinzelt nicht übernommen.
+
+
+## V7: linke Ellbogenüberlappung, 28.10.2026
+
+Privat unter `/home/dreimer/shares/music/Luna/elbow-overlap-20261028/`:
+`luna-mao-body-v7-elbow-test.cmo3`, transparente `forearm-L-overlap.png`,
+`luna-body-elbow-L.psd`, Testbilder und detaillierte `STATUS.md`.
+Die neue Textur ist ArtMesh1 zugeordnet, dessen oberes Mesh wurde erweitert.
+Zusätzlich beim Reimport entstandenen statischen Unterarm gelöscht.
+Ellbogen -30/+30 bei neutraler Schulter und Schulter/Ellbogen -30/-30 sowie
++30/+30 visuell geprüft: Überlappung verdeckt die Ellbogenlücke. Naht und
+Torso-Stoffrest bleiben; rechte Seite noch ohne zusätzliche Überlappung.
+Nach Rückstellen auf Neutralpose gespeichert; V6 unverändert, kein Runtime-Export.
+
+Korrektur zur vermuteten Blockade: kein bestätigter Hänger. Der Nutzer erkannte
+einen übersehenen Discard-Changes-Dialog. Danach zeigte eine Gesamtbildaufnahme
+`Mesh is opened`; fehlende Randverbindung geschlossen, Auto connect, bestätigt.
+Aktive-Fenster-Screenshots erfassten diese Dialoge nicht. Bei ausbleibender Reaktion
+zuerst Gesamtbild prüfen. Alte 19:15-Autosicherung nur historischer Zwischenstand.
+
+## Heimstand 28.10.2026: Schulter-Keyforms in V6 abgeglichen
+
+Neuer privater Arbeitsstand:
+`/home/dreimer/shares/music/Luna/shoulder-repair-20261028/luna-mao-body-v6-shoulder-working.cmo3`.
+Gespeichert und auf Platte bestätigt (1.742.107 Bytes); Testbilder und SHA256 liegen
+daneben. Das mitgebrachte Komplettpaket/V5 wurde nicht verändert. Zusätzlich liegt
+`luna-mao-body-v6-left-checkpoint.cmo3` als Zwischenstand nur der linken Korrektur vor.
+
+Ergebnis: Das starke Auseinanderfliegen der Armteile ist in den geprüften
+Schulter-/Ellbogenstellungen beider Seiten beseitigt. Noch KEIN fertiges Rig:
+Gelenkspalten, Stoffreste und unnatürliche Übergänge bleiben sichtbar. Die
+Wrist-/Hand-/Arm-Y-Varianten und Körperparameter sind noch nicht durchgeprüft.
+Kein Runtime-Export, keine Änderung am HA-Avatar.
+
+Vorgehen im Cubism-PRO-Trial unter Wine:
+
+- Linke Schulter (`Rotation18`): korrigierte Neutralposition aus V5 übernommen.
+  Nur den Eltern-Deformer an die Anschläge zu kopieren reichte NICHT aus.
+- Ganze linke Armkette ausgewählt: drei Rotations-Deformer und drei ArtMeshes.
+  Form bei exakt Schulter=0/Ellbogen=0 kopiert. Bei Rotation-Deformern ausschließlich
+  `Vertices Info` mit Paste Form Special übertragen, Winkel/Skalierung abgewählt.
+  Der Optionsdialog muss während des Einfügens geöffnet bleiben.
+- Zunächst Schulter -30/+30 bei Ellbogen 0 abgeglichen. Kombitest -30/-30 zeigte
+  noch die alte Oberarm-Geometrie. Deshalb auch die sechs Kombinationen aus
+  Schulter {-30,0,30} und Ellbogen {-30,30} mit der neutralen Form abgeglichen.
+  Damit werden alte Formkorrekturen ersetzt; anatomische Formgebung muss später
+  gezielt neu aufgebaut werden. Rotationswinkel bleiben erhalten.
+- Rechte Schulter (`Rotation14`): bei Neutralstellung mit Strg+Ziehen den Pivot
+  zum Schulteransatz verschoben, Kinder dabei optisch unverändert. Danach ganze
+  rechte Armkette einschließlich `Arm R B Warp` kopiert und analog die acht
+  nichtneutralen Schulter-/Ellbogenkombinationen abgeglichen. Arm-Y blieb 0.
+- Endstellungen und eine gemischte Zwischenstellung (-15/+15) beider Seiten
+  angesehen; nach Abschluss Schulter und Ellbogen beidseitig wieder auf 0.
+
+Nächster sinnvoller Schritt: Gelenküberlappungen/Ärmelmaterial und konkrete
+Ellbogen-/Handgelenkformen korrigieren, dann die übrigen Parameterkombinationen
+prüfen. Nicht erneut blind die Eltern-Deformer verschieben. Bilder im privaten
+Arbeitsordner zeigen sowohl den fehlgeschlagenen Kombitest als auch die Korrektur.
+Der untenstehende Transportstand beschreibt weiterhin die unveränderte V5.
+
 ## Aktueller Transportstand: 28.10.2026, nach manueller Schulterkorrektur
 
 Dieser Abschnitt ersetzt die älteren Angaben zum neuesten Modell/Paket unten.

@@ -2,6 +2,9 @@
 
 ## 0.4.0b6 (development)
 
+- Add persistent full/waist avatar framing, accessible on cards, popups and the
+  fullscreen tablet view without restarting the speech session.
+
 - Add optional display-only avatar card for a dedicated tablet dashboard, with
   tap-to-fullscreen and supported-browser screen wake lock.
 
