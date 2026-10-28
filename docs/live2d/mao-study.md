@@ -32,7 +32,7 @@ Keep the original and its ReadMe intact. Work on the sibling `working` copy.
 The archive also includes animation source `.can3` and a 4096-texture runtime;
 the automated browser study currently uses the SDK's 2048-texture runtime.
 
-**No template transfer or adapted CMO3 has been completed.** Native app control
+**Partial body transfers are saved; no finished avatar/runtime export exists.** Native app control
 was restored after the user's restart/retry on 28 October. The working Mao CMO3
 was opened successfully in Cubism and exported through Modeling > Model Template
 as `Mao - private Luna rig study`, with Live2D Inc. credited as original author.
@@ -55,17 +55,55 @@ The draft is in `Downloads/Cubism/Mao-test/luna-body-v2/`.
 It remains unrigged: head/hair/ears are combined, joints lack hidden overlaps,
 and thin knee seams are visible in the editor.
 
-A partial template preview on `calf_viewer_L` incorrectly auto-mapped to
-`Light 3`. The manual list exposes `Leg L` and `Leg R` (whole-leg meshes), but
-no corrected transfer has been applied or saved. Do not accept the pending
-mapping dialog: its last temporary selection was `Line 6`, also incorrect.
-Cancel it and explicitly map the appropriate leg. Mixed-DPI redraw artifacts
-appeared after display changes; reopening Mapping List fixed that dialog.
-Native access then failed with `GetCursorPos failed: Zugriff verweigert
-(0x80070005)`. Restore desktop access before further UI work.
+A partial template preview on `calf_viewer_L` initially auto-mapped incorrectly.
+This was corrected to `Leg R`, checked with body X/Z movement, applied and saved
+as `luna-body-v2/luna-mao-calf-test.cmo3` (1,823,351 bytes). The initial unrigged
+CMO3 was preserved.
 
-Next: correct and validate the partial mapping, then apply Mao's template on a
-copy with manual part/deformer correspondence and compatible layer boundaries.
+### Completed body-transfer experiment
+
+`--mao-body` combines each thigh/calf pair into one leg, removing artificial knee
+seams. It uses anatomical Mao layer names (viewer-left = anatomical right).
+The resulting twelve-layer PSD includes eleven body parts and `Luna Head Reference`.
+Both neutral reconstruction and reopened PSD pixels were checked exactly.
+
+Private files under `Downloads/Cubism/Mao-test/`:
+
+- `luna-body-v3/luna-mao-body-test.cmo3`: first whole-body transfer, 1,727,265 bytes.
+- `luna-body-v4/luna-body-separated.psd`: revised inner sleeve contours.
+- `luna-body-v4/luna-mao-body-v4.cmo3`: saved transfer with revised sleeves.
+
+Import as a new model with pre-5.3 blend mode, lock the head reference, select
+the eleven body parts, then apply the local Mao template. Exact names largely
+match, but **Forearm R incorrectly maps to Arm R A**, while the other right-arm
+parts use B. In Preview > Mapping List, edit Forearm R and select the **last**
+Forearm R near the end of the list (between Hand R and Sleeve R Back). Press
+Enter to commit the cell, then Mapping List OK. The unwanted Arm R A parameter
+group disappears. Reusing previous application settings did not retain this
+manual correction in the next new model; check it every time.
+
+V3 and V4 were checked at both extremes of Arm R B shoulder rotation. V4 fixes
+the long thin sleeve strip caused by cutting along the outside of the arm.
+It still fails visual acceptance: the shoulder pivot is too low and the upper
+arm separates from the shoulder at one extreme. A small detached cloth fragment
+remains near the cuff at the other extreme. Hidden joint overlap artwork is
+absent. The head remains a static locked reference outside the body hierarchy.
+Do not deploy this study or describe it as finished facial/body animation.
+
+Current editor selection: `Upper Arm L B Rotation` (`Rotation18`) in the V4 model.
+Its pivot is visibly around the middle of the upper arm, below Luna's shoulder.
+The official correction uses Ctrl+drag to move the deformer without its children.
+The available desktop `sky.drag` API has no modifier-key argument and `press_key`
+only sends completed chords; do not substitute an ordinary drag. This is an
+authoring-control limitation, not a license or authentication issue.
+
+Mixed-DPI redraw artifacts after display changes can be resolved by reopening
+the affected dialog. A transient `no monitor found for window` this session was
+resolved by reselecting the returned Cubism window. Desktop access subsequently
+worked; no Windows security or lock settings were changed.
+
+Next: correct shoulder/elbow/wrist pivot positions on a copy and validate their
+keyforms, then build separated facial/hair artwork and corresponding deformers.
 Keep ears, hair, sweater, hands, trousers and shoes separate; redraw occluded
 areas before deforming. Check head turns, closed eyes, mouth corners, overlapping
 limbs, sleeve cuffs, hips/knees/ankles and edge cropping through every keyform.
@@ -77,6 +115,8 @@ Official references:
 
 - [Mao source and FREE/PRO note](https://www.live2d.com/en/learn/sample/niziiro-mao/)
 - [Applying model templates](https://docs.live2d.com/en/cubism-editor-manual/applying-the-model-template/)
+- [Rotation deformer positioning](https://docs.live2d.com/en/cubism-editor-manual/making-and-rotation-of-rotationdeformer/)
+- [PSD re-import and mesh changes](https://docs.live2d.com/4.2/en/cubism-editor-manual/psd-re-import/)
 - [Sample terms](https://www.live2d.com/en/learn/sample/model-terms/)
 - [Free Material License Agreement](https://www.live2d.com/eula/live2d-free-material-license-agreement_en.html)
 

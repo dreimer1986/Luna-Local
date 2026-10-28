@@ -4,18 +4,34 @@
 ganzkörperlich einschließlich Beinen/Füßen vorbereiten. Der lokale Browser-Test
 ist unter [Mao-Studie](docs/live2d/mao-study.md) dokumentiert. Mao-Quelldatei liegt
 privat vor. Editorzugriff und PRO Trial sind inzwischen bestätigt, eine portable
-Mao-Modellvorlage wurde exportiert; die eigentliche Übertragung ist noch nicht
-erfolgt. HA bleibt auf dem unten dokumentierten Portraitmodell.
+Mao-Modellvorlage wurde exportiert; erste Körperübertragungen sind jetzt als
+private CMO3 gespeichert. HA bleibt auf dem unten dokumentierten Portraitmodell.
 
-**Weiterer Stand 28.10.:** Körperentwurf mit 14 Ebenen als PSD und ungeriggte
-CMO3 in `Downloads/Cubism/Mao-test/luna-body-v2/` gespeichert. Reproduzierbares
-Skript: `tools/separate_luna_body.py`; neutrale Rekonstruktion und PSD-Roundtrip
-pixelgenau geprüft. Noch keine Gelenküberlappungen oder Gesichtstrennung.
-Template-Test nicht übernommen: automatische Zuordnung war ein Lichteffekt;
-der offene Mapping-Dialog enthält inzwischen die ebenfalls falsche temporäre
-Auswahl `Line 6`. Nicht bestätigen. Details und nächste Schritte in der Mao-Studie.
-Desktopsteuerung zuletzt mit `GetCursorPos failed: Zugriff verweigert
-(0x80070005)` abgebrochen; nach Entsperren Fensterzustand frisch erfassen.
+**Weiterer Stand 28.10.:** Desktopzugriff wiederhergestellt. Der korrigierte
+Wadentest ist in `Downloads/Cubism/Mao-test/luna-body-v2/luna-mao-calf-test.cmo3`
+gespeichert. Die neueste Körperstudie liegt in
+`Downloads/Cubism/Mao-test/luna-body-v4/luna-mao-body-v4.cmo3`.
+Sie enthält elf übertragene Körperteile und eine gesperrte, ungeriggte Kopfreferenz.
+`tools/separate_luna_body.py --mao-body --output NEUER_ORDNER` erzeugt zwölf
+PSD-Ebenen mit ganzen Beinen, anatomischen Mao-Namen und korrigierten
+Ärmelkonturen. Neutrale Rekonstruktion und PSD-Roundtrip sind pixelgenau geprüft.
+Die doppelte Vorlage `Forearm R` muss manuell auf die letzte Variante (Arm R B)
+gesetzt werden; danach Enter und Mapping-OK. Automatik mischt sonst A und B.
+
+**Kein fertiger Avatar:** Schulterdrehpunkte liegen noch zu tief; an den
+Extremposen lösen sich Ärmel vom Schulteransatz. Ein kleiner Stoffrest und fehlende
+Gelenküberlappungen bleiben. Kopf/Gesicht/Haare sind noch nicht übertragen.
+Der ausgewählte linke Oberarm-Deformer zeigt den zu tiefen Drehpunkt direkt.
+Die offizielle Drehpunktkorrektur erfordert Strg+Ziehen ohne Bewegung der Kinder;
+die aktuelle `sky.drag`-API bietet keine Modifier-Tasten. Nicht durch normales
+Ziehen ersetzen: Das verschiebt die Bildteile mit. Kein neuer Runtime-Export und
+keine HA-Änderung. Details, Dateinamen und Fortsetzung in der Mao-Studie.
+
+**Transportpaket:** `C:\Users\dreimer\Downloads\Luna-Mao-authoring-2026-10-28.zip`
+(107.705.529 Bytes). Enthält V2/V3/V4 mit PSD/CMO3, die exportierte Mao-Vorlage,
+Original-ReadMe, Arbeitsstand und SHA-256-Manifest. Alle 59 Nutzdateien wurden
+direkt aus dem ZIP gegen das Manifest geprüft. Das Paket bleibt privat und muss
+zum anderen Rechner mitgenommen werden; Git enthält nur eigenes Skript und Doku.
 
 ## Den richtigen Branch holen
 

@@ -66,6 +66,19 @@ Keep Luna's approved identity, age-appropriate clothing and her own artwork; do
 not ship Mao's costume or magical props as a substitute. See
 [Mao study handoff](../../docs/live2d/mao-study.md).
 
+Private authoring studies now include a calf transfer and an eleven-part body
+transfer, saved as CMO3. Generate the revised body PSD from the repository root:
+
+```sh
+python tools/separate_luna_body.py --mao-body --output /path/to/new/body-study
+```
+
+Requires Pillow, numpy and psd-tools. The script verifies exact neutral pixels
+and PSD round-trip, refuses existing output folders, and leaves the head as an
+unrigged reference. This is material preparation, not automated finished rigging.
+The transferred shoulder pivots and joint overlaps still need authoring work;
+see the handoff for the duplicate `Forearm R` mapping trap and saved private paths.
+
 ### Runtime calls
 
 ```javascript

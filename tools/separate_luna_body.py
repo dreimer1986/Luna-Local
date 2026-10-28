@@ -26,16 +26,18 @@ REGIONS = {
     'thigh_viewer_R': [(510,772),(570,770),(637,764),(680,745),(720,1100),(500,1100),(520,900)],
     'hand_viewer_L': [(0,756),(249,756),(274,770),(294,790),(321,870),(0,900)],
     'hand_viewer_R': [(744,772),(768,758),(1024,745),(1024,900),(714,890),(725,804)],
-    'sleeve_lower_viewer_L': [(0,570),(299,570),(329,584),(348,601),(324,689),(316,722),(286,776),(247,763),(0,756)],
-    'sleeve_lower_viewer_R': [(676,587),(706,572),(1024,555),(1024,745),(768,758),(744,772),(706,725),(690,655)],
-    'sleeve_upper_viewer_L': [(0,335),(377,335),(371,387),(356,438),(352,512),(348,601),(329,584),(299,570),(0,570)],
-    'sleeve_upper_viewer_R': [(632,330),(1024,330),(1024,555),(706,572),(676,587),(670,509),(655,430),(649,376)],
+    'sleeve_lower_viewer_L': [(0,570),(304,570),(344,589),(393,602),(376,650),(363,691),(354,722),(335,740),(312,741),(286,776),(247,763),(0,756)],
+    'sleeve_lower_viewer_R': [(633,592),(672,577),(706,572),(1024,555),(1024,745),(768,758),(744,772),(717,744),(689,737),(669,714),(656,667)],
+    'sleeve_upper_viewer_L': [(0,335),(377,335),(398,372),(412,430),(417,490),(413,539),(402,578),(393,602),(344,589),(304,570),(0,570)],
+    'sleeve_upper_viewer_R': [(632,330),(1024,330),(1024,555),(706,572),(672,577),(633,592),(622,550),(617,498),(620,443),(631,388)],
     'head_hair_ears_unseparated': [(0,0),(1024,0),(1024,330),(685,330),(659,330),(623,336),(594,310),(591,284),(570,269),(540,280),(505,276),(470,269),(444,282),(433,308),(405,328),(377,335),(0,335)],
 }
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',required=True,type=Path)
+    parser.add_argument('--mao-body',action='store_true',
+                        help='Use whole legs and Mao anatomical body names; head remains an unrigged reference.')
     args=parser.parse_args()
     if args.output.exists(): parser.error('Choose a new output folder; existing work is never overwritten.')
     source=Image.open(SOURCE).convert('RGBA')
@@ -47,6 +49,18 @@ def main():
         layer=pixels.copy();layer[~owned]=0; layers[name]=Image.fromarray(layer)
     torso=pixels.copy();torso[assigned]=0
     layers={'torso_sweater':Image.fromarray(torso),**layers}
+    if args.mao_body:
+        # Mao rigs the leg as a continuous mesh. Avoid introducing an artificial
+        # knee seam. Anatomical right is viewer-left in this front-facing source.
+        mapped={'Hoodie Body': layers['torso_sweater']}
+        for viewer,anatomical in [('L','R'),('R','L')]:
+            mapped['Leg '+anatomical]=Image.alpha_composite(
+                layers['thigh_viewer_'+viewer],layers['calf_viewer_'+viewer])
+            for original,target in [('shoe','Shoe'),('hand','Hand'),
+                                    ('sleeve_lower','Forearm'),('sleeve_upper','Upper Arm')]:
+                mapped[target+' '+anatomical]=layers[original+'_viewer_'+viewer]
+        mapped['Luna Head Reference']=layers['head_hair_ears_unseparated']
+        layers=mapped
     args.output.mkdir(parents=True);(args.output/'layers').mkdir()
     psd=PSDImage.new('RGBA',source.size); rebuilt=Image.new('RGBA',source.size)
     for name,layer in layers.items():
@@ -71,7 +85,7 @@ def main():
         draw.line(points+[points[0]],fill=color,width=2)
     overlay.save(args.output/'contours.png')
     manifest={'source':str(SOURCE.relative_to(ROOT)),'sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
-      'layers':list(layers),'contours':REGIONS,'visible_pixels_exact':True,'psd_roundtrip_exact':True,
+      'layers':list(layers),'contours':REGIONS,'mao_body':args.mao_body,'visible_pixels_exact':True,'psd_roundtrip_exact':True,
       'limitations':['No hidden joint overlaps yet','Head, hair and ears still combined','No authored keyforms or runtime export','Contours need visual and movement review']}
     (args.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(f'{len(layers)} layers, exact visible reconstruction and PSD round-trip: {psd_path}')
