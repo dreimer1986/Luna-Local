@@ -1,5 +1,54 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Aktueller Transportstand: 28.10.2026, nach manueller Schulterkorrektur
+
+Dieser Abschnitt ersetzt die älteren Angaben zum neuesten Modell/Paket unten.
+Alles für die lokale Mao-Studie steckt jetzt in
+`Downloads/Luna-Komplett-2026-10-28.zip`; die beiden älteren Teil-ZIPs sind
+dafür nicht zusätzlich nötig. Das Paket enthält ein Git-Bundle des Arbeitsbranches,
+alle Mao-test-Arbeitsordner einschließlich Original und Vorlage, das Web-SDK,
+den lokalen Browser-Test-Build und eine separate V5-Autosicherung. Keine Konten,
+Passwörter oder Editor-Lizenzaktivierung werden übertragen. Cubism muss auf dem
+Zielrechner installiert/aktiviert sein. Das bestehende HA-Portraitprojekt liegt
+weiterhin auf dem Heimrechner und ist nicht Bestandteil dieser lokalen Sicherung.
+
+Neueste Körperdatei im Paket:
+`Cubism/Mao-test/luna-body-v4/luna-mao-body-v5.cmo3`.
+Der Nutzer verschob `Upper Arm L B Rotation` (`Rotation18`) per Strg+Ziehen
+zum Schulteransatz. In der Neutralpose sitzt der Punkt nun plausibel. Beim Test
+von `Arm L B_Shoulder` bei -30/+30 sprang er jedoch wieder nach unten; Oberarm
+und Unterarm lösten sich deutlich voneinander. Die Änderung ist noch nicht
+konsistent in den End-Keyforms. `Arm L B Position` ist dessen Eltern-Deformer;
+sein tiefer Mittelpunkt allein beweist keinen Fehler. Nicht blind ebenfalls
+verschieben. Gegenüberliegende Schulter ist noch nicht korrigiert.
+
+Nächster Versuch: auf einer Kopie die korrigierte Neutralposition mittels
+"Options for Paste Form Special" / "Vertices info" auf die End-Keyforms
+übertragen, dabei Winkel und Skalierung erhalten und die Auswirkungen auf
+Kind-Deformer prüfen. Das ist nur ein recherchierter Ansatz, noch NICHT getestet.
+Die zuletzt untersuchte Neutralnähe war -0,3 statt exakt 0: vor Kopieren exakt
+auf Standardwerte zurückstellen. Neutral-, End- und Zwischenposen visuell prüfen.
+
+Beim abschließenden Verpacken war Cubism bereits geschlossen. Die gespeicherte
+V5-Datei wurde auf Platte gefunden (1.744.071 Bytes, Änderungszeit 16:25:05).
+Sie konnte nach dem Schließen nicht erneut im Editor geprüft werden; das Paket
+bewahrt zusätzlich die Autosicherung von 12:28:44 separat. Keine neue
+Schulterkorrektur durch den Assistenten, kein Runtime-Export, keine HA-Änderung.
+
+### Auf dem Heimrechner
+
+ZIP entpacken und `START-HIER.md` lesen. Vorhandenen Checkout auf
+`work/luna-live2d-preparation` aktualisieren. Alternativ offline klonen:
+
+```sh
+git clone --branch work/luna-live2d-preparation Luna-Local.bundle Luna-Local
+```
+
+Das SDK liegt unter `Cubism/CubismSdkForWeb-5-r.5`. Den optionalen Browser-Build
+aus `private-browser-dist` bei Bedarf nach `Luna-Local/tools/live2d/dist` kopieren.
+Die exportierte Mao-Vorlage liegt unter `Cubism/Mao-test/template`.
+Material- und Rig-Grenzen in den folgenden Abschnitten bleiben gültig.
+
 **Nachtrag 28.10.:** Nutzer möchte Mao als Rig-Vorlage testen und Luna künftig
 ganzkörperlich einschließlich Beinen/Füßen vorbereiten. Der lokale Browser-Test
 ist unter [Mao-Studie](docs/live2d/mao-study.md) dokumentiert. Mao-Quelldatei liegt
