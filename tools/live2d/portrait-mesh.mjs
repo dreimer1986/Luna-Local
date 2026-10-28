@@ -33,9 +33,9 @@ export function refineMesh(vertices, uvs, indices, levels = 3) {
   return {vertices: positions, uvs: new Float32Array(texture), indices: new Uint16Array(triangles), refresh};
 }
 
-export function refinePortraitMeshes(core) {
+export function refinePortraitMeshes(core, names = ['foreground_original','base_skin_completed']) {
   const nativeVertices = core.getDrawableVertices.bind(core), refined = new Map();
-  for (const name of ['foreground_original','base_skin_completed']) {
+  for (const name of names) {
     const i = Array.from({length: core.getDrawableCount()}, (_, n) => n).find(n => core.getDrawableId(n).getString() === name) ?? -1;
     if (i >= 0) refined.set(i, refineMesh(nativeVertices(i), core.getDrawableVertexUvs(i), core.getDrawableVertexIndices(i)));
   }

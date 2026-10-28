@@ -1,0 +1,8 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><title>Luna V9</title>
+<style>body{background:#20283b;color:white;font:16px system-ui}canvas{width:420px;height:630px;background:#374760}</style>
+<h1>Luna V9 — Ganzkörper und Gesicht</h1><canvas width="630" height="945"></canvas>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+window.player=await mountLuna(document.querySelector('canvas'),'../tools/live2d/dist/LunaV9/luna.model3.json');
+player.draw(0,{reducedMotion:true});
+</script></html>

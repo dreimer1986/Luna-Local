@@ -11,17 +11,24 @@ try {
 const page=await browser.newPage({viewport:{width:800,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
 const url=`http://127.0.0.1:${server.address().port}/tests/avatar-preview.html`;
 await page.goto(url);await page.waitForFunction(()=>document.body.dataset.test==='passed');
-await page.evaluate(()=>{const c=document.querySelector('luna-avatar-card');c.setConfig({avatar:'live2d',display_only:true,follow_rooms:false,live2d_runtime:'/tools/live2d/dist/runtime.mjs',live2d_model:'/tools/live2d/dist/Luna/luna.model3.json'});window.originalSession=c.session;});
+await page.evaluate(()=>{const c=document.querySelector('luna-avatar-card');c.setConfig({avatar:'live2d',display_only:true,follow_rooms:false,live2d_runtime:'/tools/live2d/dist/runtime.mjs',live2d_model:'/tools/live2d/dist/LunaV9/luna.model3.json'});window.originalSession=c.session;});
 await page.waitForFunction(()=>document.querySelector('luna-avatar-card').rig?.player);
 await page.screenshot({path:resolve(here,'dist/luna-zoom-full.png')});
 await page.locator('luna-avatar-card').getByRole('button',{name:'Avatar bis zur Hüfte zeigen'}).click();
 await page.screenshot({path:resolve(here,'dist/luna-zoom-waist.png')});
-const check=await page.evaluate(()=>{const c=document.querySelector('luna-avatar-card');return {framing:c.shadowRoot.querySelector('.stage').dataset.framing,sameSession:c.session===window.originalSession,transform:getComputedStyle(c.shadowRoot.querySelector('.rig')).transform,fullscreen:!!document.fullscreenElement};});
+const check=await page.evaluate(()=>{const c=document.querySelector('luna-avatar-card');return {framing:c.shadowRoot.querySelector('.stage').dataset.framing,sameSession:c.session===window.originalSession,view:c.rig.view(),fullscreen:!!document.fullscreenElement};});
 if(check.framing!=='waist'||!check.sameSession||check.fullscreen)throw Error(JSON.stringify(check));
 await page.reload();await page.waitForFunction(()=>document.body.dataset.test==='passed');
-await page.evaluate(()=>document.querySelector('luna-avatar-card').setConfig({avatar:'live2d',display_only:true,follow_rooms:false,live2d_runtime:'/tools/live2d/dist/runtime.mjs',live2d_model:'/tools/live2d/dist/Luna/luna.model3.json'}));
+await page.evaluate(()=>document.querySelector('luna-avatar-card').setConfig({avatar:'live2d',display_only:true,follow_rooms:false,live2d_runtime:'/tools/live2d/dist/runtime.mjs',live2d_model:'/tools/live2d/dist/LunaV9/luna.model3.json'}));
 if(await page.locator('luna-avatar-card').getByRole('button',{name:'Avatar ganz zeigen'}).count()!==1)throw Error('Selection not restored');
 await page.locator('luna-avatar-card').getByRole('button',{name:'Avatar ganz zeigen'}).click();
+for(const [name,width,height] of [['phone',390,844],['tablet',1024,768]]){
+ await page.setViewportSize({width,height});
+ await page.locator('luna-avatar-card').getByRole('button',{name:'Avatar bis zur Hüfte zeigen'}).click();
+ await page.waitForFunction(()=>{const r=document.querySelector('luna-avatar-card').rig;return r?.canvas.width>0&&r?.player;});
+ await page.screenshot({path:resolve(here,`dist/luna-zoom-${name}.png`)});
+ await page.locator('luna-avatar-card').getByRole('button',{name:'Avatar ganz zeigen'}).click();
+}
 if(errors.length)throw Error(errors.join('\n'));
 console.log('PASS: real model rendering, full/waist toggle, session retained, fullscreen click isolated, persistence and reset',check);
 } finally {await browser.close();server.close();}

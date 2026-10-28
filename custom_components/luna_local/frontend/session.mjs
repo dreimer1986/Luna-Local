@@ -1,3 +1,4 @@
+import {markerExpression} from './emotion-markers.mjs?v=20261028-v9';
 export const VERSION = '0.4.0b5';
 export const PHASES = {
   idle: 'Bereit', starting: 'Mikrofon wird gestartet', listening: 'Ich höre zu',
@@ -221,8 +222,11 @@ export class LunaSession extends EventTarget {
     }
   }
   async getExpression(reply, turn) {
+    if (turn !== this.generation) return;
     this.expression = {name: 'neutral', intensity: 0};
     if (this.config.expressions === false) return;
+    const marked = markerExpression(reply);
+    if (marked) { if (turn === this.generation) { this.expression = marked; this.emit(); } return; }
     try {
       const expression = await this.hass.callWS({type: 'luna_local/avatar/expression',
         text: (this.lastUserText || '').slice(0, 2000), reply: reply.slice(0, 3000)});

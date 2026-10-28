@@ -7,10 +7,10 @@ window.audibleContexts=0;window.AudioContext=class {constructor(){audibleContext
 window.receive=null;
 const hass={connection:{subscribeMessage:async cb=>{window.receive=cb;return ()=>{};}}};
 const session={phase:'idle',generation:0};session.roomPlayback=new RoomPlayback(hass);
-const rig=new LunaLive2DRig(document.querySelector('.rig'),session,{live2d_runtime:'../tools/live2d/dist/runtime.mjs',live2d_model:'../tools/live2d/dist/Luna/luna.model3.json'});
+const rig=new LunaLive2DRig(document.querySelector('.rig'),session,{live2d_runtime:'../tools/live2d/dist/runtime.mjs',live2d_model:'../tools/live2d/dist/LunaV9/luna.model3.json'});
 await rig.ready;if(!rig.player)throw Error('Luna failed to load');
-window.mouth=[];const draw=rig.player.draw.bind(rig.player);rig.player.draw=(dt,p)=>{mouth.push(p.parameters.ParamMouthOpenY);return draw(dt,p)};
-window.start=()=>receive({id:'room-test',device_id:'room',room:'Wohnzimmer',url:'/api/tts_proxy/room.wav',phase:'speaking',server_time:Date.now()/1000,started_at:Date.now()/1000});
+window.moods=[];window.mouth=[];const draw=rig.player.draw.bind(rig.player);rig.player.draw=(dt,p)=>{mouth.push(p.parameters.ParamMouthOpenY);moods.push(p.expression);return draw(dt,p)};
+window.start=()=>receive({id:'room-test',device_id:'room',room:'Wohnzimmer',url:'/api/tts_proxy/room.wav',phase:'speaking',emotion_markers:['😢'],server_time:Date.now()/1000,started_at:Date.now()/1000});
 window.stop=()=>receive({id:'room-test',device_id:'room',phase:'idle'});
 window.ready=true;
 </script></html>

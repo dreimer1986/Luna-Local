@@ -1,3 +1,4 @@
+import {markerExpression} from './emotion-markers.mjs?v=20261028-v9';
 // Silent audio analysis: no AudioContext destination, media element or microphone.
 export function mouthEnvelope(buffer, step = .02) {
   const count = Math.ceil(buffer.duration / step), values = new Float32Array(count);
@@ -87,6 +88,7 @@ export class RoomPlayback {
     const elapsed = Math.max(0, (now - job.startedAt) / 1000), envelope = job.envelope;
     if (envelope && elapsed >= envelope.duration) return null;
     return {id: job.id, room: job.room, speaking: !!envelope,
+      expression: markerExpression(job.markers),
       mouth: envelope ? envelope.values[Math.floor(elapsed / envelope.step)] || 0 : 0};
   }
   clear() {for (const job of this.jobs.values()) {job.abort.abort(); this.env.clearTimeout(job.endTimer);} this.jobs.clear();}

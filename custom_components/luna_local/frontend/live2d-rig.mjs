@@ -1,4 +1,4 @@
-import {LunaPerformance} from './performance.mjs?v=0.4.0b5';
+import {LunaPerformance} from './performance.mjs?v=20261028-v9';
 
 export function localAssetURL(path, base = globalThis.location.href) {
   const url = new URL(path, base), origin = new URL(base).origin;
@@ -12,7 +12,7 @@ export class LunaLive2DRig {
     this.host = host; this.session = session; this.config = config; this.onStatus = onStatus;
     this.abort = new AbortController(); this.performance = new LunaPerformance();
     this.reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    this.visible = true;
+    this.visible = true; this.framing = config.framing || 'full';
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('role', 'img');
     this.canvas.setAttribute('aria-label', 'Luna: animierte Ragdoll-Katze');
@@ -49,12 +49,20 @@ export class LunaLive2DRig {
     if (this.canvas.width !== width) this.canvas.width = width;
     if (this.canvas.height !== height) this.canvas.height = height;
   }
+  setFraming(value) { this.framing = value === 'waist' ? 'waist' : 'full'; }
+  view() {
+    if (this.framing !== 'waist') return {zoom: 1, y: 0};
+    const requested = this.config.waist_zoom ?? this.player?.waistZoom ?? 1.2;
+    const fraction = Math.min(.95, .95 * this.canvas.width / this.canvas.height * 1.5);
+    const zoom = Math.min(3, requested * .95 / fraction);
+    return {zoom, y: (zoom * fraction - .95) / 2};
+  }
   tick(now) {
     if (this.abort.signal.aborted || !this.player) return;
     const dt = Math.min(.05, (now - this.last) / 1000); this.last = now;
     try {
       if (this.visible && !document.hidden) {
-        this.player.draw(dt, this.performance.sample(this.session, (now - this.started) / 1000, dt, this.reduced.matches));
+        this.player.draw(dt, {...this.performance.sample(this.session, (now - this.started) / 1000, dt, this.reduced.matches), view: this.view()});
       }
     } catch (error) { this.failed(error); return; }
     this.frame = requestAnimationFrame(next => this.tick(next));

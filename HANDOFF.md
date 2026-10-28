@@ -1,26 +1,41 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
-## HA-Zoom und Zusammenführung nach master, 28.10.2026
+## Aktuell: V9-Ganzkörper mit beweglichem Gesicht, 28.10.2026
 
-Die V8-Körperstudie ist NICHT als Ersatz für den laufenden Sprachavatar geeignet:
-`Luna Head Reference` ist weiterhin ein statisches Bild ohne Gesichts-Keyforms.
-Ein Austausch würde Blinzeln und Lippenbewegung verlieren. Deshalb verbleibt das
-bewährte Porträtmodell in HA; die neue Kartenoberfläche ergänzt Ganz-/Hüftansicht.
-Button oben rechts auch im Vollbild, Browser-Speicherung pro Pfad/Modell;
-`framing: full|waist`, `waist_zoom: 1.2` (Porträt; Ganzkörper später etwa 1.8).
-„Ganz“ bedeutet beim bisherigen Modell gesamtes Porträt bis Oberschenkel, keine Beine.
+V9 ersetzt jetzt das Porträtmodell in beiden bestehenden HA-Karten. Der bewährte
+Gesicht-Rig wurde aus der Cubism-Sicherung vom 27.10. 20:36 auf den V8-Körper
+übertragen. Der statische Kopf wurde entfernt. Kragen-Mesh geschlossen; linkes
+Hosenbein bis unter den Pullover verlängert und Zeichenreihenfolge auf 100 gesetzt.
+Die Lächeln-/Zahntextur bleibt exakt die bisherige `texture_smile2.png`.
 
-45 Python-Tests und alle 22 Node-Tests bestanden. Echter Cubism-Browsertest
-prüft Umschalten, bestehende Sitzung, kein versehentliches Vollbild, Speicherung
-über Neuladen und Rückschalten. Reproduzierbar: `node tools/live2d/zoom-smoke.mjs`
-mit lokalem Runtime-Build und `dist/Luna/luna.model3.json`.
-HA-Frontend-Sicherung: `/home/dreimer/shares/music/Luna/backups/20261028-zoom/`.
-Nach Deployment Browser neu laden, ggf. Strg+F5; kein HA-Neustart nötig.
-Körperstudie/SDK bleiben privat; Git enthält Code, Tests und Übergabe.
-HA liefert die aktualisierte JS-Datei per HTTPS bytegleich aus. Lokaler master
-ist per Fast-forward zusammengeführt, Arbeitsbaum sauber. Push zu origin/master
-scheitert an fehlender GitHub-Anmeldung (could not read Username); gh ist nicht
-installiert. Nach Anmeldung `git push origin master` ausführen.
+Privates Gesamtpaket: `/home/dreimer/shares/music/Luna/Luna-V9-2026-10-28.zip`.
+Bearbeitbare Quelle: `head-integration-20261028/luna-v9-head-working.cmo3` unter
+obigem Luna-Verzeichnis. Original-V8 und Office-Komplettpaket bleiben erhalten.
+Runtime-Profil `fullbody-face-v1`: sanfte Arm-/Hand-/Fingerbewegungen, kohärenter
+Kopf, Körper und Atmung; keine unbeschränkten Extremposen. Freiwillige Bewegung
+wird bei reduced-motion abgeschaltet. Kopf-X/Y und Brauen bleiben begrenzt,
+damit die Gesichtspatches nicht aus ihren Öffnungen wandern.
+
+HA: `/local/luna/runtime-20261028-v9/runtime.mjs` und
+`/local/luna/model-20261028-v9/luna.model3.json`. Vollbild weiterhin
+`https://ha.dreimer.de/luna-vollbild/luna`; Mond im Vollbild und transparent in
+der Testkarte erhalten. Zoom oben rechts, Ganzkörper/Hüfte; V9-Faktor 1.8,
+auf schmalen Displays an Höhe angepasst. Auswahl pro Browser/Pfad/Modell.
+Smiley-Marker steuern dezente lokale und entfernte Augen-/Mundmimik;
+`expressions: false` bleibt wirksam. Noch keine elf separat gezeichneten Emotionen.
+
+45 Python- und 25 Node-Tests bestanden. Echte Cubism-Browsertests: Mund/Blinzeln,
+Leerlauf und exakte Geometrie-Rückstellung, Zoom/Sitzung/Speicherung sowie
+stummer Raum-Audiotest mit Mimik und sofortigem Mundschluss bei Stop.
+Live-HA lädt Profil und 42 Parameter. Frontend- und Dashboard-Backup:
+`/home/dreimer/shares/music/Luna/backups/20261028-v9/`.
+Wichtig beim Deployment: vorhandene `luna-avatar-card.js.gz` ebenfalls erneuern;
+sonst liefert HA Browsern trotz neuer JS-Datei noch alten Code aus.
+
+Offen für spätere Arbeit: extreme Armkombinationen/Winken, ausgeprägtere Mimik
+und perspektivische Kopfbewegungen. Ein echter Sprachtest an den Raummikrofonen
+und auf dem Zieltablet ist weiterhin nötig; synthetische Tests ersetzen ihn nicht.
+Frühere Lichtschaltprobleme wurden in diesem Avatar-Schritt nicht erneut geprüft.
 
 ## V8: alle letzten Armänderungen zusammen, 28.10.2026
 

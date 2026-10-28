@@ -33,8 +33,9 @@ export class LunaPerformance {
       this.generation = generation;
       this.mouth = this.form = 0;
     }
-    const expression = POSES[session.expression?.name] || POSES.neutral;
-    const intensity = clamp(Number.isFinite(session.expression?.intensity) ? session.expression.intensity : 0);
+    const mood = session.config?.expressions === false ? null : remote ? remote.expression : session.expression;
+    const expression = POSES[mood?.name] || POSES.neutral;
+    const intensity = clamp(Number.isFinite(mood?.intensity) ? mood.intensity : 0);
     const blend = 1 - Math.exp(-dt / .22);
     const target = expression.map((n, i) => POSES.neutral[i] + (n - POSES.neutral[i]) * intensity);
     this.pose = this.pose.map((n, i) => n + (target[i] - n) * blend);
@@ -89,21 +90,21 @@ export class LunaPerformance {
       ParamEyeBallX: idle * Math.sin(time * .29) * .12,
       ParamEyeBallY: session.phase === 'thinking' ? .2 : 0,
       ParamBrowLY: this.pose[1], ParamBrowRY: this.pose[1],
-      ParamMouthOpenY: clamp(this.mouth), ParamMouthForm: clamp(this.form, -1, 1),
+      ParamMouthOpenY: clamp(this.mouth), ParamMouthForm: clamp(this.form + this.pose[1] * .3, -1, 1),
       ParamLunaBlush: this.pose[3],
-      ParamLunaJoy: ['joyful', 'amused'].includes(session.expression?.name) ? intensity : 0,
-      ParamLunaLaugh: session.expression?.name === 'laughing' ? intensity : 0,
-      ParamLunaAnger: session.expression?.name === 'angry' ? intensity : 0,
-      ParamLunaShy: session.expression?.name === 'shy' ? intensity : 0,
-      ParamLunaSad: session.expression?.name === 'sad' ? intensity : 0,
-      ParamLunaSurprise: session.expression?.name === 'surprised' ? intensity : 0,
-      ParamLunaConcern: session.expression?.name === 'concerned' ? intensity : 0,
+      ParamLunaJoy: ['joyful', 'amused'].includes(mood?.name) ? intensity : 0,
+      ParamLunaLaugh: mood?.name === 'laughing' ? intensity : 0,
+      ParamLunaAnger: mood?.name === 'angry' ? intensity : 0,
+      ParamLunaShy: mood?.name === 'shy' ? intensity : 0,
+      ParamLunaSad: mood?.name === 'sad' ? intensity : 0,
+      ParamLunaSurprise: mood?.name === 'surprised' ? intensity : 0,
+      ParamLunaConcern: mood?.name === 'concerned' ? intensity : 0,
     };
     const vowels = {A: ['aa', 'A'], I: ['I'], U: ['U'], E: ['E', 'FF'], O: ['O']};
     for (const [vowel, shapes] of Object.entries(vowels)) {
       parameters[`ParamLunaViseme${vowel}`] = speaking && shapes.includes(shape) ? clamp(this.mouth) : 0;
     }
-    return {parameters, expression: session.expression?.name || 'neutral', reducedMotion,
+    return {parameters, expression: mood?.name || 'neutral', reducedMotion,
       group: session.phase === 'speaking' ? 'Speaking' : session.phase === 'listening' ? 'Listening' :
         session.phase === 'thinking' || session.phase === 'preparing' ? 'Thinking' : 'Idle'};
   }

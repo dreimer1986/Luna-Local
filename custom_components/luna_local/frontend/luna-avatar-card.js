@@ -1,7 +1,7 @@
-import {RoomPlayback} from './room-playback.mjs?v=0.4.0b5';
-import {LunaSession, PHASES} from './session.mjs?v=0.4.0b5';
+import {RoomPlayback} from './room-playback.mjs?v=20261028-v9';
+import {LunaSession, PHASES} from './session.mjs?v=20261028-v9';
 import {LunaRig} from './rig.mjs?v=0.4.0b5';
-import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=0.4.0b5';
+import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261028-v9';
 
 class LunaAvatarCard extends HTMLElement {
   constructor() { super(); this.attachShadow({mode: 'open'}); }
@@ -48,7 +48,7 @@ class LunaAvatarCard extends HTMLElement {
       .stage[data-avatar="illustration"],.stage[data-avatar="live2d"]{width:100%;height:auto;aspect-ratio:2/3;max-height:640px}
       .stage[data-avatar="live2d"] .rig{position:absolute;inset:0}
       .portrait{display:block;width:100%;height:100%;object-fit:contain;object-position:center;position:relative;z-index:1}
-      .stage[data-framing="waist"] > .rig,.stage[data-framing="waist"] > .portrait{transform:scale(var(--luna-waist-zoom,1.2));transform-origin:50% 0}
+      .stage[data-framing="waist"]:not([data-avatar="live2d"]) > .rig,.stage[data-framing="waist"] > .portrait{transform:scale(var(--luna-waist-zoom,1.2));transform-origin:50% 0}
       .framing{position:absolute;right:10px;top:10px;z-index:3;opacity:.85}
       .badge{position:absolute;bottom:10px;left:12px;background:#121a30d9;color:#fff;padding:5px 10px;border-radius:16px;font:12px system-ui;z-index:2}
       .controls{padding:14px;display:grid;gap:10px} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -93,6 +93,8 @@ class LunaAvatarCard extends HTMLElement {
     try { const saved = localStorage.getItem(this.framingKey); if (['full', 'waist'].includes(saved)) framing = saved; } catch {}
     const setFraming = value => {
       root.querySelector('.stage').dataset.framing = value;
+      this.currentFraming = value;
+      this.rig?.setFraming?.(value);
       const button = root.querySelector('.framing');
       button.textContent = value === 'full' ? 'Bis zur Hüfte' : 'Ganz zeigen';
       button.setAttribute('aria-pressed', String(value === 'waist'));
@@ -137,6 +139,7 @@ class LunaAvatarCard extends HTMLElement {
             : 'Das Mikrofon stoppt beim Verlassen dieser Ansicht.';
           root.querySelector('.retry-animation').hidden = state !== 'error';
         });
+        this.rig.setFraming(this.currentFraming);
       };
       root.querySelector('.retry-animation').onclick = startRig;
       startRig();

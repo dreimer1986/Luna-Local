@@ -1,5 +1,6 @@
 // Luna-owned adapter to the official Cubism Web Framework, built locally.
 // No sample model or proprietary Core is embedded in this source file.
+import {moveFullBody, fullBodyParameters} from './fullbody-motion.mjs';
 import {movePortrait} from './portrait-motion.mjs';
 import {refinePortraitMeshes} from './portrait-mesh.mjs';
 import {CubismFramework} from '@framework/live2dcubismframework';
@@ -113,9 +114,12 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
       const id = model._model.getParameterId(i); ids.set(id.getString(), id);
     }
     model._model.saveParameters();
-    const portraitMeshes = data.LunaRig?.Profile === 'portrait-face-v1' ? refinePortraitMeshes(model._model) : null;
+    const fullBody = data.LunaRig?.Profile === 'fullbody-face-v1';
+    const portraitMeshes = data.LunaRig?.Profile === 'portrait-face-v1' ? refinePortraitMeshes(model._model) : fullBody ? refinePortraitMeshes(model._model, ['ArtMesh0', 'ArtMesh5']) : null;
     const shaderPath = new URL('./Shaders/WebGL/', import.meta.url).href;
     return {
+      profile: data.LunaRig?.Profile, waistZoom: data.LunaRig?.WaistZoom,
+      drawableIds: Array.from({length:model._model.getDrawableCount()}, (_,i)=>model._model.getDrawableId(i).getString()),
       parameterIds: [...ids.keys()], expressionNames: [...expressions.keys()],
       motionCounts: Object.fromEntries([...motions].map(([name, list]) => [name, list.length])),
       motionGroups: [...motions.keys()], dispose,
@@ -147,9 +151,14 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         for (const [name, value] of Object.entries(parameters)) {
           if (ids.has(name) && Number.isFinite(value)) core.setParameterValueById(ids.get(name), value);
         }
+        if (fullBody) {
+          for (const [name, value] of Object.entries(fullBodyParameters(portraitTime, reducedMotion))) {
+            if (ids.has(name)) core.setParameterValueById(ids.get(name), value);
+          }
+        }
         // This first Luna rig has a fixed original-illustration foreground. Head and
         // brow translation would move the facial patches outside their apertures.
-        if (data.LunaRig?.Profile === 'portrait-face-v1') {
+        if (data.LunaRig?.Profile === 'portrait-face-v1' || fullBody) {
           if (ids.has('ParamMouthForm')) core.setParameterValueById(ids.get('ParamMouthForm'), Math.max(-.35, Math.min(.35, parameters.ParamMouthForm || 0)));
           for (const name of ['ParamAngleX','ParamAngleY','ParamAngleZ',
             'ParamBodyAngleX','ParamBodyAngleY','ParamBodyAngleZ','ParamBrowLY','ParamBrowRY',
@@ -160,11 +169,12 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         if (!reducedMotion) model._physics?.evaluate(core, dt);
         model._pose?.updateParameters(core, dt); core.update();
         portraitMeshes?.refresh();
-        if (data.LunaRig?.Profile === 'portrait-face-v1') {
+        if (data.LunaRig?.Profile === 'portrait-face-v1' || fullBody) {
           portraitTime += dt;
           cleanVertices = Array.from({length: core.getDrawableCount()}, (_, i) => {
             const vertices = core.getDrawableVertices(i), clean = vertices.slice();
-            movePortrait(vertices, portraitTime, reducedMotion);
+            if (fullBody) moveFullBody(vertices, portraitTime, reducedMotion, core.getDrawableId(i).getString());
+            else movePortrait(vertices, portraitTime, reducedMotion);
             return clean;
           });
         }

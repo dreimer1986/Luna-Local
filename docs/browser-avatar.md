@@ -7,11 +7,28 @@ um – auch im Popup und auf der Vollbildseite. Die Sprachsitzung bleibt bestehe
 Die Auswahl wird pro Dashboard-Pfad und Modell im Browser gespeichert; sie hat
 Vorrang vor dem YAML-Startwert `framing: full` oder `framing: waist`.
 
-`waist_zoom: 1.2` ist der Standard für das derzeitige Porträtmodell. Für ein späteres
-Ganzkörpermodell lässt sich der Faktor anpassen, beispielsweise auf `1.8`
-(zulässig 1–3). „Ganz zeigen“ zeigt den gesamten vorhandenen Modellinhalt. Das
-aktuelle HA-Porträt endet an den Oberschenkeln; V8 ist noch eine Körperstudie mit
-statischem Kopf und ersetzt den funktionierenden Sprachavatar derzeit nicht.
+Das private V9-Ganzkörpermodell verwendet automatisch `waist_zoom: 1.8`;
+das bisherige Porträtmodell bleibt bei `1.2`. YAML kann den Faktor überschreiben
+(zulässig 1–3). Auf schmalen Displays wird der Hüftausschnitt an die Höhe angepasst;
+dabei können die seitlichen Hände außerhalb des Bildes liegen. „Ganz zeigen“
+zeigt beim V9-Modell auch Beine und Schuhe.
+
+## Private V9-Ganzkörperfassung, 28.10.2026
+
+Der bewegliche Gesicht-Rig wurde auf den V8-Körper übertragen. Blinzeln und
+Sprechmund inklusive der bisherigen Zahn-/Lächeln-Textur bleiben erhalten.
+Die Runtime ergänzt sanfte, begrenzte Arm-, Hand-, Finger-, Kopf- und Atembewegungen.
+`prefers-reduced-motion` deaktiviert diese freiwilligen Leerlaufbewegungen.
+Große Gelenkwinkel und Winken sind noch kein freigegebener Bewegungsumfang.
+
+Explizite Smileys der Antwort steuern jetzt dezente Augen-/Mundmimik; das gilt
+auch für Antworten der Raumassistenten. `expressions: false` schaltet dies ab.
+Die bestehende Bereinigung der Sprachausgabe bleibt aktiv. Die unterstützten
+Stimmungsnamen sind noch keine elf separat gezeichneten Gesichtsausdrücke.
+
+Browserprüfungen mit lokal gebautem SDK und privatem Modell in `dist/LunaV9`:
+`node tools/live2d/fullbody-smoke.mjs`, `node tools/live2d/zoom-smoke.mjs`,
+`node tools/live2d/room-smoke.mjs`. Der Raumtest spielt keinen Ton ab.
 
 ## Live2D-Stand 0.4.0b4
 

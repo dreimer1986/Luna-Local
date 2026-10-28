@@ -27,7 +27,7 @@ try{
  await page.evaluate(()=>window.start());
  await page.waitForFunction(()=>window.mouth.some(v=>v>.3),{timeout:10000});
  await page.evaluate(()=>window.stop());await page.waitForTimeout(100);
- const result=await page.evaluate(()=>({maxMouth:Math.max(...mouth),stoppedMouth:mouth.at(-1),audibleContexts}));
+ const result=await page.evaluate(()=>({maxMouth:Math.max(...mouth),stoppedMouth:mouth.at(-1),remoteMood:moods.includes('sad'),audibleContexts}));
  console.log(result);
- if(result.stoppedMouth!==0||result.audibleContexts!==0||errors.length)throw Error(errors.join('\n')||'Room mirror failed');
+ if(!result.remoteMood||result.stoppedMouth!==0||result.audibleContexts!==0||errors.length)throw Error(errors.join('\n')||'Room mirror failed');
 }finally{await browser.close();server.close();}
