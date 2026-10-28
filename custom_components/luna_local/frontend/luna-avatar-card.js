@@ -8,12 +8,15 @@ class LunaAvatarCard extends HTMLElement {
   setConfig(config) {
     if (!['card', 'popup'].includes(config.presentation || 'card')) throw Error('presentation: card oder popup');
     if (!['illustration', 'technical', 'live2d'].includes(config.avatar || 'illustration')) throw Error('avatar: illustration, live2d oder technical');
+    if (!['full', 'waist'].includes(config.framing || 'full')) throw Error('framing: full oder waist');
+    if (config.waist_zoom !== undefined && (!Number.isFinite(config.waist_zoom) || config.waist_zoom < 1 || config.waist_zoom > 3)) throw Error('waist_zoom: Zahl von 1 bis 3');
     if (config.avatar === 'live2d') {
       if (config.live2d_model) localAssetURL(config.live2d_model);
       if (config.live2d_runtime) localAssetURL(config.live2d_runtime);
     }
     this.teardown();
     this.config = {...config};
+    this.style.setProperty('--luna-waist-zoom', String(config.waist_zoom ?? 1.2));
     // Match kiosk-mode's explicit maintenance URL without changing saved config.
     this.displayOnly = config.display_only === true && !new URLSearchParams(location.search).has('disable_km');
     this.toggleAttribute('transparent-background', config.background === 'transparent');
@@ -45,6 +48,8 @@ class LunaAvatarCard extends HTMLElement {
       .stage[data-avatar="illustration"],.stage[data-avatar="live2d"]{width:100%;height:auto;aspect-ratio:2/3;max-height:640px}
       .stage[data-avatar="live2d"] .rig{position:absolute;inset:0}
       .portrait{display:block;width:100%;height:100%;object-fit:contain;object-position:center;position:relative;z-index:1}
+      .stage[data-framing="waist"] > .rig,.stage[data-framing="waist"] > .portrait{transform:scale(var(--luna-waist-zoom,1.2));transform-origin:50% 0}
+      .framing{position:absolute;right:10px;top:10px;z-index:3;opacity:.85}
       .badge{position:absolute;bottom:10px;left:12px;background:#121a30d9;color:#fff;padding:5px 10px;border-radius:16px;font:12px system-ui;z-index:2}
       .controls{padding:14px;display:grid;gap:10px} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
       button,input{font:inherit}button{cursor:pointer;border:1px solid var(--divider-color,#ccd0db);border-radius:12px;padding:9px 12px;background:var(--secondary-background-color,#eef0f7);color:inherit}
@@ -60,7 +65,7 @@ class LunaAvatarCard extends HTMLElement {
     <ha-card><button class="launch" hidden>Luna öffnen</button><div class="dock"></div></ha-card>
     <dialog aria-label="Mit Luna sprechen"></dialog>
     <section class="panel" aria-label="Luna Lokal">
-      <div class="stage"><div class="rig"></div><span class="badge">Luna · Animationsvorschau</span></div>
+      <div class="stage"><button class="framing" aria-pressed="false" title="Bildausschnitt wechseln">Bis zur Hüfte</button><div class="rig"></div><span class="badge">Luna · Animationsvorschau</span></div>
       <div class="controls">
         <div class="row"><p class="status" role="status" aria-live="polite"></p><button class="expand" aria-label="Luna als Popup öffnen">Vergrößern</button><button class="close" hidden>Schließen</button></div>
         <p class="error" role="alert" hidden></p>
@@ -83,6 +88,23 @@ class LunaAvatarCard extends HTMLElement {
     root.querySelector('.continuous').checked = this.config.continuous === true;
     root.querySelector('.stage').dataset.background = ['plain', 'transparent'].includes(this.config.background) ? this.config.background : 'moon';
     root.querySelector('.stage').dataset.avatar = this.config.avatar || 'illustration';
+    this.framingKey = `luna-framing:${location.pathname}:${this.config.live2d_model || this.config.avatar || 'illustration'}`;
+    let framing = this.config.framing || 'full';
+    try { const saved = localStorage.getItem(this.framingKey); if (['full', 'waist'].includes(saved)) framing = saved; } catch {}
+    const setFraming = value => {
+      root.querySelector('.stage').dataset.framing = value;
+      const button = root.querySelector('.framing');
+      button.textContent = value === 'full' ? 'Bis zur Hüfte' : 'Ganz zeigen';
+      button.setAttribute('aria-pressed', String(value === 'waist'));
+      button.setAttribute('aria-label', value === 'full' ? 'Avatar bis zur Hüfte zeigen' : 'Avatar ganz zeigen');
+    };
+    setFraming(framing);
+    root.querySelector('.framing').onclick = event => {
+      event.stopPropagation();
+      const value = root.querySelector('.stage').dataset.framing === 'full' ? 'waist' : 'full';
+      setFraming(value);
+      try { localStorage.setItem(this.framingKey, value); } catch {}
+    };
     root.querySelector('.listen').onclick = () => this.session.listen(root.querySelector('.continuous').checked);
     root.querySelector('.finish').onclick = () => this.session.finishInput();
     root.querySelector('.stop').onclick = () => this.session.stop();
