@@ -36,11 +36,12 @@ the automated browser study currently uses the SDK's 2048-texture runtime.
 app interfaces failed with `Computer Use native pipe is unavailable ... os error 2`,
 including a helper-session reset. Restore app control before editor work. This is
 an unavailable automation connection, not evidence that the desktop is locked.
-The package is PRO; the last known installed editor is FREE. According to the
-official sample page, FREE can inspect but cannot save/export a PRO model.
-No trial or subscription has been activated.
+The package is PRO. The user has now activated the PRO trial. The running editor's
+window title confirms `Trial version 43 days remaining` (28 October 2026).
+The license prerequisite is therefore resolved. Native app access still fails
+through both interfaces, including a fresh helper-session reset.
 
-Next: obtain a working PRO-capable editor, import/separate Luna's full-body art,
+Next: restore the native app connection, import/separate Luna's full-body art,
 then apply Mao's template on a copy with manual part/deformer correspondence.
 Keep ears, hair, sweater, hands, trousers and shoes separate; redraw occluded
 areas before deforming. Check head turns, closed eyes, mouth corners, overlapping
