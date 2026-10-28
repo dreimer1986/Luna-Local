@@ -44,8 +44,28 @@ window title confirms `Trial version 43 days remaining` (28 October 2026).
 Both the license prerequisite and native app connection are now resolved;
 the successful template export also verifies writing from the PRO editor.
 
-Next: import/separate Luna's full-body art,
-then apply Mao's template on a copy with manual part/deformer correspondence.
+The first body separation is reproducible with `tools/separate_luna_body.py`
+(Pillow, numpy, psd-tools), using `--output` with a new directory. It writes 14
+cropped PSD layers with original offsets, PNGs, contour diagnostics and a manifest.
+Exact neutral reconstruction and pixel equality after reopening the PSD pass.
+Existing output folders are refused.
+
+The draft is in `Downloads/Cubism/Mao-test/luna-body-v2/`.
+`luna-body-separated.psd` was imported and saved as `luna-body-separated.cmo3`.
+It remains unrigged: head/hair/ears are combined, joints lack hidden overlaps,
+and thin knee seams are visible in the editor.
+
+A partial template preview on `calf_viewer_L` incorrectly auto-mapped to
+`Light 3`. The manual list exposes `Leg L` and `Leg R` (whole-leg meshes), but
+no corrected transfer has been applied or saved. Do not accept the pending
+mapping dialog: its last temporary selection was `Line 6`, also incorrect.
+Cancel it and explicitly map the appropriate leg. Mixed-DPI redraw artifacts
+appeared after display changes; reopening Mapping List fixed that dialog.
+Native access then failed with `GetCursorPos failed: Zugriff verweigert
+(0x80070005)`. Restore desktop access before further UI work.
+
+Next: correct and validate the partial mapping, then apply Mao's template on a
+copy with manual part/deformer correspondence and compatible layer boundaries.
 Keep ears, hair, sweater, hands, trousers and shoes separate; redraw occluded
 areas before deforming. Check head turns, closed eyes, mouth corners, overlapping
 limbs, sleeve cuffs, hips/knees/ankles and edge cropping through every keyform.

@@ -7,6 +7,16 @@ privat vor. Editorzugriff und PRO Trial sind inzwischen bestätigt, eine portabl
 Mao-Modellvorlage wurde exportiert; die eigentliche Übertragung ist noch nicht
 erfolgt. HA bleibt auf dem unten dokumentierten Portraitmodell.
 
+**Weiterer Stand 28.10.:** Körperentwurf mit 14 Ebenen als PSD und ungeriggte
+CMO3 in `Downloads/Cubism/Mao-test/luna-body-v2/` gespeichert. Reproduzierbares
+Skript: `tools/separate_luna_body.py`; neutrale Rekonstruktion und PSD-Roundtrip
+pixelgenau geprüft. Noch keine Gelenküberlappungen oder Gesichtstrennung.
+Template-Test nicht übernommen: automatische Zuordnung war ein Lichteffekt;
+der offene Mapping-Dialog enthält inzwischen die ebenfalls falsche temporäre
+Auswahl `Line 6`. Nicht bestätigen. Details und nächste Schritte in der Mao-Studie.
+Desktopsteuerung zuletzt mit `GetCursorPos failed: Zugriff verweigert
+(0x80070005)` abgebrochen; nach Entsperren Fensterzustand frisch erfassen.
+
 ## Den richtigen Branch holen
 
 ```sh
