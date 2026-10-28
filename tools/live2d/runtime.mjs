@@ -117,8 +117,9 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
     const shaderPath = new URL('./Shaders/WebGL/', import.meta.url).href;
     return {
       parameterIds: [...ids.keys()], expressionNames: [...expressions.keys()],
+      motionCounts: Object.fromEntries([...motions].map(([name, list]) => [name, list.length])),
       motionGroups: [...motions.keys()], dispose,
-      draw(dt, {group = 'Idle', expression = 'neutral', parameters = {}, reducedMotion = false} = {}) {
+      draw(dt, {group = 'Idle', motionIndex = 0, expression = 'neutral', parameters = {}, reducedMotion = false, view = {}} = {}) {
         if (disposed) return;
         if (contextLost) throw Error('Grafikkontext verloren; Ansicht neu öffnen.');
         dt = Math.max(0, Math.min(.05, Number.isFinite(dt) ? dt : 0));
@@ -128,8 +129,11 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         core.loadParameters();
         if (!reducedMotion) {
           const desired = motions.has(group) ? group : 'Idle';
-          if (motions.get(desired)?.length && (activeGroup !== desired || model._motionManager.isFinished())) {
-            model._motionManager.startMotionPriority(motions.get(desired)[0], false, 1); activeGroup = desired;
+          const list = motions.get(desired);
+          const index = Number.isInteger(motionIndex) && motionIndex >= 0 && motionIndex < (list?.length || 0) ? motionIndex : 0;
+          const motionKey = `${desired}:${index}`;
+          if (list?.length && (activeGroup !== motionKey || model._motionManager.isFinished())) {
+            model._motionManager.startMotionPriority(list[index], false, 1); activeGroup = motionKey;
           }
           model._motionManager.updateMotion(core, dt);
           core.saveParameters();
@@ -168,8 +172,12 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         model.setRenderTargetSize(w, h);
         const matrix = new CubismMatrix44(); matrix.scale(h / w, 1);
         const mm = model.getModelMatrix();
-        mm.setHeight(Math.min(1.9, 1.9 * (w / h) * core.getCanvasHeight() / core.getCanvasWidth()));
-        mm.setPosition(0, 0); matrix.multiplyByMatrix(mm);
+        const bounded = (value, fallback, low, high) => Number.isFinite(value) ? Math.max(low, Math.min(high, value)) : fallback;
+        const zoom = bounded(view?.zoom, 1, .5, 3);
+        mm.setHeight(zoom * Math.min(1.9, 1.9 * (w / h) * core.getCanvasHeight() / core.getCanvasWidth()));
+        // Offsets are fractions of the viewport; positive Y moves down.
+        mm.setPosition(bounded(view?.x, 0, -1, 1) * 2 * w / h, -bounded(view?.y, 0, -1, 1) * 2);
+        matrix.multiplyByMatrix(mm);
         renderer.setMvpMatrix(matrix); renderer.setRenderState(null, [0, 0, w, h]);
         gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
         renderer.drawModel(shaderPath);

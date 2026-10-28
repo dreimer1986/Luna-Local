@@ -24,4 +24,7 @@ await cp(join(source, 'NOTICE.md'), join(output, 'SDK-NOTICE.md'));
 if (process.argv.includes('--sample')) {
   await cp(join(source, 'Samples/Resources/Hiyori'), join(output, 'Sample'), {recursive: true});
 }
+if (process.argv.includes('--mao-sample')) {
+  await cp(join(source, 'Samples/Resources/Mao'), join(output, 'Mao'), {recursive: true});
+}
 console.log('Built local Cubism runtime. dist is excluded from Git; publication review remains required.');

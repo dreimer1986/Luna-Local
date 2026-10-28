@@ -35,6 +35,39 @@ as well as the test result: nonzero pixels alone do not prove correct placement.
 
 ## Adapter interface
 
+### Private Mao full-body study
+
+The experimental page uses the **unmodified official Mao sample**, not a finished
+Luna redesign. Copy it from your own SDK and run the local preview:
+
+```powershell
+node build.mjs C:\Users\dreimer\Downloads\Cubism\CubismSdkForWeb-5-r.5 --mao-sample
+node mao-preview.mjs
+```
+
+Open <http://127.0.0.1:8791/tests/mao-study.html>. Stop the server with Ctrl+C.
+The page fits the entire model including feet, offers zoom/vertical position,
+all eight original motions, and a separate simulated Luna-controls mode.
+The latter maps Luna's five vowel controls to Mao's `ParamA/I/U/E/O` and maps
+blush, smile and mouth expressions. It has no microphone, audio output or HA
+connection. The vowel loop is only an explicit visual diagnostic, not speech sync.
+Motion and emotion controls apply to their respective modes.
+
+`node mao-preview.mjs --check` renders three aspect ratios, checks visible margins,
+five vowel changes, four expression changes, mouth closure on interruption and
+all eight motion selections. Screenshots are under ignored `dist/mao-check/`.
+These checks prove rendering/control compatibility, not artistic correctness of
+a transferred Luna rig. Source files, sample textures and compiled Core stay private.
+
+The download's `ReadMe.txt` identifies Mao as a **PRO model**. Cubism FREE cannot
+save/export such a model; a working PRO-capable editor is needed for the full rig
+transfer. The original model's motions/effects do not all suit Luna automatically.
+Keep Luna's approved identity, age-appropriate clothing and her own artwork; do
+not ship Mao's costume or magical props as a substitute. See
+[Mao study handoff](../../docs/live2d/mao-study.md).
+
+### Runtime calls
+
 ```javascript
 const {mountLuna} = await import('./dist/runtime.mjs');
 const player = await mountLuna(canvas, './model/luna.model3.json', {signal});
@@ -42,9 +75,15 @@ const player = await mountLuna(canvas, './model/luna.model3.json', {signal});
 player.draw(dt, {
   group: 'Idle', expression: 'neutral', reducedMotion: false,
   parameters: {ParamMouthOpenY: 0},
+  motionIndex: 0, // optional index within the selected motion group
+  view: {zoom: 1, x: 0, y: 0}, // optional; positive y moves down
 });
 player.dispose();
 ```
+
+The default view remains a full-canvas fit. Zoom is bounded to 0.5–3; offsets
+are fractions of viewport size, bounded to -1–1. These are runtime arguments;
+the production HA card does not yet expose them as YAML options.
 
 The caller owns animation scheduling, visibility, audio, turn cancellation and
 canvas size. This module never plays audio embedded in sample motions. Expressions
