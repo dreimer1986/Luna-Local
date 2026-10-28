@@ -90,7 +90,7 @@ remains near the cuff at the other extreme. Hidden joint overlap artwork is
 absent. The head remains a static locked reference outside the body hierarchy.
 Do not deploy this study or describe it as finished facial/body animation.
 
-Current editor selection: `Upper Arm L B Rotation` (`Rotation18`) in the V4 model.
+Observed problem deformer: `Upper Arm L B Rotation` (`Rotation18`) in the V4 model.
 Its pivot is visibly around the middle of the upper arm, below Luna's shoulder.
 The official correction uses Ctrl+drag to move the deformer without its children.
 The available desktop `sky.drag` API has no modifier-key argument and `press_key`
@@ -110,6 +110,24 @@ limbs, sleeve cuffs, hips/knees/ankles and edge cropping through every keyform.
 Map only suitable gestures, remove sample-specific props/effects and verify all
 five vowels at several head angles. Render and visually approve before replacing
 the current portrait model. Pixel-change tests alone are not acceptance criteria.
+
+### Combined material checkpoint, 28 October
+
+`luna-fullbody-face-v1` separates the full-body source into 14 visible facial/base
+layers plus one hidden skin-repair draft. The repair has visible remnants and is
+not accepted for motion. `luna-combined-v1/luna-fullbody-face-separated.psd`
+combines its 13 facial patches with the body and remaining head into 25 layers.
+Reconstruction and per-layer PSD round-trip preserve all visible source pixels.
+Cubism successfully imported the PSD as a separate model, saved privately as
+`luna-combined-v1/luna-fullbody-face-separated.cmo3` (1,785,370 bytes).
+This is unrigged material; V4's transferred body animation remains in V4.
+No hidden repairs are included in the combined model. Hair/ears are still combined,
+irises contain only their visible portions and the mouth has no interior.
+
+The default portrait separator also passed the same pixel checks after adding
+custom source/region arguments. Reproduce with the commands in the tools README.
+Transport these additions in `Downloads/Luna-face-materials-2026-10-28.zip`;
+the earlier Mao authoring ZIP has not been overwritten.
 
 Official references:
 

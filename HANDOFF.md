@@ -35,6 +35,19 @@ zum anderen Rechner mitgenommen werden; Git enthält nur eigenes Skript und Doku
 
 ## Den richtigen Branch holen
 
+**Gesichtsmaterial, weiterer Stand 28.10.:**
+`Downloads/Cubism/Mao-test/luna-fullbody-face-v1` enthält die getrennten
+Gesichtsebenen der Ganzkörperstudie. `luna-combined-v1` enthält eine gemeinsame
+PSD mit 25 sichtbaren Ebenen sowie die in Cubism importierte, separat gespeicherte
+`luna-fullbody-face-separated.cmo3` (noch ohne Rig). Sichtbare Quellpixel,
+Transparenz und PSD-Roundtrip sind exakt geprüft. Die frühere Portraittrennung
+wurde ebenfalls erfolgreich erneut geprüft. Die Hautreparatur ist sichtbar
+unzureichend und bleibt ausgeblendet; in der kombinierten PSD fehlt sie bewusst.
+Keine neue Mimik oder Runtime daraus ableiten. Details und reproduzierbare
+Befehle stehen in `tools/live2d/README.md`. Der Schulterdrehpunkt bleibt offen.
+Zusatzpaket: `Downloads/Luna-face-materials-2026-10-28.zip`, getrennt vom älteren
+Mao-Transportpaket. Es enthält die neuen Gesichtsmaterialien und kombinierte Studie.
+
 ```sh
 git clone --branch work/luna-live2d-preparation https://github.com/dreimer1986/Luna-Local.git
 cd Luna-Local

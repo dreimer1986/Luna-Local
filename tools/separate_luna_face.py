@@ -48,13 +48,17 @@ def rgba_layer(source, mask):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--source", type=Path, default=SOURCE)
+    parser.add_argument("--regions", type=Path, default=SPEC)
     args = parser.parse_args()
     OUT = args.output
+    source_path = args.source.resolve()
+    spec_path = args.regions.resolve()
     if OUT.exists():
         raise SystemExit(f"Refusing to overwrite existing materials: {OUT}")
-    original = Image.open(SOURCE)
-    source_hash = hashlib.sha256(SOURCE.read_bytes()).hexdigest()
-    spec = json.loads(SPEC.read_text())
+    original = Image.open(source_path)
+    source_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    spec = json.loads(spec_path.read_text())
     if original.mode != "RGBA" or list(original.size) != spec["canvas"]:
         raise ValueError("Source mode/dimensions differ from the authored contours")
     source = np.array(original)
@@ -153,7 +157,7 @@ def main():
         overlay = Image.alpha_composite(overlay, Image.fromarray(tint))
     map_image = Image.alpha_composite(map_image.convert("RGBA"), overlay)
     map_image.save(OUT / "separation-map.png")
-    box = (365, 255, 665, 495)
+    box = tuple(spec.get("review_box", (365, 255, 665, 495)))
     views = [(original, "Original"), (reconstructed, "Reassembled: exact pixels"),
              (map_image, "Source ownership masks"),
              (Image.fromarray(repaired_source), "Hidden skin repair: DRAFT")]
@@ -168,12 +172,12 @@ def main():
         draw.text((x + 12, y + 10), label, fill="white", font=font)
         sheet.paste(view.convert("RGB").crop(box).resize((600, 480)), (x, y + 40))
     sheet.save(OUT / "face-review.png")
-    if hashlib.sha256(SOURCE.read_bytes()).hexdigest() != source_hash:
+    if hashlib.sha256(source_path.read_bytes()).hexdigest() != source_hash:
         raise ValueError("Source file changed during separation")
     manifest = {
-        "source": str(SOURCE.relative_to(ROOT)),
+        "source": str(source_path.relative_to(ROOT) if source_path.is_relative_to(ROOT) else source_path),
         "source_sha256": source_hash,
-        "contours_sha256": hashlib.sha256(SPEC.read_bytes()).hexdigest(),
+        "contours_sha256": hashlib.sha256(spec_path.read_bytes()).hexdigest(),
         "canvas": list(size),
         "coordinate_system": "viewer L/R, original pixel positions, no scaling",
         "visible_layers": list(layers),
@@ -182,7 +186,7 @@ def main():
             "visible_rgb_mismatched_pixels": int(np.count_nonzero(rgb_mismatch)),
             "alpha_mismatched_pixels": int(np.count_nonzero(alpha_mismatch)),
             "psd_layer_pixels_exact": True,
-            "source_unchanged": hashlib.sha256(SOURCE.read_bytes()).hexdigest()
+            "source_unchanged": hashlib.sha256(source_path.read_bytes()).hexdigest()
                                 == source_hash,
         },
         "limitations": [

@@ -79,6 +79,27 @@ unrigged reference. This is material preparation, not automated finished rigging
 The transferred shoulder pivots and joint overlaps still need authoring work;
 see the handoff for the duplicate `Forearm R` mapping trap and saved private paths.
 
+### Combined full-body and facial materials
+
+Run from the repository root with Pillow, numpy, psd-tools and OpenCV installed:
+
+```sh
+python tools/separate_luna_face.py --source docs/live2d/references/luna-fullbody-study-v1.png --regions docs/live2d/source/fullbody-face-regions.json --output /path/to/new/face-study
+python tools/combine_luna_materials.py --body /path/to/body-study --face /path/to/new/face-study --output /path/to/new/combined-study
+```
+
+The body input must have been generated with `--mao-body` from the same source.
+The combined PSD has 25 registered visible layers; hidden repair drafts are
+excluded. Both tools validate neutral pixels and PSD layer pixels/offsets, and
+refuse existing output directories. The face tool's default portrait source
+remains supported and was rechecked after adding the source/contour arguments.
+
+These are source materials, not new animation. The full-body face is small in
+the original 1024×1536 artwork; scaling does not add detail. Hidden iris/sclera,
+clean skin behind moving features, mouth interior, joint overlaps and separate
+hair/ears still require artwork. Do not reimport the combined file over a rigged
+study without a separate backup and deliberate mesh/layer migration.
+
 ### Runtime calls
 
 ```javascript
