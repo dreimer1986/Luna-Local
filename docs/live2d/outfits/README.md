@@ -13,16 +13,49 @@ Die vollständigen Prompts stehen in `prompts.md`.
 Über einen lokalen HTTP-Server öffnen, nicht direkt als file:// (JSON wird geladen).
 HA-Vorschau: https://ha.dreimer.de/local/luna/outfits-20261029/index.html
 
-## Stand und nächste Modellarbeit
+## Bewegliche Winterstudie
 
-**Nur statische Konzepte, keine umschaltbaren oder animierten Outfits.** Keine
-neuen MOC3-/CMO3-Dateien, keine Änderungen am laufenden V10-Avatar. Der Katalog
+Zusätzliche Vorschau: https://ha.dreimer.de/local/luna/winter-study-20261029.html
+
+Wintermantel und Original-Pullover lassen sich im selben Player wechseln. Der
+vorhandene Cubism-Gesicht-Rig bleibt erhalten; Kleidung nutzt eine zusätzliche
+WebGL-Ebene mit V10-Körperbewegungen. Das ist **kein neues CMO3/MOC3-Outfit**.
+Der normale V10-Avatar wurde nicht umgestellt.
+
+`winter-body.png` ergänzt die hinter den Armen fehlenden Mantelflächen. Arme und
+Hände stammen aus `winter.png`, Körper/Beine aus dem bereinigten Material. Die
+Pixelbilder bleiben unverändert; Polygone und UVs teilen sie beim Zeichnen auf.
+`tools/live2d/outfits/winter.mjs` enthält die Materialgrenzen, `mesh.mjs` die
+Triangulierung, `renderer.mjs` die Kleidungsebene. Keine neu erfundene Mimik: Kopf,
+Blinzeln und Sprechmund stammen weiterhin aus dem V9-Modell.
+
+Reproduzieren (private V9-Modell-Dateien und offizielles SDK erforderlich):
+
+```sh
+node tools/live2d/prepare-winter-study.mjs /pfad/zum/V9-Modellordner
+node tools/live2d/build.mjs /pfad/zum/CubismSdkForWeb-5-r.5
+node tools/live2d/poses-smoke.mjs --winter
+```
+
+`LunaRig.WinterStudyTexture` und `WinterStudyBodyTexture` aktivieren die Studie nur
+bei ausdrücklich vorbereiteten Modellen. Ohne diese Angaben bleibt das Verhalten
+wie bisher. `setOutfit('classic'|'winter')` wechselt nur die geladene Darstellung;
+es legt keinen neuen Player an.
+
+Grenzen: Posen verformen Ärmel weiterhin teilweise stark; die Hand bleibt die
+vorhandene entspannte Zeichnung. Keine dauerhaft gespeicherte Kleiderauswahl in
+der HA-Karte und keine Outfit-Automationsaktion. Sommer und Bademantel sind
+weiterhin statische Konzepte. Die zusätzliche Ebene ist aktuell auf die feste
+Geometrie des V9-Gesichts und 1024×1536-Material abgestimmt.
+
+## Weitere Modellarbeit
+
+**Sommer und Bademantel sind noch statische Konzepte.** Keine neuen MOC3-/CMO3-Dateien, keine Änderungen am laufenden V10-Avatar. Der Katalog
 führt diese Einträge ausdrücklich als `concept` und enthält keine Modell-URLs.
 Die Bilder haben einen Alphakanal; saubere Kanten, anatomische Übereinstimmung
 und verdeckte Gelenkflächen müssen bei der Materialaufbereitung geprüft werden.
 
-Der nächste Umsetzungsschritt beginnt mit dem Winteroutfit, dessen Ärmelaufbau
-dem bestehenden Modell am ähnlichsten ist:
+Für native Cubism-Outfits und die spätere allgemeine Kleiderauswahl bleiben:
 
 1. Körpermaterial in Torso, Oberarme, Unterarme, Hände, Beine, Schuhe und
    Kragen/Schal aufteilen. Verdeckte Gelenkflächen ergänzen; keine harten

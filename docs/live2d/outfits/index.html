@@ -7,7 +7,7 @@
 <header><h1>Lunas Garderobe</h1><p>Drei Kleidungsentwürfe zum Vergleichen. Dies sind <strong>statische Zeichnungen</strong>; sie sind noch keine umschaltbaren Live2D-Modelle. Der laufende Avatar behält seine bisherigen Posen und Kleidung.</p></header>
 <div class="controls"><label>Hintergrund <select id="background"><option value="moon">Dunkelblau</option><option value="light">Hell</option><option value="checker">Transparenzraster</option></select></label><button id="zoom" aria-pressed="false">Bis zur Hüfte</button></div>
 <main id="gallery" class="gallery" aria-label="Kleidungsentwürfe"></main>
-<footer>Als Nächstes: Kleidungs- und Armteile mit verdeckten Gelenkübergängen zeichnen, den vorhandenen Gesicht-Rig übernehmen und jede Pose mit dem neuen Outfit prüfen. Diese Vorschau verwendet weder Mikrofon noch Sprachausgabe.</footer>
+<footer><p><a href="https://ha.dreimer.de/local/luna/winter-study-20261029.html">Bewegliche Winterstudie öffnen</a> – mit Outfitwechsel, Posen und Sprechmund.</p>Als Nächstes: Kleidungs- und Armteile mit verdeckten Gelenkübergängen zeichnen, den vorhandenen Gesicht-Rig übernehmen und jede Pose mit dem neuen Outfit prüfen. Diese Vorschau verwendet weder Mikrofon noch Sprachausgabe.</footer>
 <script type="module">
 const gallery=document.querySelector('#gallery'),background=document.querySelector('#background'),zoom=document.querySelector('#zoom');
 background.addEventListener('change',()=>gallery.dataset.bg=background.value);

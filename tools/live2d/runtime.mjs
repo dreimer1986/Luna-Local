@@ -1,3 +1,4 @@
+import {createWinterStudy} from './outfits/renderer.mjs';
 import {createBlush} from './blush.mjs';
 import {ARM_MESHES} from './fullbody-pose.mjs';
 // Luna-owned adapter to the official Cubism Web Framework, built locally.
@@ -51,14 +52,14 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
   const gl = canvas.getContext('webgl', {alpha: true, premultipliedAlpha: true, antialias: true});
   if (!gl) {setting.release(); throw Error('WebGL ist nicht verfügbar.');}
   const model = new CubismUserModel(), textures = [], motions = new Map(), expressions = new Map();
-  let portraitTime = 0, cleanVertices = null, blush = null;
+  let portraitTime = 0, cleanVertices = null, blush = null, winterStudy = null, winterActive = true;
   let disposed = false, activeGroup = '', activeExpression = '', contextLost = false;
   const lost = event => {event.preventDefault(); contextLost = true;};
   canvas.addEventListener('webglcontextlost', lost);
   const dispose = () => {
     if (disposed) return;
     disposed = true; canvas.removeEventListener('webglcontextlost', lost);
-    blush?.dispose();
+    blush?.dispose(); winterStudy?.dispose();
     model.release();
     textures.forEach(texture => gl.deleteTexture(texture));
     motions.forEach(list => list.forEach(motion => ACubismMotion.delete(motion)));
@@ -119,9 +120,24 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
     model._model.saveParameters();
     const fullBody = data.LunaRig?.Profile === 'fullbody-face-v1';
     if(fullBody)blush=createBlush(gl);
+    if(fullBody && data.LunaRig?.WinterStudyTexture){
+      const bitmaps=[];
+      try{
+        for(const file of [data.LunaRig.WinterStudyTexture,data.LunaRig.WinterStudyBodyTexture]){
+          const bytes=await load(assetURL(file,base));
+          bitmaps.push(await createImageBitmap(new Blob([bytes],{type:'image/png'}),{premultiplyAlpha:'premultiply'}));
+        }
+        winterStudy=createWinterStudy(gl,...bitmaps);
+      }finally{bitmaps.forEach(bitmap=>bitmap.close());}
+      const opacity=model._model.getDrawableOpacity.bind(model._model);
+      model._model.getDrawableOpacity=i=>winterActive && /^ArtMesh\d+$/.test(model._model.getDrawableId(i).getString())?0:opacity(i);
+    }
+
     const portraitMeshes = data.LunaRig?.Profile === 'portrait-face-v1' ? refinePortraitMeshes(model._model) : fullBody ? refinePortraitMeshes(model._model, ['foreground_original', 'base_skin_completed', ...ARM_MESHES]) : null;
     const shaderPath = new URL('./Shaders/WebGL/', import.meta.url).href;
     return {
+      outfits: winterStudy ? ['classic','winter'] : ['classic'],
+      setOutfit(name) { if(!['classic','winter'].includes(name) || (name==='winter'&&!winterStudy)) throw Error('Outfit nicht verfügbar'); winterActive=name==='winter'; },
       profile: data.LunaRig?.Profile, waistZoom: data.LunaRig?.WaistZoom,
       drawableIds: Array.from({length:model._model.getDrawableCount()}, (_,i)=>model._model.getDrawableId(i).getString()),
       parameterIds: [...ids.keys()], expressionNames: [...expressions.keys()],
@@ -194,6 +210,7 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         matrix.multiplyByMatrix(mm);
         renderer.setMvpMatrix(matrix); renderer.setRenderState(null, [0, 0, w, h]);
         gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+        if(winterActive)winterStudy?.draw(renderer,matrix,portraitTime,reducedMotion,parameters);
         renderer.drawModel(shaderPath);
         blush?.draw(renderer,matrix,portraitTime,reducedMotion,parameters);
       },

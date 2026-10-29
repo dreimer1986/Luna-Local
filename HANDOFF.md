@@ -1,5 +1,18 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Bewegliche Winterstudie, 29.10.2026
+
+Separate Vorschau: https://ha.dreimer.de/local/luna/winter-study-20261029.html
+Wintermantel/Original-Pullover im selben Player umschaltbar; bestehendes Gesicht,
+Blinzeln, Mund und V10-Posen bleiben aktiv. Zusätzliche Runtime-Kleidungsebene,
+kein neu bearbeitetes CMO3/MOC3. Bildmaterial und reproduzierbarer Aufbau stehen
+in `docs/live2d/outfits/README.md`. Normale HA-Karten/Integration bleiben V10.
+Prüfung: 37 Node-Tests, Original-Ganzkörper-Smoke und Winter-Posentest bestanden.
+Winter: Mund 120 / Blinzeln 588 geänderte Pixel; nach Outfitwechsel pixelgenau
+wiederhergestellt, derselbe Player. Live-Vorschau und schmale Ansicht geprüft.
+Noch offen: allgemeine persistente Kleiderwahl und Automationsauswahl, Sommer-/
+Bademantel-Rig, bessere Handformen und native Cubism-Kleidungsquellen.
+
 ## Garderobenentwürfe, 29.10.2026
 
 Drei neue statische Outfit-Referenzen in `docs/live2d/outfits/`: Sommer, Winter

@@ -3,6 +3,7 @@ import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {resolve, dirname, extname, sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
+const winter=process.argv.includes('--winter');
 const here=dirname(fileURLToPath(import.meta.url)), root=resolve(here,'../..');
 const server=createServer(async(req,res)=>{
   try{
@@ -18,7 +19,7 @@ const browser=await chromium.launch({channel,headless:true,args:['--use-angle=sw
 try{
  const page=await browser.newPage({viewport:{width:900,height:850}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- await page.goto(`http://127.0.0.1:${server.address().port}/tests/pose-preview.html`);
+ await page.goto(`http://127.0.0.1:${server.address().port}/tests/${winter?'winter-preview':'pose-preview'}.html`);
  await page.waitForFunction(()=>window.ready,{timeout:30000});
  await page.evaluate(()=>{window.testMode=true;});
  await page.evaluate(async()=>{for(let i=0;i<40;i++){step(0);await new Promise(requestAnimationFrame);}});
@@ -35,9 +36,21 @@ try{
   },name);
   results[name]={visible:check.visible,changed:check.changed};
   if(check.visible<10000||(name!=='neutral'&&check.changed<100))throw Error('Pose not visible: '+name);
-  await page.screenshot({path:resolve(here,`dist/v10-${name}.png`)});
+  await page.screenshot({path:resolve(here,`dist/${winter?'winter-study':'v10'}-${name}.png`)});
  }
  const stopped=await page.evaluate(()=>{setPose('wave');for(let n=0;n<180;n++)step(.05);return step(.05).parameters.ParamLunaWave;});
  if(stopped>.001)throw Error('Wave did not finish');
+ if(winter){
+  const regression=await page.evaluate(()=>{
+   const originalPlayer=player,canvas=document.querySelector('canvas'),gl=canvas.getContext('webgl');
+   const frame=(outfit,mouth=0,eye=1)=>{player.setOutfit(outfit);player.draw(0,{reducedMotion:true,parameters:{ParamMouthOpenY:mouth,ParamEyeLOpen:eye,ParamEyeROpen:eye}});const pixels=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);return pixels;};
+   const difference=(a,b)=>{let n=0;for(let i=0;i<a.length;i+=4)if(Math.max(...[0,1,2,3].map(k=>Math.abs(a[i+k]-b[i+k])))>12)n++;return n;};
+   const neutral=frame('winter'),mouth=frame('winter',1),blink=frame('winter',0,0),classic=frame('classic'),restored=frame('winter');
+   let rejected=false;try{player.setOutfit('unavailable')}catch{rejected=true;}
+   return {mouth:difference(neutral,mouth),blink:difference(neutral,blink),outfit:difference(neutral,classic),restored:difference(neutral,restored),samePlayer:player===originalPlayer,rejected};
+  });
+  if(regression.mouth<20||regression.blink<100||regression.outfit<1000||regression.restored!==0||!regression.samePlayer||!regression.rejected)throw Error(JSON.stringify(regression));
+  console.log('Winter face and outfit regression:',JSON.stringify(regression));
+ }
  if(errors.length)throw Error(errors.join('\n'));console.log(JSON.stringify({poses:results,waveAfterNineSeconds:stopped},null,2));
 }finally{await browser.close();server.close();}
