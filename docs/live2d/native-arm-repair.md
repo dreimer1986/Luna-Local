@@ -1,5 +1,58 @@
 # Native Arm-Reparatur — 29.10.2026
 
+## Neue native Formkorrektur und Vorschau
+
+Live: https://ha.dreimer.de/local/luna/native-wave-20261029.html
+
+Private Quelle: `native-arm-repair-20261029/luna-native-wave-forms.cmo3`,
+Export daneben in `native-wave-export/`. Das ist eine neue bearbeitbare CMO3
+und ein neuer MOC3-Export, keine Runtime-Verformung der Armvertices.
+
+- Schulteransatz von ArtMesh0 verbreitert; unteres Oberarmende verkürzt.
+- Überstehende Kappe von ArtMesh1 für die gehobene Haltung verkürzt und gerundet.
+  Unterarm in dieser Haltung vor den Oberarm gelegt (Draw Order 560 statt 540).
+- `ParamLunaArmRaise` (0..1, Standard 0) an die drei vorhandenen Rotationen
+  und drei ArtMeshes der linken B-Arm-Kette gebunden. 0 enthält die kopierten
+  Original-V9-Formen, 1 die korrigierte gehobene Haltung. Keine pauschale
+  Neutralform-Kopie über die alten Schulter-/Ellbogenkombinationen.
+- Handgelenk-Pivot Rotation20 bei gehobenem Arm an die Manschette gesetzt.
+  Bei `ParamArmLB03` -30/0/10 liegen die korrigierten Winkel bei 0/15/30 Grad;
+  Handform und Pivot an diesen drei Stellen abgeglichen.
+
+Die Vorschau hebt den Arm in 1,5 Sekunden, winkt vier Sekunden aus dem
+Handgelenk und senkt ihn in 1,5 Sekunden. Handgelenkbewegung ausschließlich
+bei ArmRaise=1, ansonsten Wrist=0. Alte Schulter-, Ellbogen- und Handform-
+Parameter bleiben auf ihren Standardwerten. Diese Einschränkung ist wichtig:
+Kombinationen mit den übrigen alten Armparametern sind noch nicht repariert.
+Andere Armseite, neue Fingerzeichnungen und weitere Posen sind ebenfalls offen.
+
+Editorprüfung: Ruhehaltung, 25/50/75/100 Prozent Armhebung und beide seitlichen
+Handstellungen. Browserprüfung über lokale und HA-URL: Arm 27630, Hand 1893,
+Mund 228, Blinzeln 1013 geänderte Pixel, Rückkehr zur Ruhehaltung 0 Pixel
+Abweichung; 71 Samples der Sequenz bleiben sichtbar. Das prüft Rendering und
+Rückkehr, keine automatische anatomische Qualitätsbewertung. Stoffnähte und
+Handform sind weiter sichtbar; der normale HA-Avatar bleibt unverändert.
+Vergleich der neuen Ruhehaltung mit dem alten V9-Export: 73 abweichende Pixel
+bei 720×1000 und Differenzschwelle 12 (also nicht identischer Export). Handyansicht
+390×844 ohne horizontalen Überlauf; der echte Sieben-Sekunden-Ablauf endet mit
+ArmRaise=0 und Wrist=0. Privates vollständiges Vorschaupaket:
+`/home/dreimer/shares/music/Luna/Luna-Native-Winken-2026-10-29.zip`, einschließlich
+CMO3, Export, Runtime, lokaler Vorschauseite, Bildern und SHA256SUMS.
+
+Reproduktion: Export nach `tools/live2d/dist/LunaNativeWave/` kopieren,
+Diagnoseserver unten starten, dann `node tools/live2d/native-wave-smoke.mjs`.
+Optional `LUNA_WAVE_TEST_URL` auf die Vorschau-URL mit `?manual` setzen.
+Quelle der Vorschauseite: `tests/native-wave-study.html`.
+
+Bearbeitungshinweise: Unter Wine schlug ein direkter Vertex-Drag fehl; Undo
+und gezielte Pfeiltasten-Verschiebungen funktionierten. Shift+Pfeil bewegt hier
+um fünf Bildschirm-Pixel. Ctrl-Ziehen eines Rotationspivots funktionierte.
+Copy Form benutzt die Systemzwischenablage: anschließendes Text-Kopieren
+verwirft die kopierten Formen. Beim Übertragen zwischen Kopien desselben Modells
+passt der Editor die sechs Quell-/Zielobjekte anhand ihrer Identität zu.
+
+Die folgenden Abschnitte dokumentieren die Diagnose vor der Formkorrektur.
+
 Nutzervorgabe: Gelenke und Bewegungsaufbau aus dem fertigen Mao-Modell übernehmen.
 Die Winter-Runtime-Studie und ihre räumliche Verformung erfüllen diese Vorgabe
 nicht. Nicht weiter als fertigen Bewegungsaufbau ausbauen oder ausrollen.

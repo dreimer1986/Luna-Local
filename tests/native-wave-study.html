@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luna – native Winkbewegung</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#172334;color:#edf3ff;font:16px system-ui}main{max-width:1100px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(240px,1fr) minmax(260px,.7fr);gap:24px}canvas{width:100%;height:min(82vh,800px);object-fit:contain;background:radial-gradient(ellipse at top,#3d5269,#233246);border-radius:20px}h1{font-size:1.6rem}p{line-height:1.5;color:#c4d2e4}label{display:block;margin:24px 0}input[type=range]{display:block;width:100%;margin-top:12px}button{font:inherit;color:inherit;background:#365378;border:1px solid #6b86a8;border-radius:10px;padding:12px;margin:4px;cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid #d6b8ff}output{float:right}small{color:#bdc9d8}#error{color:#ffc9b9}@media(max-width:650px){main{display:flex;flex-direction:column}canvas{height:60vh}h1{margin-top:0}}
+</style>
+<main><canvas id="avatar" width="720" height="1000" aria-label="Luna mit nativer Armbewegung"></canvas><section>
+<h1>Luna winkt</h1><p>Neue Vorschau mit korrigierter Schulter, Ellenbogenkontur und Handgelenk.</p>
+<button id="play" disabled>Winken</button><button id="reset" disabled>Ruhehaltung</button>
+<label for="raise">Arm heben <output id="raiseValue">0 %</output><input id="raise" type="range" min="0" max="1" step=".01" value="0" disabled></label>
+<label for="wrist">Hand seitlich bewegen <output id="wristValue">0</output><input id="wrist" type="range" min="-30" max="10" step=".1" value="0" disabled></label>
+<small>Die Handbewegung ist bei vollständig gehobenem Arm verfügbar.</small>
+<label><input id="speech" type="checkbox"> Mundbewegung testen</label>
+<p>Arbeitsvorschau für einen Arm. Die normale HA-Anzeige bleibt unverändert. Handform und Stoffnähte sind noch nicht endgültig.</p><p id="error" role="status">Modell wird geladen …</p>
+</section></main>
+<script type="module">
+const qs=new URLSearchParams(location.search),runtime=qs.get('runtime')||'../tools/live2d/dist/runtime.mjs',model=qs.get('model')||'../tools/live2d/dist/LunaNativeWave/luna.model3.json';
+const ui=Object.fromEntries(['avatar','play','reset','raise','raiseValue','wrist','wristValue','speech','error'].map(id=>[id,document.getElementById(id)]));
+let player,playing=false,start=0;
+const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
+export function waveAt(t){if(t<1.5)return {raise:smooth(t/1.5),wrist:0};if(t<5.5){const phase=Math.sin((t-1.5)*Math.PI*2*1.2),envelope=smooth((t-1.5)/.25)*smooth((5.5-t)/.25);return {raise:1,wrist:envelope*phase*(phase<0?30:10)}}if(t<7)return {raise:1-smooth((t-5.5)/1.5),wrist:0};return {raise:0,wrist:0};}
+function draw(raise,wrist,{mouth=0,eyes=1}={}){raise=Math.max(0,Math.min(1,raise));wrist=raise===1?Math.max(-30,Math.min(10,wrist)):0;player.draw(0,{nativeRig:true,reducedMotion:true,parameters:{ParamLunaArmRaise:raise,ParamArmLB03:wrist,ParamEyeLOpen:eyes,ParamEyeROpen:eyes,ParamMouthOpenY:mouth}});ui.raise.value=raise;ui.wrist.value=wrist;ui.raiseValue.value=Math.round(raise*100)+' %';ui.wristValue.value=wrist.toFixed(1);ui.wrist.disabled=raise!==1;}
+function stop(){playing=false;ui.play.textContent='Winken';}
+try{const {mountLuna}=await import(runtime);player=await mountLuna(ui.avatar,model);if(!player.parameterIds.includes('ParamLunaArmRaise'))throw Error('Das Modell enthält die neue Armbewegung nicht.');window.player=player;window.drawPose=draw;window.waveAt=waveAt;ui.play.disabled=ui.reset.disabled=ui.raise.disabled=false;ui.error.textContent='Bereit';
+ui.play.onclick=()=>{playing=!playing;start=performance.now();ui.play.textContent=playing?'Anhalten':'Winken'};ui.reset.onclick=()=>{stop();draw(0,0)};
+ui.raise.oninput=()=>{stop();draw(Number(ui.raise.value),0)};ui.wrist.oninput=()=>{stop();draw(1,Number(ui.wrist.value))};
+function frame(now){const t=now/1000;let pose={raise:Number(ui.raise.value),wrist:Number(ui.wrist.value)};if(playing){const elapsed=(now-start)/1000;pose=waveAt(elapsed);if(elapsed>=7)stop();}const blink=t%4.8,eyes=blink<.16?Math.abs(blink-.08)/.08:1;draw(pose.raise,pose.wrist,{eyes,mouth:ui.speech.checked?.25+.55*Math.abs(Math.sin(t*8)):0});if(!qs.has('manual'))requestAnimationFrame(frame);}
+draw(0,0);
+const gl=ui.avatar.getContext('webgl'),pixels=new Uint8Array(ui.avatar.width*ui.avatar.height*4);let rendered=false;
+for(let i=0;i<120;i++){await new Promise(requestAnimationFrame);draw(0,0);gl.readPixels(0,0,ui.avatar.width,ui.avatar.height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);if(pixels.some((v,n)=>n%4===3&&v>32)){rendered=true;break;}}
+if(!rendered)throw Error('Modell konnte nicht gezeichnet werden.');window.ready=true;if(!qs.has('manual'))requestAnimationFrame(frame);
+}catch(e){ui.error.textContent='Vorschau konnte nicht geladen werden: '+e.message;console.error(e);}
+</script></html>

@@ -1,5 +1,20 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Native Winkvorschau mit Formkorrekturen, 29.10.2026
+
+https://ha.dreimer.de/local/luna/native-wave-20261029.html
+
+Neue private CMO3 `native-arm-repair-20261029/luna-native-wave-forms.cmo3`
+und `native-wave-export/`: Schulteransatz, Ellenbogenkontur und Handgelenk
+der linken B-Kette korrigiert. ParamLunaArmRaise verbindet originale Ruheform
+mit gehobenem Arm. ParamArmLB03 winkt nur bei vollständig gehobenem Arm.
+Vorschau benutzt nativeRig:true, keine zusätzliche Arm-/Körperverformung.
+Lokaler und HA-Browsertest bestanden: Arm/Hand/Mund/Blinzeln bewegen sich,
+Ruhehaltung nach Sequenz exakt wiederhergestellt. Details, Grenzen und
+Bedienhinweise in `docs/live2d/native-arm-repair.md`.
+Noch keine Umstellung der normalen HA-Karte; andere Posen/Armseite und alte
+Parameterkombinationen sind nicht durch diesen begrenzten Arbeitsstand behoben.
+
 ## Priorität: nativen Arm-Rig reparieren, 29.10.2026
 
 Nutzer lehnt Gummiarm der Runtime-Studie ab und verlangt echte Gelenke aus dem
