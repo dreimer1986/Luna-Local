@@ -1,0 +1,31 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna – übernommener Mao-Arm</title>
+<style>body{background:#28374b;color:white;font:16px system-ui;margin:20px}canvas{width:min(480px,95vw);height:auto;background:#34465e}label{display:block;margin:15px 0}input{width:250px}main{display:flex;flex-wrap:wrap;gap:24px}</style>
+<h1>Original-Rig mit Luna-Strickmaterial</h1>
+<p id="description">Linker B-Arm aus Niziiro Mao © Live2D Inc. Noch keine offene Winkhand oder Übergänge zum gesenkten Arm.</p>
+<button id="play">Bewegung prüfen</button>
+<main><canvas width="720" height="1000"></canvas><section id="controls"></section></main>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+const integrated=new URLSearchParams(location.search).has('integrated');
+document.querySelector('#description').prepend(integrated?'In Luna eingesetzt. ':'Isolierte Armkette. ');
+window.player=await mountLuna(document.querySelector('canvas'),integrated?'../tools/live2d/dist/IntactIntegration/luna.model3.json':'../tools/live2d/dist/IntactArm/luna-left-arm-intact.model3.json');
+window.parameters={};
+window.render=()=>player.draw(0,{nativeRig:true,reducedMotion:true,parameters,view:integrated?{}:{zoom:2,x:-1,y:-.35}});
+for(const [id,title] of [['ParamArmLB01','Schulter'],['ParamArmLB02','Ellbogen'],['ParamArmLB03','Handgelenk'],['ParamHandLB','Hand / Zeigefinger']]){
+ const r=player.parameterRanges.find(p=>p.id===id),l=document.createElement('label'),input=document.createElement('input'),o=document.createElement('output');
+ input.type='range';input.min=r.min;input.max=r.max;input.step=.1;input.value=r.default;parameters[id]=r.default;o.value=r.default;
+ input.oninput=()=>{parameters[id]=Number(input.value);o.value=input.value;render()};l.append(title,' ',o,document.createElement('br'),input);document.querySelector('#controls').append(l);
+}
+for(let n=0;n<120;n++){render();await new Promise(requestAnimationFrame);}
+window.ready=true;
+document.querySelector('#play').onclick=async()=>{
+ const button=document.querySelector('#play');button.disabled=true;
+ const saved={...parameters},start=performance.now();
+ try{for(let t=0;t<8;t=(performance.now()-start)/1000){
+  const envelope=Math.sin(Math.PI*Math.min(t/8,1))**2;
+  Object.assign(parameters,{ParamArmLB01:20*envelope*Math.sin(t),ParamArmLB02:20*envelope*Math.sin(t*.8),ParamArmLB03:-10*envelope+20*envelope*Math.sin(t*3),ParamHandLB:10*envelope*Math.sin(t*2)});
+  render();await new Promise(requestAnimationFrame);
+ }}finally{Object.assign(parameters,saved);render();button.disabled=false;}
+};
+</script>

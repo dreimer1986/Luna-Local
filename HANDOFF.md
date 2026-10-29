@@ -1,5 +1,32 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Verbindliche Nutzervorgabe nach der Winkstudie, 29.10.2026
+
+Einziger freigegebener Weg: intakte Armbewegung der Originalvorlage erhalten
+und Lunas Ärmel und Hände daran anpassen. Zuerst einen vollständigen Arm samt
+Übergängen sichtbar prüfen. Bestehendes Gesicht und HA-Anbindung erhalten.
+Keine Fortsetzung der Einzelreparaturen als Hauptlösung und keine zusätzlichen
+Browser-Verformungen als Ersatz für den intakten Rig. Eine Abweichung benötigt
+vorher einen konkret genannten triftigen Grund und ausdrückliche Nutzerfreigabe.
+Die native Winkstudie unten ist ein Vergleichsartefakt, kein fertiger Körper-Rig.
+Zwei vollständige Bewegungsmodelle wurden bisher NICHT zusammengeführt.
+Mao ist als übernommene Vorlage belegt; Hiyori bisher nur als Player-Testmodell.
+Die Identität einer ursprünglich empfohlenen zweiten Rig-Basis ist noch nicht
+eindeutig belegt. Keine weiteren Erfolgsaussagen aus Parameternamen oder bloßer
+Pixelbewegung ableiten.
+
+### Neuer Stand: intakte linke B-Arm-Kette übernommen
+
+`docs/live2d/intact-mao-arm.md` ist die aktuelle Fortsetzung. Originale Mao-Kette
+mit vier ArtMeshes übernommen, zwei Ärmel mit Luna-Strickmaterial versehen,
+Hand/Finger original erhalten. In separater V9-Kopie unter Shoulder L eingesetzt.
+625 Parameterkombinationen gegen unverändertes Mao geprüft: max. 0,014 Quellpixel
+Abweichung nach fester Skalierung/Platzierung. Die 28 übrigen V9-ArtMeshes sind
+in Neutralstellung exakt unverändert. Privat: `intact-mao-arm-20261029/`.
+Vorschau: https://ha.dreimer.de/local/luna/intact-arm-20261029.html
+Noch offen: gesenkte A-Variante/Übergang, offene Winkhand, Körperkombinationen,
+rechte Seite. Normale HA-Karte unverändert. Alte Abschnitte unten sind historisch.
+
 ## Native Winkvorschau mit Formkorrekturen, 29.10.2026
 
 https://ha.dreimer.de/local/luna/native-wave-20261029.html
