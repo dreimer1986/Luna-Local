@@ -116,3 +116,12 @@ nicht ausgeführt. Deshalb wirkt insbesondere „sauer“ noch nicht entsprechen
 Die originale Zeichnungsreihenfolge lässt die Winkhand bei starker Einwärts-
 bewegung hinter die Haare treten. Keine stillen Formkorrekturen vorgenommen.
 Die normale HA-Karte bleibt bis zur Klärung dieser Funktionslücken unverändert.
+
+## Hauptansicht freigegeben und umgestellt
+
+Der Nutzer akzeptiert vorerst fehlende Ausdrücke und hat die Umstellung explizit
+freigegeben. Hauptkarte und Vollbild verwenden jetzt den nativen Stand. Lippen,
+Blinzeln, Winken, kleine native Armbewegungen und Blush bleiben verfügbar.
+Fehlende Formen wurden weder vorgetäuscht noch durch Browser-Verformungen ersetzt.
+Mit Integration 0.4.0b8 sind Gemini und Luna Lokal im Avatar auswählbar; beide
+wurden über die tatsächliche HA-Karte einschließlich Audiowiedergabe geprüft.

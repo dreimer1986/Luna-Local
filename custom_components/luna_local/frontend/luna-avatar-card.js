@@ -1,6 +1,6 @@
 import {AvatarCommands} from './avatar-commands.mjs?v=20261029-v10';
 import {RoomPlayback} from './room-playback.mjs?v=20261029-v10';
-import {LunaSession, PHASES} from './session.mjs?v=20261029-v10';
+import {LunaSession, PHASES} from './session.mjs?v=20261029-v11';
 import {LunaRig} from './rig.mjs?v=0.4.0b5';
 import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261029-v10';
 
@@ -68,6 +68,8 @@ class LunaAvatarCard extends HTMLElement {
     <section class="panel" aria-label="Luna Lokal">
       <div class="stage"><button class="framing" aria-pressed="false" title="Bildausschnitt wechseln">Bis zur Hüfte</button><div class="rig"></div><span class="badge">Luna · Animationsvorschau</span></div>
       <div class="controls">
+        <label>Sprachassistent <select class="pipeline" aria-label="Sprachassistent"><option value="">Wird geladen …</option></select></label>
+        <p class="pipeline-note note"></p>
         <div class="row"><p class="status" role="status" aria-live="polite"></p><button class="expand" aria-label="Luna als Popup öffnen">Vergrößern</button><button class="close" hidden>Schließen</button></div>
         <p class="error" role="alert" hidden></p>
         <div class="row"><button class="listen primary">Sprechen</button><button class="finish">Fertig</button><button class="stop">Stopp</button><button class="mute" aria-pressed="false">Ton aus</button></div>
@@ -155,6 +157,7 @@ class LunaAvatarCard extends HTMLElement {
       root.querySelector('.note').textContent = 'Das Mikrofon stoppt beim Verlassen dieser Ansicht.';
     }
     this.render = this.render.bind(this); this.session.addEventListener('change', this.render);
+    this.loadPipelines();
     if(this.config.follow_automations !== false)this.session.avatarCommands=new AvatarCommands(this._hass);
     if (this.config.follow_rooms !== false)
       this.session.roomPlayback = new RoomPlayback(this._hass, () => this.render());
@@ -178,6 +181,37 @@ class LunaAvatarCard extends HTMLElement {
       this.keepAwake();
     }
     this.render();
+  }
+  async loadPipelines() {
+    const session = this.session, root = this.shadowRoot;
+    const key = `luna-pipeline:${location.pathname}:${this.config.pipeline || 'auto'}`;
+    try {
+      const data = await session.availablePipelines();
+      if (this.session !== session) return;
+      const choices = data.pipelines.filter(p => p.tts_engine);
+      let saved; try { saved = localStorage.getItem(key); } catch {}
+      if (saved && choices.some(p => p.id === saved)) session.config.pipeline = saved;
+      const selected = await session.selectPipeline();
+      if (this.session !== session) return;
+      const select = root.querySelector('.pipeline');select.replaceChildren();
+      for (const pipeline of choices) {
+        const option = document.createElement('option');option.value = pipeline.id;
+        option.textContent = pipeline.name;select.append(option);
+      }
+      select.value = selected.id;
+      const note = () => {
+        const pipeline = choices.find(p => p.id === select.value);
+        root.querySelector('.pipeline-note').textContent = session.localAgents.includes(pipeline?.conversation_engine)
+          ? 'Luna mit lokalem Gedächtnis.' : 'Dieser Assistent verwendet Lunas lokales Gedächtnis nicht.';
+      };
+      note();
+      select.onchange = () => {
+        session.setPipeline(select.value);note();
+        try { localStorage.setItem(key, select.value); } catch {}
+      };
+    } catch (error) {
+      if (this.session === session) root.querySelector('.pipeline-note').textContent = error.message;
+    }
   }
   async keepAwake() {
     if (!this.isConnected || !this.displayOnly || document.visibilityState !== 'visible' || this.wakeLock || this.wakePending) return;

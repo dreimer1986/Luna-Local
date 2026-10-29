@@ -54,18 +54,29 @@ export class LunaSession extends EventTarget {
     if (this.transcript.length > 40) this.transcript.shift();
     this.emit();
   }
-  async selectPipeline() {
+  async availablePipelines() {
     const [data, avatar] = await Promise.all([
       this.hass.callWS({type: 'assist_pipeline/pipeline/list'}),
       this.hass.callWS({type: 'luna_local/avatar/config'}),
     ]);
+    this.localAgents = avatar.agents;
+    return data;
+  }
+  setPipeline(id) {
+    this.stop();
+    this.config.pipeline = id;
+    this.pipeline = null;
+    this.conversationId = null;
+  }
+  async selectPipeline() {
+    const data = await this.availablePipelines();
     const configured = this.config.pipeline;
-    const isLuna = pipeline => avatar.agents.includes(pipeline.conversation_engine);
+    const isLuna = pipeline => this.localAgents.includes(pipeline.conversation_engine);
     const candidates = data.pipelines.filter(isLuna);
     this.pipeline = configured ? data.pipelines.find(p => p.id === configured) :
       candidates.find(p => p.id === data.preferred_pipeline) || (candidates.length === 1 ? candidates[0] : null);
     if (!this.pipeline) throw Error('Bitte in der Kartenkonfiguration die ID einer Assist-Pipeline mit Luna auswählen.');
-    if (!isLuna(this.pipeline)) throw Error('Die gewählte Pipeline muss Luna als Gesprächsagent verwenden.');
+    this.externalAgent = !isLuna(this.pipeline);
     if (!this.pipeline.tts_engine) throw Error('In Lunas Assist-Pipeline fehlt die Sprachausgabe.');
     return this.pipeline;
   }
@@ -157,7 +168,7 @@ export class LunaSession extends EventTarget {
     }, 125000);
     const unsub = await this.hass.connection.subscribeMessage(
       event => { if (turn === this.generation) this.handleEvent(event, turn); },
-      {type: 'assist_pipeline/run', ...options, end_stage: 'tts', pipeline: this.pipeline.id,
+      {type: 'assist_pipeline/run', ...options, end_stage: this.externalAgent ? 'intent' : 'tts', pipeline: this.pipeline.id,
         conversation_id: this.conversationId, timeout: 120},
     );
     if (turn !== this.generation) { await unsub(); return; }
@@ -195,6 +206,10 @@ export class LunaSession extends EventTarget {
         this.addMessage('luna', originalReply);
         if (originalReply) this.getExpression(originalReply, turn);
         this.setPhase('preparing');
+        if (this.externalAgent) {
+          this.ttsRequested = true;
+          this.speakExternal(reply, turn);
+        }
         break;
       }
       case 'tts-start': this.setPhase('preparing'); break;
@@ -221,12 +236,27 @@ export class LunaSession extends EventTarget {
       case 'error': this.fail(data.message || data.code || 'Assist-Fehler'); break;
     }
   }
+  async speakExternal(reply, turn) {
+    const pipeline = this.pipeline.id;
+    this.audioTimer = this.env.setTimeout(() => {
+      if (turn === this.generation) this.fail('Die Sprachausgabe hat nicht rechtzeitig geantwortet.');
+    }, 60000);
+    try {
+      const result = await this.hass.callWS({type: 'luna_local/avatar/tts', pipeline, text: reply});
+      if (turn !== this.generation) return;
+      this.env.clearTimeout(this.audioTimer);
+      if (result.url) await this.playAudio(result.url, turn);
+      else this.complete(turn);
+    } catch (error) { if (turn === this.generation) this.fail(this.describeError(error)); }
+  }
   async getExpression(reply, turn) {
     if (turn !== this.generation) return;
     this.expression = {name: 'neutral', intensity: 0};
     if (this.config.expressions === false) return;
     const marked = markerExpression(reply);
     if (marked) { if (turn === this.generation) { this.expression = marked; this.emit(); } return; }
+    // Switching to Gemini must not start a hidden Ollama classification request.
+    if (this.externalAgent) return;
     try {
       const expression = await this.hass.callWS({type: 'luna_local/avatar/expression',
         text: (this.lastUserText || '').slice(0, 2000), reply: reply.slice(0, 3000)});

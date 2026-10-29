@@ -29,7 +29,46 @@ test('pipeline uses registered Luna agent even after entity renaming', async () 
   };
   assert.equal((await session.selectPipeline()).id, 'ours');
   session.config.pipeline = 'other';
-  await assert.rejects(session.selectPipeline(), /Luna/);
+  assert.equal((await session.selectPipeline()).id, 'other');
+  assert.equal(session.externalAgent, true);
+});
+
+test('switching assistants cancels the old turn and clears its conversation id', () => {
+  const {session} = fixture();session.conversationId='private-local-history';
+  const old=session.generation;session.setPipeline('gemini');
+  assert.equal(session.config.pipeline,'gemini');assert.equal(session.conversationId,null);
+  assert.equal(session.generation,old+1);
+});
+
+test('external agents end at intent and use selected pipeline for cleaned speech', async () => {
+  const {session,hass} = fixture();session.externalAgent=true;session.pipeline={id:'gemini'};
+  let request,synthesis,played;
+  hass.connection.subscribeMessage=async(cb,message)=>{request=message;return ()=>{}};
+  hass.callWS=async message=>{synthesis=message;return {url:'/api/tts_proxy/test.wav'}};
+  session.playAudio=async url=>{played=url};
+  await session.run({start_stage:'intent',input:{text:'Hallo'}},0);
+  assert.equal(request.end_stage,'intent');assert.equal(request.pipeline,'gemini');
+  await session.speakExternal('Hallo 👋',0);
+  assert.deepEqual(synthesis,{type:'luna_local/avatar/tts',pipeline:'gemini',text:'Hallo 👋'});
+  assert.equal(played,'/api/tts_proxy/test.wav');
+});
+
+test('external emoji-only speech completes and stale speech never plays', async () => {
+  const {session,hass} = fixture();session.pipeline={id:'gemini'};
+  hass.callWS=async()=>({url:null});session.phase='preparing';
+  await session.speakExternal('👋',0);assert.equal(session.phase,'idle');
+  let finish,played=false;
+  hass.callWS=()=>new Promise(resolve=>finish=resolve);
+  session.playAudio=()=>{played=true};
+  const pending=session.speakExternal('Hallo',0);session.stop();finish({url:'/api/tts_proxy/a.wav'});
+  await pending;assert.equal(played,false);
+});
+
+test('Gemini expressions use emoji without contacting Ollama', async () => {
+  const {session,hass}=fixture();session.externalAgent=true;
+  hass.callWS=()=>{throw Error('Unexpected classifier request')};
+  await session.getExpression('Hallo 👋',0);assert.equal(session.expression.gesture,'wave');
+  await session.getExpression('Hallo',0);assert.equal(session.expression.name,'neutral');
 });
 
 test('stop releases microphone, EOF, audio and subscription; stale events are ignored', async () => {

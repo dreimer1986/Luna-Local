@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0b8 — 2026-10-29
+
+- Select an Assist pipeline directly in the avatar card; persist the choice per browser/dashboard. Switching cancels the old turn and starts a fresh conversation.
+- Support Gemini and other explicitly selected conversation agents. Clean emoji before their selected TTS provider while retaining reply markers for gestures; no hidden Ollama expression request for external agents.
+- Activate the private native donor model in the home installation: intact Chitose waving arm and Mao raised arm, native idle, mouth, blink and blush. Angry/hips/crossed shapes remain unavailable in this profile; no synthetic arm deformation is added.
+
 ## 0.4.0b7 — 2026-10-29
 
 - Add bounded full-body poses: wave, hands on hips, crossed arms, and varied idle stances.

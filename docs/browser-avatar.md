@@ -1,5 +1,34 @@
 # Luna im Browser – experimentelle Vorschau
 
+## Sprachassistent wählen (0.4.0b8)
+
+Unter dem Avatar steht die Auswahl **Sprachassistent**. Dort zwischen
+**Luna Lokal** und **Luna (Gemini)** wechseln. Die Wahl bleibt pro Browser und
+Dashboard gespeichert; eine neue Auswahl beendet die laufende Sprachsitzung
+und beginnt einen neuen Gesprächsverlauf. YAML `pipeline` bleibt als Startwert
+möglich. Ohne gespeicherte Wahl bleibt die bisherige Luna-Auswahl erhalten.
+
+Luna Lokal nutzt weiterhin das lokale Gedächtnis und den konfigurierten
+Ollama-Agenten. Direktes Gemini nutzt dieses Gedächtnis nicht und startet keine
+versteckte Ollama-Emotionsanalyse. Explizite Emoji-Marker steuern den Avatar bei
+beiden Wegen. Bei externen Agenten endet Assist nach der Antwort; der neue
+`luna_local/avatar/tts`-Endpunkt entfernt Emoji und benutzt genau die Stimme der
+ausgewählten Pipeline. Reine Emoji-Antworten bleiben stumm.
+
+Im reinen Vollbild sind die Bedienelemente weiterhin ausgeblendet. Zum Einstellen
+`/luna-vollbild/luna?disable_km` öffnen. Ein Browser-Neuladen kann nach dem Update
+nötig sein, damit das neue Auswahlfeld erscheint.
+
+## Aktuelles natives Modell
+
+Die Hauptkarte und Vollbildansicht verwenden jetzt `native-donors-v1` aus
+`/local/luna/model-native-donors-20261029/` und den dazugehörigen Runtime-Ordner.
+Verfügbar: originale Chitose-Winkbewegung, Sprechmund, Blinzeln, native kleine
+Armbewegungen und Wangenfarbe. Die linke Mao-Haltung bleibt im Modell und in
+der separaten Vorschau wählbar. A/B-Überblendung ersetzt kein durchgehendes
+Armheben. Die unten beschriebenen V10-Hüft-/Verschränkposen und synthetischen
+Gesichtsformen sind historisch und im neuen Profil nicht aktiv.
+
 ## Bildausschnitt wechseln
 
 Oben rechts am Avatar schaltet **Bis zur Hüfte / Ganz zeigen** den Bildausschnitt
@@ -13,7 +42,7 @@ das bisherige Porträtmodell bleibt bei `1.2`. YAML kann den Faktor überschreib
 dabei können die seitlichen Hände außerhalb des Bildes liegen. „Ganz zeigen“
 zeigt beim V9-Modell auch Beine und Schuhe.
 
-## Posen und Smileys (V10)
+## Frühere Posen und Smileys (V10, historisch)
 
 Luna wechselt im Leerlauf mit weichen Übergängen zwischen entspannter Haltung,
 einer Hand an der Hüfte und verschränkten Armen. Die Wechsel erfolgen ungefähr
@@ -261,3 +290,18 @@ gemeldeten Avataranfrage konnte nicht eindeutig einer Logzeile zugeordnet werden
 Zusätzlich nutzt die alte Vorladeautomation 8192 Kontext, der Gesprächsagent
 4096; das ist ein auffälliger Unterschied, noch kein belegter Fehlergrund.
 Keine Agenten-, Modell- oder Gedächtnisumstellung während dieser Diagnose.
+
+### Abschluss der Ollama-/Pipeline-Korrektur
+
+0.4.0b8 hebt die oben beschriebene Beschränkung der expliziten Pipelinewahl auf.
+Ollama gab im direkten Gegenversuch wiederholt nur „nonono…“ aus; nach gezieltem
+Neustart der Ollama-App antwortete dasselbe Modell wieder korrekt. Die alte
+Vorladeautomation verwendet jetzt 4096 Kontext, läuft nur beim HA-Start und hält
+das Modell mit `keep_alive=-1` resident. Die genaue Ursache des defekten Laufzeit-
+zustands ist nicht nachgewiesen; die Wiederherstellung ist live belegt.
+
+Nach Installation, Neustart und Dashboard-Umstellung funktionierten beide Wege
+in der echten Avatar-Karte: Gemini und anschließend Luna Lokal, jeweils korrekte
+Antwort, Audiowiedergabe und Rückkehr zu idle ohne Fehler. Die Zeiten von ca.
+23 bzw. 25 Sekunden enthalten auch die Wiedergabe, nicht nur die KI-Berechnung.
+Die Tests ersetzen keinen Mikrofon- oder Lautsprechertest an den Raumgeräten.

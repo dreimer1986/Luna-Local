@@ -7,7 +7,7 @@
 
 Experimental Home Assistant conversation agent with persistent local memory and optional continuous room listening. German dialogue is currently the primary supported language. Ollama runs the conversation locally; speech recognition and voice output follow the selected Assist pipeline, so Whisper/Piper can keep speech local or you can explicitly choose cloud providers.
 
-**Version 0.4.0b7 (experimental).** The private Luna Live2D avatar supports speech-driven mouth movement, blinking, idle stances, reply-marker expressions and bounded arm poses. Home Assistant automation actions can select a pose and expression for a limited duration without interrupting speech. The private model and Cubism runtime are supplied separately; they are not part of this repository. See the browser-avatar documentation for setup, tests and remaining visual limitations.
+**Version 0.4.0b8 (experimental).** The avatar card can select Luna Local or another Home Assistant Assist pipeline such as Gemini. External replies retain emoji gestures while speech omits emoji; direct Gemini does not use Luna's local memory. The private native donor model supports the intact waving arm, speech mouth, blinking, gentle native arm motion and blush. Angry/hips/crossed poses are not yet available in this profile. Model and Cubism runtime are supplied separately. See the browser-avatar documentation for setup and limitations.
 
 ## Install with HACS
 

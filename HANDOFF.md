@@ -1,6 +1,38 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
-## Aktuell: Chitose in Luna/Mao integriert, 29.10.2026
+## Aktuell installiert: 0.4.0b8, natives Modell und Assistentenwahl
+
+Nutzer hat die Umstellung trotz fehlender Sauer-/Hüft-/Verschränkformen ausdrücklich
+freigegeben. Hauptkarte und `/luna-vollbild/luna` sind per Lovelace-API auf
+`model-native-donors-20261029` + `runtime-native-donors-20261029` umgestellt.
+Keine Änderung der ursprünglichen Armformen. Die separate Vorschau bleibt erhalten.
+
+Neues Auswahlfeld **Sprachassistent**: Luna Lokal oder Luna (Gemini); browserlokal
+pro Dashboard gespeichert. Wechsel beendet die alte Sitzung und verwirft deren
+Conversation-ID. Gemini nutzt kein lokales Luna-Gedächtnis und keine zusätzliche
+Ollama-Emotionsabfrage. Neuer TTS-Endpunkt filtert Emoji auch für externe Agenten
+und verwendet die gewählte Pipeline-Stimme. Emoji-only bleibt stumm.
+
+Live-Test in authentifizierter HA-Avataransicht: Gemini und anschließend Luna
+Lokal antworteten korrekt auf die Paris-Frage, spielten Audio ab und erreichten
+wieder idle ohne Fehler. Gemini ca. 23 s, Luna Lokal ca. 25 s einschließlich
+Wiedergabe; Lippenbewegung im gemeinsamen Renderpfad gemessen. 28 Node-Tests und
+8 Python-Avatar-Tests bestanden, HA-Konfigurationscheck bestanden.
+
+Ollama hatte reproduzierbar nur „nonono…“ ausgegeben. Gezielter App-Neustart
+behob den beobachteten Zustand; anschließend korrekte direkte und HA-Antworten.
+Keine Behauptung einer bewiesenen dauerhaften Fehlerursache. Die alte HA-Vorlade-
+automation wurde auf 4096 Kontext passend zur Unterhaltung und nur HA-Start
+umgestellt; `keep_alive=-1` bleibt. Vorladen danach in Millisekunden, Modell bleibt
+resident. Kein Modellwechsel oder Löschen von Erinnerungen.
+
+Backup vor Installation: `backups/ha-native-gemini-20261029-134430/` in der privaten
+Luna-Ablage. Ein zwischenzeitliches Installieren des alten Git-Stands setzte HA
+auf b7 zurück; Nutzer bestätigte ein zuvor angebotenes Git-Update. b8 erneut
+installiert und tatsächlich ausgelieferte Oberfläche danach live getestet.
+Git muss vor weiteren HACS-Updates denselben Versionsstand enthalten.
+
+## Chitose in Luna/Mao integriert, 29.10.2026
 
 Nutzer hat den Einbau freigegeben. Rechter Chitose-Winkarm mit Luna-Strickmaterial
 und originalen Gelenkformen in die bestehende Luna/Mao-Kopie eingebaut.
@@ -19,8 +51,8 @@ Private Quelle `chitose-study-20261029/luna-chitose-integration.cmo3`,
 Runtime-Profil `native-donors-v1`, neue Parts `PartLunaWaveR`, `PartLunaRaisedL`.
 
 Weiterhin A/B-Überblendung statt durchgehendem Armheben. Winkfinger nicht einzeln
-steuerbar; native Hüft-/Verschränkposen fehlen. Normale HA-Karte unverändert,
-neuer Stand als separate Vorschau verfügbar. Kein neuer Sprach-End-to-End-Test.
+steuerbar; native Hüft-/Verschränkposen fehlen. Die normale HA-Karte verwendet
+inzwischen diesen Stand; Details zur freigegebenen Umstellung siehe oben.
 Die älteren Abschnitte unten beschreiben Zwischenstände, nicht den aktuellen
 Integrationsstatus. Zwei vollständige Modelle wurden nicht verschmolzen;
 intakte Armketten aus Mao und Chitose sind jetzt gemeinsam in Luna eingebaut.

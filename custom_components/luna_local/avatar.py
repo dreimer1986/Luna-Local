@@ -21,6 +21,39 @@ EXPRESSIONS = ("neutral", "joyful", "amused", "shy", "curious", "thoughtful",
 NEUTRAL = {"name": "neutral", "intensity": 0.0}
 
 
+@websocket_api.websocket_command({
+    vol.Required("type"): "luna_local/avatar/tts",
+    vol.Required("pipeline"): str,
+    vol.Required("text"): vol.All(str, vol.Length(max=32000)),
+})
+@websocket_api.async_response
+async def avatar_tts(hass, connection, msg):
+    """Synthesize external-agent replies after removing spoken emoji markers."""
+    from homeassistant.components import assist_pipeline, media_source, tts
+    from homeassistant.components.tts.media_source import generate_media_source_id
+    from .speech_text import prepare_speech
+
+    pipeline = next((p for p in assist_pipeline.async_get_pipelines(hass)
+                     if p.id == msg["pipeline"]), None)
+    if pipeline is None or not pipeline.tts_engine:
+        connection.send_error(msg["id"], "invalid_pipeline", "Sprachassistent oder Sprachausgabe nicht verfügbar.")
+        return
+    prepared = prepare_speech(msg["text"])
+    if not prepared["text"]:
+        connection.send_result(msg["id"], {"url": None})
+        return
+    engine = tts.async_resolve_engine(hass, pipeline.tts_engine)
+    if engine is None:
+        connection.send_error(msg["id"], "missing_tts", "Die gewählte Stimme ist nicht verfügbar.")
+        return
+    options = {} if pipeline.tts_voice is None else {tts.ATTR_VOICE: pipeline.tts_voice}
+    source = generate_media_source_id(hass, message=prepared["text"], engine=engine,
+                                     language=pipeline.tts_language, options=options, cache=False)
+    async with asyncio.timeout(55):
+        media = await media_source.async_resolve_media(hass, source, None)
+    connection.send_result(msg["id"], {"url": media.url})
+
+
 @websocket_api.websocket_command({vol.Required("type"): "luna_local/avatar/config"})
 @callback
 def avatar_config(hass, connection, msg):
@@ -159,3 +192,4 @@ async def async_setup_avatar(hass):
     websocket_api.async_register_command(hass, avatar_commands)
     websocket_api.async_register_command(hass, avatar_room_playback)
     websocket_api.async_register_command(hass, avatar_expression)
+    websocket_api.async_register_command(hass, avatar_tts)

@@ -44,6 +44,31 @@ with patch.dict(sys.modules, stubs):
 
 
 class AvatarTests(unittest.IsolatedAsyncioTestCase):
+    async def test_external_tts_uses_selected_voice_and_strips_emoji(self):
+        pipeline = SimpleNamespace(id='gemini', tts_engine='tts.google', tts_language='de-DE', tts_voice='callirrhoe')
+        generate = Mock(return_value='media-source://tts/test')
+        resolve = AsyncMock(return_value=SimpleNamespace(url='/api/tts_proxy/test.wav'))
+        modules = {
+            'avatar_test_package': package,
+            'homeassistant.components': SimpleNamespace(
+                assist_pipeline=SimpleNamespace(async_get_pipelines=lambda hass: [pipeline]),
+                media_source=SimpleNamespace(async_resolve_media=resolve),
+                tts=SimpleNamespace(async_resolve_engine=lambda hass, engine: engine, ATTR_VOICE='voice')),
+            'homeassistant.components.tts.media_source': SimpleNamespace(generate_media_source_id=generate),
+        }
+        connection = SimpleNamespace(send_result=Mock(), send_error=Mock())
+        with patch.dict(sys.modules, modules):
+            await avatar.avatar_tts(None, connection, {'id': 1, 'pipeline': 'gemini', 'text': 'Hallo 👋😊'})
+            self.assertEqual(generate.call_args.kwargs['message'], 'Hallo')
+            self.assertEqual(generate.call_args.kwargs['options'], {'voice': 'callirrhoe'})
+            connection.send_result.assert_called_with(1, {'url': '/api/tts_proxy/test.wav'})
+            generate.reset_mock()
+            await avatar.avatar_tts(None, connection, {'id': 2, 'pipeline': 'gemini', 'text': '👋'})
+            generate.assert_not_called()
+            connection.send_result.assert_called_with(2, {'url': None})
+            await avatar.avatar_tts(None, connection, {'id': 3, 'pipeline': 'missing', 'text': 'Hallo'})
+            self.assertEqual(connection.send_error.call_args.args[1], 'invalid_pipeline')
+
     def fixture(self, content):
         response = SimpleNamespace(raise_for_status=Mock(), json=AsyncMock(return_value={
             "message": {"content": json.dumps(content)}}))
