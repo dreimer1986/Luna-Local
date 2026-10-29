@@ -27,6 +27,18 @@ Vorschau: https://ha.dreimer.de/local/luna/intact-arm-20261029.html
 Noch offen: gesenkte A-Variante/Übergang, offene Winkhand, Körperkombinationen,
 rechte Seite. Normale HA-Karte unverändert. Alte Abschnitte unten sind historisch.
 
+### Nachfolgende Originalprüfung: Übergangsgrenze erkannt
+
+Mao A/B sind getrennte Zeichnungen mit 0,5-s-Deckkraftwechsel, keine durchgehende
+Hebebewegung. Alle acht Originalmotions und SDK-Posecode geprüft. Diagnose
+`tests/mao-arm-variants.html`, Audit `tools/live2d/mao-variants-audit.mjs` bestanden.
+A-Kette noch nicht zusätzlich übernommen, da dies die fehlende Hebebewegung und
+offene Winkhand nicht löst. Hiyoris geprüfte B-Haltung ebenfalls keine offene
+Winkhand. Chitose ist ein offizieller Kandidat mit beschriebener Winkfunktion,
+aber noch ungeprüft und nicht als weitere Vorlage freigegeben. Vor Erweiterung
+Nutzerentscheidung einholen; keine Eigenkonstruktion beginnen. Details in
+`docs/live2d/intact-mao-arm.md`. In diesem Prüfungsschritt keine Luna-Modelländerung.
+
 ## Native Winkvorschau mit Formkorrekturen, 29.10.2026
 
 https://ha.dreimer.de/local/luna/native-wave-20261029.html

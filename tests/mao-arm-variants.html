@@ -1,0 +1,31 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mao: originale Armvarianten</title>
+<style>body{background:#28374b;color:white;font:16px system-ui;margin:20px}main{display:flex;flex-wrap:wrap;gap:20px}canvas{width:440px;max-width:95vw;background:#34465e}label{display:block;margin:12px 0}input{width:240px}button{padding:12px;margin:8px}p{max-width:850px}</style>
+<h1>Originalvorlage: gesenkter und gehobener Arm</h1>
+<p>Niziiro Mao © Live2D Inc. Unveränderte Originalgeometrie. A und B sind getrennte Armzeichnungen. Der Wechsel blendet die Zeichnungen über 0,5 Sekunden um; er erzeugt keine Bewegung dazwischen. Diese Diagnose ist keine fertige Luna-Pose.</p>
+<button id="switch">Zur B-Variante überblenden</button><button id="reset">Neutralwerte</button><span id="state">A: gesenkt</span>
+<main><canvas width="660" height="1050"></canvas><section id="controls"></section></main>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+window.player=await mountLuna(document.querySelector('canvas'),'../tools/live2d/dist/Mao/Mao.model3.json');
+window.parameters={ParamEyeLOpen:1,ParamEyeROpen:1};
+let variant='A',opacity={A:1,B:0},animation=null;
+window.render=()=>player.draw(0,{nativeRig:true,reducedMotion:true,parameters,partOpacities:{PartArmLA:opacity.A,PartArmLB:opacity.B}});
+for(const r of player.parameterRanges.filter(p=>/^Param(Arm|Hand)L[AB]/.test(p.id))){
+ const label=document.createElement('label'),input=document.createElement('input'),value=document.createElement('output');
+ input.type='range';input.min=r.min;input.max=r.max;input.step=.1;input.value=r.default;input.dataset.id=r.id;parameters[r.id]=r.default;value.value=r.default;
+ label.append(r.id+' ',value,document.createElement('br'),input);input.oninput=()=>{parameters[r.id]=Number(input.value);value.value=input.value;render()};document.querySelector('#controls').append(label);
+}
+window.setVariant=(v)=>{cancelAnimationFrame(animation);variant=v;opacity={A:v==='A'?1:0,B:v==='B'?1:0};render();updateLabel()};
+function updateLabel(){document.querySelector('#state').textContent=variant==='A'?'A: gesenkt':'B: gehoben';document.querySelector('#switch').textContent=`Zur ${variant==='A'?'B':'A'}-Variante überblenden`}
+document.querySelector('#switch').onclick=()=>{
+ cancelAnimationFrame(animation);variant=variant==='A'?'B':'A';const other=variant==='A'?'B':'A';let last=performance.now();updateLabel();
+ // SDK CubismPose.doFade: incoming opacity rises linearly; outgoing is
+ // capped to avoid excessive background transparency (threshold 0.15).
+ const frame=now=>{opacity[variant]=Math.min(1,opacity[variant]+(now-last)/500);last=now;const n=opacity[variant];let cap=1-n;if((1-cap)*(1-n)>.15)cap=1-.15/(1-n);opacity[other]=Math.min(opacity[other],cap);render();if(n<1)animation=requestAnimationFrame(frame)};
+ animation=requestAnimationFrame(frame);
+};
+document.querySelector('#reset').onclick=()=>{for(const r of player.parameterRanges)if(r.id in parameters&&!/Eye/.test(r.id))parameters[r.id]=r.default;document.querySelectorAll('input').forEach(i=>{i.value=parameters[i.dataset.id];i.parentElement.querySelector('output').value=i.value});render()};
+function drawFrame(){render();requestAnimationFrame(drawFrame)}drawFrame();
+for(let n=0;n<120;n++)await new Promise(requestAnimationFrame);window.ready=true;
+</script>

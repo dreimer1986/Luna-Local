@@ -55,11 +55,41 @@ die übernommene Hand ist gekrümmt mit separatem beweglichem Zeigefinger.
 
 ## Nächster Schritt innerhalb der Freigabe
 
-Die gesenkte A-Variante und deren ursprüngliche Umschaltung/Übergänge prüfen,
-danach passend übernehmen. Schulteranschluss und Stoffdarstellung weiter
+Die A/B-Prüfung unten ist abgeschlossen. Vor weiterer Übernahme die fehlende
+Winkhand und die akzeptable Übergangsqualität klären. Schulteranschluss und Stoffdarstellung weiter
 visuell prüfen, anschließend Körper-/Atemkombinationen. Die rechte Seite und
 weitere Posen folgen erst nach dieser Armprüfung. Keine Rückkehr zum alten
 Einzelreparatur- oder Browser-Verformungsweg.
+
+## Ergebnis der Original-Posenprüfung
+
+`tests/mao-arm-variants.html` zeigt das unveränderte SDK-Mao mit den nativen
+A/B-Parametern und einem separat nachvollziehbaren Sichtbarkeitswechsel.
+`node tools/live2d/mao-variants-audit.mjs` prüft diese Diagnose, erzeugt Bilder
+der A-Parameterenden und sammelt die Sichtbarkeitskurven aller acht Originalmotions.
+Browserprüfung bestanden: keine Fehler, Varianten verschieden, A nach A→B→A
+pixelgenau wiederhergestellt. Artefakte: `dist/mao-variants-check/`.
+
+**Grenze der Vorlage:** A und B sind getrennte Zeichnungen. Die Originalmotions
+halten die jeweilige Arm-Sichtbarkeit konstant; sie enthalten keine durchgehende
+geometrische Hebebewegung zwischen den Varianten. `Mao.pose3.json` gruppiert
+PartArmLA/LB. SDK `Framework/src/effect/cubismpose.ts`, `doFade`, ändert nur
+die Deckkraft; Standardzeit 0,5 Sekunden. Die Diagnose bildet diese Deckkraftregel
+nach, ohne Vertexkorrekturen. Die getrennten Haltungen sind kein vollständiges
+natürliches Armheben. Das zusätzliche Übernehmen der A-Kette allein löst das nicht.
+
+Hiyori wurde separat im unveränderten Runtime-Modell betrachtet: Die geprüfte
+B-Haltung zeigt gekrümmte Hände an den Haaren. Das ist kein Nachweis einer offenen
+Winkhand oder einer kompatiblen Ersatzkette. Bearbeitbare Hiyori-Quelldaten wurden
+im privaten Luna-Verzeichnis bei der gezielten Dateisuche nicht gefunden.
+
+Zusätzlicher Kandidat, noch NICHT übernommen oder technisch qualifiziert:
+https://www.live2d.com/en/learn/sample/chitose/
+Die offizielle Beschreibung nennt Winken durch Wechsel des rechten Arms und
+bearbeitbare CMO3-Daten. Ein nahtloses Armheben ist damit weiterhin nicht belegt.
+Vor Erweiterung der bisher besprochenen Vorlagenauswahl ausdrückliche Freigabe
+einholen. Keine automatische Rückkehr zu selbst konstruierten Bewegungsformen.
+Lunas CMO3, HA-Modell und Produktionsruntime wurden bei dieser Prüfung nicht verändert.
 
 ## Reproduktion und Editorhinweise
 
