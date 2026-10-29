@@ -8,9 +8,13 @@ Runtime-Verformung zeigt: Maos B-Arm ist angehoben angelegt, Lunas übertragener
 B-Arm bleibt bei denselben Parametern unten. Dokumentation und Diagnoseansicht:
 `docs/live2d/native-arm-repair.md`, `tests/native-arm-study.html`.
 Separate V9-CMO3-Arbeitskopie unter `native-arm-repair-20261029/` im privaten
-Luna-Verzeichnis. Noch keine Gelenkkorrektur gespeichert. KDE-Fernsteuerungsdialog
-für python wartet auf Nutzerfreigabe. Danach zuerst native Schulter-/Ellbogen-/
-Handgelenkkette in der Quelle korrigieren, nicht erneut Browser-Verformungen.
+Luna-Verzeichnis. KDE-Eingabe inzwischen freigegeben. Separater nativer
+Pivot-Versuch `luna-native-elbow-pivot-study-NOT-RELEASE.cmo3` gesichert:
+Ellbogenlücke in Testhaltung geschlossen, aber doppelte Ärmelkontur und offene
+Schulternaht bleiben. Nur einzelne Form geändert, noch keine fertige Animation.
+Details/Winkel/Screenshots und Wine-Speicherumweg in der Reparaturdokumentation.
+Nächster Schritt sind native Formkorrekturen für gehobene B-Pose und konsistente
+Keyforms; nicht erneut Browser-Verformungen oder Diagnosepose ausrollen.
 Original-Ganzkörper-Regressionsprüfung unverändert bestanden.
 
 ## Bewegliche Winterstudie, 29.10.2026
