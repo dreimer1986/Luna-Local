@@ -1,3 +1,5 @@
+import {createBlush} from './blush.mjs';
+import {ARM_MESHES} from './fullbody-pose.mjs';
 // Luna-owned adapter to the official Cubism Web Framework, built locally.
 // No sample model or proprietary Core is embedded in this source file.
 import {moveFullBody, fullBodyParameters} from './fullbody-motion.mjs';
@@ -49,13 +51,14 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
   const gl = canvas.getContext('webgl', {alpha: true, premultipliedAlpha: true, antialias: true});
   if (!gl) {setting.release(); throw Error('WebGL ist nicht verfügbar.');}
   const model = new CubismUserModel(), textures = [], motions = new Map(), expressions = new Map();
-  let portraitTime = 0, cleanVertices = null;
+  let portraitTime = 0, cleanVertices = null, blush = null;
   let disposed = false, activeGroup = '', activeExpression = '', contextLost = false;
   const lost = event => {event.preventDefault(); contextLost = true;};
   canvas.addEventListener('webglcontextlost', lost);
   const dispose = () => {
     if (disposed) return;
     disposed = true; canvas.removeEventListener('webglcontextlost', lost);
+    blush?.dispose();
     model.release();
     textures.forEach(texture => gl.deleteTexture(texture));
     motions.forEach(list => list.forEach(motion => ACubismMotion.delete(motion)));
@@ -115,7 +118,8 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
     }
     model._model.saveParameters();
     const fullBody = data.LunaRig?.Profile === 'fullbody-face-v1';
-    const portraitMeshes = data.LunaRig?.Profile === 'portrait-face-v1' ? refinePortraitMeshes(model._model) : fullBody ? refinePortraitMeshes(model._model, ['ArtMesh0', 'ArtMesh5']) : null;
+    if(fullBody)blush=createBlush(gl);
+    const portraitMeshes = data.LunaRig?.Profile === 'portrait-face-v1' ? refinePortraitMeshes(model._model) : fullBody ? refinePortraitMeshes(model._model, ['foreground_original', 'base_skin_completed', ...ARM_MESHES]) : null;
     const shaderPath = new URL('./Shaders/WebGL/', import.meta.url).href;
     return {
       profile: data.LunaRig?.Profile, waistZoom: data.LunaRig?.WaistZoom,
@@ -173,7 +177,7 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
           portraitTime += dt;
           cleanVertices = Array.from({length: core.getDrawableCount()}, (_, i) => {
             const vertices = core.getDrawableVertices(i), clean = vertices.slice();
-            if (fullBody) moveFullBody(vertices, portraitTime, reducedMotion, core.getDrawableId(i).getString());
+            if (fullBody) moveFullBody(vertices, portraitTime, reducedMotion, core.getDrawableId(i).getString(), parameters);
             else movePortrait(vertices, portraitTime, reducedMotion);
             return clean;
           });
@@ -191,6 +195,7 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         renderer.setMvpMatrix(matrix); renderer.setRenderState(null, [0, 0, w, h]);
         gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
         renderer.drawModel(shaderPath);
+        blush?.draw(renderer,matrix,portraitTime,reducedMotion,parameters);
       },
     };
   } catch (error) {dispose(); throw error;}

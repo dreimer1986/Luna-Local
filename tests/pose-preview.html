@@ -1,0 +1,22 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Luna – Posen ausprobieren</title>
+<style>body{margin:0;background:#20283b;color:#fff;font:16px system-ui}main{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:12px}canvas{width:min(65vw,620px);height:min(90vh,930px);background:#374760;border-radius:18px}nav{display:flex;flex-direction:column;gap:8px;max-width:240px}button{font:inherit;padding:10px;border:0;border-radius:10px;cursor:pointer;background:#e3e6f4;color:#172039}button[aria-pressed=true]{background:#9ce5e1}p{line-height:1.5}h1{font-size:1.3rem} @media(max-width:650px){canvas{width:95vw;height:70vh}nav{max-width:95vw;flex-direction:row;flex-wrap:wrap}nav h1,nav p{width:100%}}</style>
+<main><canvas width="800" height="1200" aria-label="Luna"></canvas><nav><h1>Lunas Posen</h1><button data-pose="neutral">Entspannt</button><button data-pose="smile">Lächeln 🙂</button><button data-pose="angry">Sauer 😠</button><button data-pose="shy">Verlegen 🙈</button><button data-pose="wave">Winken 👋</button><button data-pose="hips">Hände an die Hüften</button><button data-pose="crossed">Arme verschränken</button><button data-pose="idle">Leerlauf wechseln lassen</button><button id="speak">Sprechmund testen</button><p id="status">Luna lädt …</p><p>Die Vorschau bleibt stumm und verwendet kein Mikrofon. Gesten kehren nach einigen Sekunden in die Ruhehaltung zurück.</p></nav></main>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+import {LunaPerformance} from '../custom_components/luna_local/frontend/performance.mjs';
+const canvas=document.querySelector('canvas'),status=document.querySelector('#status');
+new ResizeObserver(()=>{const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);}).observe(canvas);
+const definitions={neutral:null,smile:{name:'joyful',intensity:.6},angry:{name:'angry',intensity:.6},shy:{name:'shy',intensity:.6},wave:{name:'joyful',intensity:.4,gesture:'wave'},hips:{name:'neutral',intensity:0,gesture:'hips'},crossed:{name:'neutral',intensity:0,gesture:'crossed'},idle:null};
+const session={phase:'idle',generation:0,config:{},expression:null};
+window.testMode=false;window.speaking=false;window.clock=0;
+window.setPose=name=>{session.expression=definitions[name];session.generation++;session.phase=name==='idle'?'idle':'speaking';window.selectedPose=name;document.querySelectorAll('[data-pose]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pose===name)));};
+document.querySelectorAll('[data-pose]').forEach(b=>b.onclick=()=>setPose(b.dataset.pose));
+document.querySelector('#speak').onclick=()=>{window.speaking=!window.speaking;document.querySelector('#speak').textContent=window.speaking?'Sprechmund stoppen':'Sprechmund testen';};
+try{
+ window.player=await mountLuna(canvas,'../tools/live2d/dist/LunaV9/luna.model3.json');
+ const performanceDriver=new LunaPerformance();
+ window.step=(dt=.05)=>{window.clock+=dt;const p=performanceDriver.sample(session,window.clock,dt,false);if(window.speaking)p.parameters.ParamMouthOpenY=.4+.3*Math.sin(window.clock*9);player.draw(dt,p);return p;};
+ setPose('neutral');status.textContent='Bereit. Wähle einen Ausdruck oder eine Pose.';
+ let last=performance.now();function tick(now){if(!window.testMode)step(Math.min(.05,(now-last)/1000));last=now;requestAnimationFrame(tick);}requestAnimationFrame(tick);window.ready=true;
+}catch(e){status.textContent=e.message;throw e;}
+</script></html>

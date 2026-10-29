@@ -109,9 +109,10 @@ class Runtime:
 
 
 async def async_setup_entry(hass, entry):
-    from .avatar import async_setup_avatar
+    from .avatar import async_setup_avatar, setup_avatar_actions
 
     await async_setup_avatar(hass)
+    setup_avatar_actions(hass)
     runtime = Runtime(hass, entry)
     await runtime.call("initialize")
     await runtime.changed()
@@ -159,7 +160,9 @@ async def async_unload_entry(hass, entry):
     if await hass.config_entries.async_unload_platforms(entry, [Platform.CONVERSATION, Platform.SENSOR, Platform.SELECT]):
         if entry.runtime_data.continuous:
             await entry.runtime_data.continuous.stop()
-        for name in ("remember", "recall", "forget"):
+        if commands := hass.data.get("luna_local_avatar", {}).get("commands"):
+            commands.reset()
+        for name in ("remember", "recall", "forget", "avatar_pose", "avatar_reset"):
             hass.services.async_remove(DOMAIN, name)
         hass.data.pop(DOMAIN, None)
         return True

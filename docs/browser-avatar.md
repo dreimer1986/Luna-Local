@@ -13,6 +13,31 @@ das bisherige Porträtmodell bleibt bei `1.2`. YAML kann den Faktor überschreib
 dabei können die seitlichen Hände außerhalb des Bildes liegen. „Ganz zeigen“
 zeigt beim V9-Modell auch Beine und Schuhe.
 
+## Posen und Smileys (V10)
+
+Luna wechselt im Leerlauf mit weichen Übergängen zwischen entspannter Haltung,
+einer Hand an der Hüfte und verschränkten Armen. Die Wechsel erfolgen ungefähr
+alle 18–32 Sekunden. `prefers-reduced-motion` unterdrückt diese Körperbewegungen.
+
+Antwortmarker lösen passende Ausdrücke/Gesten aus:
+
+| Marker | Reaktion |
+| --- | --- |
+| 🙂 | Lächeln |
+| 🙈, 😳, 😅 | Verlegen: Kopfhaltung, Blicksenkung und Wangenfarbe |
+| 👋 | Einmal winken, anschließend Ruhehaltung |
+| 😡, 😤 | Sauer, Hände an die Hüften |
+| 😠 | Sauer, Arme verschränken |
+
+Das gilt für lokale und Raum-Antworten. `expressions: false` deaktiviert diese
+Antwortreaktionen. Die Marker werden weiterhin aus der Sprachausgabe entfernt.
+Sprechmund und Blinzeln bleiben während der Posen aktiv. Die Handzeichnungen
+werden wiederverwendet; eine speziell gezeichnete offene Winkhand ist noch offen.
+
+Die stumme Vorschau `/local/luna/poses-20261029.html` erlaubt das direkte Testen
+aller Posen, ohne eine KI-Anfrage oder Mikrofonzugriff. Quellen: `tests/pose-preview.html`;
+WebGL-Prüfung: `node tools/live2d/poses-smoke.mjs`.
+
 ## Private V9-Ganzkörperfassung, 28.10.2026
 
 Der bewegliche Gesicht-Rig wurde auf den V8-Körper übertragen. Blinzeln und
@@ -179,3 +204,40 @@ Vor produktiver Freigabe noch in HA prüfen: Mikrofon-Berechtigungen, tatsächli
 STT/TTS-Anbieter, Tablet/Safari, wiederholtes Öffnen/Schließen, Unterbrechungen und
 deutsche Aussprache. Die endgültige Illustration braucht eine eigene bewegte
 Qualitätsprüfung, bevor sie das Vorschau-Rig ersetzt.
+
+## Posen aus Home-Assistant-Automatisierungen
+
+Ab 0.4.0b7 stehen die Aktionen **Luna Lokal: Avatar-Pose anzeigen** und
+**Avatar-Pose beenden** im Automatisierungseditor bereit. Sie wirken auf alle
+verbundenen Luna-Karten, einschließlich Vollbild und Tablet. Eine Karte kann mit
+`follow_automations: false` davon ausgenommen werden.
+
+```yaml
+action: luna_local.avatar_pose
+data:
+  pose: wave
+  expression: joyful
+  intensity: 0.7
+  duration: 8
+```
+
+`pose`: `neutral`, `wave`, `hands_on_hips`, `arms_crossed`.
+`expression`: `neutral`, `joyful`, `angry`, `shy`.
+`intensity`: 0–1. `duration`: 0,5–120 Sekunden. Eine neue Aktion ersetzt die
+vorherige. Nach Ablauf kehrt Luna zur normalen Animation zurück. Vorzeitig beenden:
+
+```yaml
+action: luna_local.avatar_reset
+```
+
+Die Aktion steuert Körper und Gesicht unabhängig vom Sprechmund. Eine bestehende
+Luna-Sprachausgabe kann parallel laufen; Mundbewegungen und Blinzeln bleiben
+aktiv. Die Pose-Aktion erzeugt selbst keinen Ton. Lippenbewegungen benötigen
+weiterhin eine Luna-Sprachsitzung oder die angebundene Raumwiedergabe; diese neue
+Aktion bindet zusätzliche, beliebige TTS-Ausgaben nicht automatisch an den Avatar.
+
+Automatisierungskommandos haben für ihre Laufzeit Vorrang vor Smiley-Gesten und
+Leerlaufposen. `expressions: false` unterdrückt den Gesichtsausdruck;
+`prefers-reduced-motion` unterdrückt Körpergesten. Nach Neuladen bekommt eine
+Anzeige nur die verbleibende Laufzeit einer noch aktiven Aktion. HA-Neustart oder
+Entladen der Integration verwirft die Aktion; sie wird nicht dauerhaft gespeichert.

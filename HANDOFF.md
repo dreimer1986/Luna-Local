@@ -1,6 +1,49 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
-## Aktuell: V9-Ganzkörper mit beweglichem Gesicht, 28.10.2026
+## Aktuell: V10-Posen und Gesichtsausdrücke, 29.10.2026
+
+Integration 0.4.0b7 ergänzt `luna_local.avatar_pose` und `luna_local.avatar_reset`.
+Pose, Ausdruck, Stärke und Dauer (0,5–120 s) sind im HA-Aktionseditor auswählbar.
+Transientes WebSocket-Kommando an alle Anzeigen, neue Aktion ersetzt alte;
+Ablauf und Reset lassen Sprache weiterlaufen. `follow_automations:false` nimmt
+Karten aus. 49 Python- und 34 Node-Tests bestanden. Live in HA geprüft: Winken
+wird gerendert, läuft automatisch ab, kann ersetzt und zurückgesetzt werden.
+Integration 0.4.0b7 und V10-Runtime installiert, HA erfolgreich neu gestartet.
+Die Pose-Aktion selbst spricht nicht. Details und YAML: docs/browser-avatar.md.
+
+V10 ergänzt die V9-Geometrie durch eine modellabhängige Runtime-Posenbibliothek.
+Keine neue CMO3-Geometrie: Die bearbeitbare Quelle bleibt die V9-Datei; die neuen
+Posen sind in `fullbody-pose.mjs`, `fullbody-motion.mjs` und `avatar-poses.mjs`.
+Gemeinsame räumliche Verformung von Ober-/Unterarm verhindert abstehende
+Überlappungen beim Beugen; Haut, Mund und Gesichtspatches werden gemeinsam bewegt.
+Fingerzuordnung korrigiert: Hände sind ArtMesh2/7, nicht ArtMesh0/5 (Oberarme).
+
+Enthalten: Lächeln, sauer, verlegen mit Blicksenkung/zusätzlicher Wangenfarbe;
+Winken, beide Hände an Hüften, verschränkte Arme. Zufällige ruhige Leerlaufwechsel
+alle 18–32 Sekunden mit weichen Übergängen: entspannt, eine Hand an der Hüfte,
+verschränkte Arme. Mund/Blinzeln bleiben unabhängig. Stopp löscht alte Mimik;
+unterbrochene Antworten dürfen ihre Geste nicht erneut starten. Raumgesten
+berücksichtigen die bereits vergangene Audiozeit. Reduced motion unterdrückt
+freiwillige Körperposen. Explizite Ausdrucksmarker werden bei expressions:false
+ignoriert; der normale Leerlauf bleibt davon unabhängig.
+
+Marker: 👋 einmal winken (5,5 s), 😡/😤 Hände an Hüften (12 s), 😠 Arme verschränken
+(12 s), 🙂 lächeln, 🙈/😳/😅 verlegen. Danach Rückkehr zur normalen Haltung.
+Vorschau: https://ha.dreimer.de/local/luna/poses-20261029.html (stumm, kein Mikrofon).
+Runtime: `/local/luna/runtime-20261029-v10/runtime.mjs`; Modell bleibt unter dem
+V9-Pfad, damit die gespeicherte Zoom-Auswahl erhalten bleibt.
+Backup: `/home/dreimer/shares/music/Luna/backups/20261029-v10/`.
+Privates Gesamtpaket: `/home/dreimer/shares/music/Luna/Luna-V10-2026-10-29.zip`.
+
+Grenzen: Die Handzeichnungen bleiben die vorhandenen, entspannten Hände. Winken
+ist daher keine neu gezeichnete offene Handfläche; Stoffmuster werden an starken
+Beugungen gedehnt. Die Posen sind gezielt begrenzt, kein frei drehbares 3D-Skelett.
+
+Nächster vom Nutzer gewünschter Ausbau nach dieser Posenrunde: Kleidung als
+umschaltbare Varianten (Sommer, Winter, nach dem Bad mit Handtuch). Noch nicht
+umgesetzt; Gesicht und bestehende Sprachfunktionen sollen erhalten bleiben.
+
+## Historisch: V9-Ganzkörper mit beweglichem Gesicht, 28.10.2026
 
 V9 ersetzt jetzt das Porträtmodell in beiden bestehenden HA-Karten. Der bewährte
 Gesicht-Rig wurde aus der Cubism-Sicherung vom 27.10. 20:36 auf den V8-Körper

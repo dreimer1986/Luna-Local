@@ -1,7 +1,8 @@
-import {RoomPlayback} from './room-playback.mjs?v=20261028-v9';
-import {LunaSession, PHASES} from './session.mjs?v=20261028-v9';
+import {AvatarCommands} from './avatar-commands.mjs?v=20261029-v10';
+import {RoomPlayback} from './room-playback.mjs?v=20261029-v10';
+import {LunaSession, PHASES} from './session.mjs?v=20261029-v10';
 import {LunaRig} from './rig.mjs?v=0.4.0b5';
-import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261028-v9';
+import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261029-v10';
 
 class LunaAvatarCard extends HTMLElement {
   constructor() { super(); this.attachShadow({mode: 'open'}); }
@@ -154,6 +155,7 @@ class LunaAvatarCard extends HTMLElement {
       root.querySelector('.note').textContent = 'Das Mikrofon stoppt beim Verlassen dieser Ansicht.';
     }
     this.render = this.render.bind(this); this.session.addEventListener('change', this.render);
+    if(this.config.follow_automations !== false)this.session.avatarCommands=new AvatarCommands(this._hass);
     if (this.config.follow_rooms !== false)
       this.session.roomPlayback = new RoomPlayback(this._hass, () => this.render());
     if (this.displayOnly) {
@@ -218,6 +220,7 @@ class LunaAvatarCard extends HTMLElement {
     this.wakeLock?.release().catch(() => {}); this.wakeLock = null;
     this.rig?.destroy(); this.rig = null;
     this.session?.roomPlayback?.destroy();
+    this.session?.avatarCommands?.destroy();
     this.session?.destroy(); this.session = null;
     this.shadowRoot.replaceChildren();
   }

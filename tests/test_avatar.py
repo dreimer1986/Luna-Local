@@ -106,3 +106,12 @@ class AvatarTests(unittest.IsolatedAsyncioTestCase):
         for text, reply in (("x" * 2001, ""), ("", "y" * 3001), (None, "")):
             with self.assertRaises(vol.Invalid):
                 schema({"id": 1, "type": "luna_local/avatar/expression", "text": text, "reply": reply})
+
+    def test_pose_action_schema_is_bounded_and_finite(self):
+        value=avatar.POSE_SCHEMA({'pose':'wave','expression':'joyful','duration':8})
+        self.assertEqual(value['intensity'],.7)
+        for data in ({'pose':'unknown'},{'expression':'unknown'},{'duration':0},
+                     {'duration':121},{'duration':float('nan')},{'intensity':float('inf')},
+                     {'intensity':-1},{'intensity':2}):
+            with self.subTest(data=data), self.assertRaises(vol.Invalid):
+                avatar.POSE_SCHEMA(data)

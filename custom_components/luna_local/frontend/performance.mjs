@@ -1,3 +1,4 @@
+import {AvatarPoses} from './avatar-poses.mjs?v=20261029-v10';
 // Bounded performance controls driven by the existing Assist/TTS session.
 // The spectral fallback is an approximation; timed visemes take precedence.
 import {estimateViseme} from './rig.mjs?v=0.4.0b5';
@@ -17,6 +18,7 @@ const SHAPES = {
 
 export class LunaPerformance {
   constructor() {
+    this.poses = new AvatarPoses();
     this.samples = new Float32Array(2048);
     this.spectrum = new Float32Array(1024);
     this.generation = -1;
@@ -33,7 +35,8 @@ export class LunaPerformance {
       this.generation = generation;
       this.mouth = this.form = 0;
     }
-    const mood = session.config?.expressions === false ? null : remote ? remote.expression : session.expression;
+    const automation = session.avatarCommands?.sample();
+    const mood = session.config?.expressions === false ? null : automation ? automation.expression : remote ? remote.expression : ['speaking','idle'].includes(session.phase) ? session.expression : null;
     const expression = POSES[mood?.name] || POSES.neutral;
     const intensity = clamp(Number.isFinite(mood?.intensity) ? mood.intensity : 0);
     const blend = 1 - Math.exp(-dt / .22);
@@ -100,6 +103,7 @@ export class LunaPerformance {
       ParamLunaSurprise: mood?.name === 'surprised' ? intensity : 0,
       ParamLunaConcern: mood?.name === 'concerned' ? intensity : 0,
     };
+    Object.assign(parameters,this.poses.sample({turn:automation?`command:${automation.id}`:generation,phase:remote?'speaking':session.phase,mood,automation,replyAge:automation?.elapsed??remote?.elapsed??session.playbackTime??0},time,dt,reducedMotion));
     const vowels = {A: ['aa', 'A'], I: ['I'], U: ['U'], E: ['E', 'FF'], O: ['O']};
     for (const [vowel, shapes] of Object.entries(vowels)) {
       parameters[`ParamLunaViseme${vowel}`] = speaking && shapes.includes(shape) ? clamp(this.mouth) : 0;

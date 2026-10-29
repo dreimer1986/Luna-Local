@@ -14,9 +14,10 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.loader import async_get_integration
 
 from .ollama_runtime import KEEP_ALIVE
+from .avatar_commands import AvatarCommandRelay
 
 EXPRESSIONS = ("neutral", "joyful", "amused", "shy", "curious", "thoughtful",
-               "surprised", "concerned", "sad")
+               "surprised", "concerned", "sad", "angry", "laughing")
 NEUTRAL = {"name": "neutral", "intensity": 0.0}
 
 
@@ -96,6 +97,53 @@ def avatar_room_playback(hass, connection, msg):
         send(event)
 
 
+POSES = ('neutral', 'wave', 'hands_on_hips', 'arms_crossed')
+POSE_EXPRESSIONS = ('neutral', 'joyful', 'angry', 'shy')
+def finite_number(value):
+    if not math.isfinite(value):
+        raise vol.Invalid('Expected a finite number')
+    return value
+
+
+POSE_SCHEMA = vol.Schema({
+    vol.Optional('pose', default='neutral'): vol.In(POSES),
+    vol.Optional('expression', default='neutral'): vol.In(POSE_EXPRESSIONS),
+    vol.Optional('intensity', default=0.7): vol.All(vol.Coerce(float), finite_number, vol.Range(min=0, max=1)),
+    vol.Optional('duration', default=8): vol.All(vol.Coerce(float), finite_number, vol.Range(min=0.5, max=120)),
+})
+
+
+@websocket_api.websocket_command({vol.Required('type'): 'luna_local/avatar/commands'})
+@callback
+def avatar_commands(hass, connection, msg):
+    relay = hass.data.get('luna_local_avatar', {}).get('commands')
+    if relay is None:
+        connection.send_error(msg['id'], 'not_ready', 'Lunas Posensteuerung ist noch nicht bereit.')
+        return
+    def send(event):
+        connection.send_message(websocket_api.event_message(msg['id'], event))
+    connection.subscriptions[msg['id']] = relay.subscribe(send)
+    connection.send_result(msg['id'])
+    send(relay.snapshot())
+
+
+def setup_avatar_actions(hass):
+    state = hass.data['luna_local_avatar']
+    if 'commands' not in state:
+        state['commands'] = AvatarCommandRelay(hass.loop)
+    relay = state['commands']
+
+    async def pose(call):
+        data = call.data
+        relay.start(data['pose'], data['expression'], data['intensity'], data['duration'])
+
+    async def reset(call):
+        relay.reset()
+
+    hass.services.async_register('luna_local', 'avatar_pose', pose, schema=POSE_SCHEMA)
+    hass.services.async_register('luna_local', 'avatar_reset', reset, schema=vol.Schema({}))
+
+
 async def async_setup_avatar(hass):
     if "luna_local_avatar" in hass.data:
         return
@@ -108,5 +156,6 @@ async def async_setup_avatar(hass):
     )
     hass.data["luna_local_avatar"] = {"expression_lock": asyncio.Lock()}
     websocket_api.async_register_command(hass, avatar_config)
+    websocket_api.async_register_command(hass, avatar_commands)
     websocket_api.async_register_command(hass, avatar_room_playback)
     websocket_api.async_register_command(hass, avatar_expression)

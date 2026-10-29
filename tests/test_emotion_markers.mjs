@@ -26,7 +26,7 @@ test('remote mood drives eyes and mouth, local conversation has priority, disabl
  for(let i=0;i<30;i++)value=p.sample(s,1,.05);
  assert.equal(value.expression,'sad');assert.ok(value.parameters.ParamMouthOpenY>.5);
  assert.ok(value.parameters.ParamEyeLOpen<.95);
- s.phase='thinking';value=p.sample(s,1,.05);assert.equal(value.expression,'joyful');assert.equal(value.parameters.ParamMouthOpenY,0);
+ s.phase='speaking';value=p.sample(s,1,.05);assert.equal(value.expression,'joyful');assert.equal(value.parameters.ParamMouthOpenY,0);
  s.config.expressions=false;for(let i=0;i<60;i++)value=p.sample(s,1,.05);
  assert.equal(value.expression,'neutral');assert.ok(value.parameters.ParamEyeLOpen>.999);
 });

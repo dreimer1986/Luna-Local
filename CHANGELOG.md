@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0b7 — 2026-10-29
+
+- Add bounded full-body poses: wave, hands on hips, crossed arms, and varied idle stances.
+- Add coherent smile/angry/shy face deformation and soft cheek colour; correct hand mesh IDs.
+- Map reply emoji to one-shot gestures for local and room responses without interrupting lip sync.
+- Add `luna_local.avatar_pose` and `luna_local.avatar_reset` automation actions with duration,
+  expression and intensity; commands expire, replace older commands and survive browser reconnect
+  only for their remaining lifetime. They do not generate audio.
+- Add a silent pose preview and transport/geometry/browser regression checks.
+
+
 ## 0.4.0b6 (development)
 
 - Add persistent full/waist avatar framing, accessible on cards, popups and the

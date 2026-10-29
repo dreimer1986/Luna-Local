@@ -1,4 +1,4 @@
-import {markerExpression} from './emotion-markers.mjs?v=20261028-v9';
+import {markerExpression} from './emotion-markers.mjs?v=20261029-v10';
 export const VERSION = '0.4.0b5';
 export const PHASES = {
   idle: 'Bereit', starting: 'Mikrofon wird gestartet', listening: 'Ich höre zu',
@@ -323,6 +323,7 @@ export class LunaSession extends EventTarget {
   }
   stop(resetContinuous = true) {
     ++this.generation;
+    this.expression = {name: 'neutral', intensity: 0};
     if (resetContinuous) this.continuous = false;
     this.env.clearTimeout(this.restartTimer);
     this.env.clearTimeout(this.endTimer);

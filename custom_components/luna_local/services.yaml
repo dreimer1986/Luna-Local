@@ -31,3 +31,56 @@ forget:
       required: true
       selector:
         text:
+avatar_pose:
+  name: Avatar-Pose anzeigen
+  description: Zeigt eine Pose und einen Ausdruck auf allen verbundenen Luna-Anzeigen. Ohne Ton, auch parallel zu einer Sprachausgabe. Eine neue Aktion ersetzt die vorherige.
+  fields:
+    pose:
+      name: Körperpose
+      default: neutral
+      selector:
+        select:
+          options:
+            - label: Entspannt
+              value: neutral
+            - label: Winken
+              value: wave
+            - label: Hände an die Hüften
+              value: hands_on_hips
+            - label: Arme verschränken
+              value: arms_crossed
+    expression:
+      name: Gesichtsausdruck
+      default: neutral
+      selector:
+        select:
+          options:
+            - label: Neutral
+              value: neutral
+            - label: Lächeln
+              value: joyful
+            - label: Sauer
+              value: angry
+            - label: Verlegen
+              value: shy
+    intensity:
+      name: Stärke des Gesichtsausdrucks
+      default: 0.7
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.05
+    duration:
+      name: Dauer
+      description: Danach kehrt Luna automatisch zur normalen Animation zurück.
+      default: 8
+      selector:
+        number:
+          min: 0.5
+          max: 120
+          step: 0.5
+          unit_of_measurement: s
+avatar_reset:
+  name: Avatar-Pose beenden
+  description: Beendet die aktuelle Automatisierungspose auf allen Luna-Anzeigen. Eine laufende Sprachausgabe bleibt aktiv.
