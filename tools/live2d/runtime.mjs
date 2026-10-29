@@ -44,7 +44,7 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
   const base = new URL(modelURL, location.href);
   if (base.origin !== location.origin) throw Error('Modell muss lokal bereitgestellt werden.');
   const load = async url => {
-    const response = await fetch(url, {signal, credentials: 'same-origin'});
+    const response = await fetch(url, {signal, credentials: 'same-origin', cache: 'no-cache'});
     if (!response.ok) throw Error(`Modell-Datei nicht verfügbar (${response.status})`);
     return response.arrayBuffer();
   };

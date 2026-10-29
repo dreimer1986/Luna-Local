@@ -125,3 +125,23 @@ Blinzeln, Winken, kleine native Armbewegungen und Blush bleiben verfügbar.
 Fehlende Formen wurden weder vorgetäuscht noch durch Browser-Verformungen ersetzt.
 Mit Integration 0.4.0b8 sind Gemini und Luna Lokal im Avatar auswählbar; beide
 wurden über die tatsächliche HA-Karte einschließlich Audiowiedergabe geprüft.
+
+## Portraittextur bei Reexport erhalten
+
+Der CMO3-Export enthielt die ursprüngliche, ungepatchte Portraittextur und brachte
+so den alten Zahnstreifen und die unsaubere Oberlippe zurück. Die native Runtime
+hatte außerdem die bisherigen Grenzen für die Portraitparameter ausgelassen.
+Beides ist korrigiert. Keine neue Mundzeichnung, sondern Wiederherstellung der
+bereits freigegebenen V9-Textur mit unveränderten UVs.
+
+Nach erneutem Export zwingend ausführen:
+
+```sh
+node tools/live2d/restore-portrait-atlas.mjs EXPORT_DIR APPROVED_V9_TEXTURE_00_PNG
+```
+
+Das Skript akzeptiert nur die beiden bekannten Atlas-Hashes, ist idempotent und
+verweigert unbekannte Layouts. `node tools/live2d/native-mouth-check.mjs` prüft
+15 Mundstellungen gegen die freigegebene V9-Fassung; `native-avatar-check.mjs`
+prüft anschließend Winken, Mund, Blinzeln und Rückkehr. Die produktive Runtime
+liegt jetzt unter `/local/luna/runtime-native-donors-mouthfix-20261029/`.

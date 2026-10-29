@@ -1,5 +1,32 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Mundkorrektur nach nativem Export, 29.10.2026
+
+Der neue Export enthielt wieder den ungepatchten Gesichtsatlas (SHA256 a54acfad…)
+statt der freigegebenen Mundfassung (95d0403d…). Alle Gesichts-UVs und Texturindizes
+sind gegenüber V9 identisch. `texture_00.png` wurde deshalb bytegleich aus der
+freigegebenen V9-Fassung wiederhergestellt, ohne neue Zeichnung oder Geometrie.
+`tools/live2d/restore-portrait-atlas.mjs` prüft beide vollständigen Hashes und
+verweigert unbekannte Atlaslayouts. Nach JEDEM CMO3-Reexport diesen Schritt
+anwenden; die CMO3 selbst enthält weiterhin die ungepatchte Portraittextur.
+
+`native-avatar.mjs` übernimmt wieder die bisherigen Portrait-Parametergrenzen:
+Mundform ±0,35, unabhängige Template-Kopf-/Körper-/Brauen-/Blickverschiebung 0.
+Mundöffnung, Blinzeln, Blush und originale Armparameter bleiben nutzbar.
+Kein synthetisches Gelenk oder neue Armverformung hinzugefügt.
+
+15 Kombinationen aus Mundöffnung und Mundform mit V9 verglichen. Maximale
+RGB/A-Kanalabweichung 10/255, mittlere Abweichung unter 0,145/255; kleine
+Rasterunterschiede durch die alte Mesh-Unterteilung, keine Pixelidentität behaupten.
+Nahansicht visuell geprüft. Native Bewegung/Mund/Blinzeln/Rückkehr-Test bestanden.
+Aktuelle Runtime in Hauptkarte und Vollbild:
+`/local/luna/runtime-native-donors-mouthfix-20261029/runtime.mjs`.
+Modellpfad bleibt gleich, damit die gespeicherte Zoomwahl erhalten bleibt.
+Runtime validiert Modell-/Textur-Cache beim Laden neu.
+Private Sicherung: `chitose-study-20261029/mouth-backup-20261029-183319/`;
+korrigierter Export und Nachweise daneben unter `integration-export/` und
+`native-mouth-check/`.
+
 ## Aktuell installiert: 0.4.0b8, natives Modell und Assistentenwahl
 
 Nutzer hat die Umstellung trotz fehlender Sauer-/Hüft-/Verschränkformen ausdrücklich
