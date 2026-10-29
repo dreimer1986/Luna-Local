@@ -29,6 +29,15 @@ rechte Seite. Normale HA-Karte unverändert. Alte Abschnitte unten sind historis
 
 ### Nachfolgende Originalprüfung: Übergangsgrenze erkannt
 
+**Aktueller Nachtrag:** Chitose wurde danach ausdrücklich freigegeben und geprüft.
+Siehe `docs/live2d/chitose-study.md`. Offene Winkhand samt vollständiger rechter
+B-Kette separat extrahiert; 21 Parameterstellungen gegen Original geprüft,
+max. 0,003321 Quellpixel Abweichung. Keine Integration in Luna bisher. Auch diese
+Vorlage nutzt A/B-Überblendung, kein natürliches durchgehendes Armheben.
+Private Daten: `chitose-study-20261029/`; lokales Original/Arm-Preview:
+http://127.0.0.1:8792/tests/chitose-study.html . Die folgende Freigabe-Anforderung
+ist für Chitose inzwischen erfüllt, für neue Eigenkonstruktionen weiterhin nicht.
+
 Mao A/B sind getrennte Zeichnungen mit 0,5-s-Deckkraftwechsel, keine durchgehende
 Hebebewegung. Alle acht Originalmotions und SDK-Posecode geprüft. Diagnose
 `tests/mao-arm-variants.html`, Audit `tools/live2d/mao-variants-audit.mjs` bestanden.

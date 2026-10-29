@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chitose – Original-Winkbewegung</title>
+<style>body{background:#28374b;color:white;font:16px system-ui;margin:20px}canvas{width:500px;max-width:95vw;background:#34465e}button{padding:12px;margin:5px}p{max-width:850px}</style>
+<h1>Chitose: unveränderte Originalbewegung</h1>
+<p>© Live2D Inc. Diagnose einer zusätzlichen Vorlage. Der Wechsel zwischen Ruhearm und Winkarm erfolgt über getrennte Zeichnungen. Noch keine Übernahme in Luna.</p>
+<p><a style="color:white" href="?isolated">Extrahierten Arm prüfen</a> · <a style="color:white" href="?">Ganzes Originalmodell</a></p>
+<button data-group="Idle">Leerlauf</button><button data-group="Flick">Original-Winken</button><button id="static">Winkarm einzeln prüfen</button>
+<label>Armparameter <input id="arm" type="range" min="0" max="10" step=".1" value="4"><output>4</output></label><br>
+<canvas width="750" height="1050"></canvas>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+const isolated=new URLSearchParams(location.search).has('isolated');
+window.player=await mountLuna(document.querySelector('canvas'),isolated?'../tools/live2d/dist/ChitoseArm/chitose-arm.model3.json':'../tools/live2d/dist/Chitose/chitose.model3.json');
+window.group='Idle';window.manual=isolated;window.armValue=4;
+if(isolated){document.querySelector('h1').textContent='Chitose: intakt extrahierter Winkarm';document.querySelectorAll('[data-group]').forEach(b=>b.disabled=true)}
+const range=player.parameterRanges.find(p=>p.id==='PARAM_ARM_R_B');document.querySelector('#arm').min=range.min;document.querySelector('#arm').max=range.max;
+document.querySelectorAll('[data-group]').forEach(b=>b.onclick=()=>{manual=false;group=b.dataset.group});
+document.querySelector('#static').onclick=()=>manual=true;
+document.querySelector('#arm').oninput=e=>{manual=true;armValue=Number(e.target.value);document.querySelector('output').value=armValue};
+let last=performance.now();function frame(now){player.draw((now-last)/1000,{nativeRig:true,group,reducedMotion:manual,parameters:manual?Object.fromEntries(player.parameterRanges.map(p=>[p.id,p.id==='PARAM_ARM_R_B'?armValue:p.default])):{},partOpacities:manual?{PARTS_01_ARM_R_A:0,PARTS_01_ARM_R_B:1}: {}});last=now;requestAnimationFrame(frame)}requestAnimationFrame(frame);
+for(let n=0;n<120;n++)await new Promise(requestAnimationFrame);window.ready=true;
+</script>
