@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luna · Garderobe</title>
+<style>
+:root{color-scheme:dark;font:16px/1.5 system-ui;color:#f2f1f8;background:#141b2e}*{box-sizing:border-box}body{max-width:1400px;margin:auto;padding:24px}h1{margin:0;font-size:clamp(26px,4vw,40px)}header p{max-width:850px;color:#cbd2e5}a{color:#bdd6ff}.controls{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:20px 0}select,button{font:inherit;color:inherit;background:#29364e;border:1px solid #7185a4;border-radius:8px;padding:8px}button{cursor:pointer}button:focus-visible,select:focus-visible{outline:3px solid #d7b973;outline-offset:3px}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}article{border:1px solid #43526c;border-radius:18px;overflow:hidden;background:#202a40}h2{font-size:21px;margin:0}.caption{padding:18px}.caption p{margin:6px 0;color:#cbd2e5}.badge{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#f4d499}.stage{height:650px;max-height:75vh;overflow:hidden;background:radial-gradient(ellipse at 70% 20%,#737ba4,#293556 35%,#131c31 85%)}.stage img{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center top}.gallery.waist img{transform:scale(1.8)}.gallery[data-bg="light"] .stage{background:#e8e3dd}.gallery[data-bg="checker"] .stage{background-color:#b8bec9;background-image:conic-gradient(#8c97aa 25%,transparent 0 50%,#8c97aa 0 75%,transparent 0);background-size:24px 24px}.error{padding:20px;color:#f4bdbd}footer{margin-top:24px;color:#cbd2e5}@media(max-width:850px){.gallery{grid-template-columns:1fr}.stage{height:650px}body{padding:16px}}
+</style>
+<header><h1>Lunas Garderobe</h1><p>Drei Kleidungsentwürfe zum Vergleichen. Dies sind <strong>statische Zeichnungen</strong>; sie sind noch keine umschaltbaren Live2D-Modelle. Der laufende Avatar behält seine bisherigen Posen und Kleidung.</p></header>
+<div class="controls"><label>Hintergrund <select id="background"><option value="moon">Dunkelblau</option><option value="light">Hell</option><option value="checker">Transparenzraster</option></select></label><button id="zoom" aria-pressed="false">Bis zur Hüfte</button></div>
+<main id="gallery" class="gallery" aria-label="Kleidungsentwürfe"></main>
+<footer>Als Nächstes: Kleidungs- und Armteile mit verdeckten Gelenkübergängen zeichnen, den vorhandenen Gesicht-Rig übernehmen und jede Pose mit dem neuen Outfit prüfen. Diese Vorschau verwendet weder Mikrofon noch Sprachausgabe.</footer>
+<script type="module">
+const gallery=document.querySelector('#gallery'),background=document.querySelector('#background'),zoom=document.querySelector('#zoom');
+background.addEventListener('change',()=>gallery.dataset.bg=background.value);
+zoom.addEventListener('click',()=>{const waist=gallery.classList.toggle('waist');zoom.setAttribute('aria-pressed',String(waist));zoom.textContent=waist?'Ganzkörper':'Bis zur Hüfte';});
+try{
+ const response=await fetch('./catalog.json');if(!response.ok)throw Error('Katalog konnte nicht geladen werden.');const catalog=await response.json();
+ for(const outfit of catalog.outfits){
+  const article=document.createElement('article'),stage=document.createElement('div'),img=document.createElement('img'),caption=document.createElement('div'),badge=document.createElement('span'),h2=document.createElement('h2'),p=document.createElement('p');
+  stage.className='stage';caption.className='caption';badge.className='badge';badge.textContent='Entwurf · noch nicht animiert';h2.textContent=outfit.name;p.textContent=outfit.description;
+  img.alt=`Luna – ${outfit.name}`;img.src=outfit.image;img.addEventListener('error',()=>{img.hidden=true;const error=document.createElement('p');error.className='error';error.textContent='Dieser Entwurf konnte nicht geladen werden.';stage.append(error);});
+  stage.append(img);caption.append(badge,h2,p);article.append(stage,caption);gallery.append(article);
+ }
+ window.previewReady=true;
+}catch(e){gallery.textContent=e.message;}
+</script></html>

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "outfits": [
+    {"id":"summer","name":"Sommer","image":"summer.png","status":"concept","description":"Hellblaues Shirt, luftige helle Hose und Canvas-Schuhe."},
+    {"id":"winter","name":"Winter","image":"winter.png","status":"concept","description":"Blauer Wintermantel mit hellem Kragen, kurzer Schal und Stiefel."},
+    {"id":"bath","name":"Nach dem Bad","image":"bath.png","status":"concept","description":"Geschlossener Frottee-Bademantel, Hausschuhe und Handtuch über der Schulter."}
+  ]
+}

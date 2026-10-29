@@ -1,5 +1,13 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Garderobenentwürfe, 29.10.2026
+
+Drei neue statische Outfit-Referenzen in `docs/live2d/outfits/`: Sommer, Winter
+und Bademantel mit Schulterhandtuch. Eingebautes imagegen-Werkzeug, vollständige
+Prompts und konkreter Rig-Fahrplan im selben Ordner. Noch keine animierten
+Outfits und keine Kleiderumschaltung im Live-Avatar. V10 bleibt unverändert.
+Vergleich mit Zoom/Hintergrund: https://ha.dreimer.de/local/luna/outfits-20261029/index.html
+
 ## Aktuell: V10-Posen und Gesichtsausdrücke, 29.10.2026
 
 Integration 0.4.0b7 ergänzt `luna_local.avatar_pose` und `luna_local.avatar_reset`.
