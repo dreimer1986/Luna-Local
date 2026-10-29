@@ -241,3 +241,23 @@ Leerlaufposen. `expressions: false` unterdrückt den Gesichtsausdruck;
 `prefers-reduced-motion` unterdrückt Körpergesten. Nach Neuladen bekommt eine
 Anzeige nur die verbleibende Laufzeit einer noch aktiven Aktion. HA-Neustart oder
 Entladen der Integration verwirft die Aktion; sie wird nicht dauerhaft gespeichert.
+
+## Diagnose der Testeingabe, 29.10.2026
+
+Die Textzeile verwendet `LunaSession.sendText` → Assist-Pipeline ab Intent → TTS.
+Sie ruft Ollama nicht direkt auf. Die automatische Pipelinewahl beschränkt sich
+jedoch auf registrierte Luna-Gesprächsagenten; auch eine ausdrücklich konfigurierte
+andere Pipeline wird bisher abgewiesen. `LunaConversation` delegiert an den in
+der Integration gespeicherten `agent_id`. Im geprüften HA-Stand war das
+`conversation.ollama_conversation`. Google-STT/TTS in „Luna Lokal“ ändern diesen
+Gesprächsagenten nicht. „Luna (Gemini)“ ist eine separate Pipeline.
+
+Live-Befunde: wiederholte 120-s-Timeouts der Ollama-Vorladeautomation, während
+`/api/ps` erreichbar ist, auch aus dem Core-Container. Ein kurzer direkter
+Chat-Test antwortete in 2,50 s, aber mit unbrauchbarem Text; er beweist keine
+funktionierende Unterhaltung. Ollama-Logs zeigen außerdem eine frühere Anfrage
+mit 70 s Laufzeit und etwa 4,5 generierten Tokens/s. Der genaue Timeout der
+gemeldeten Avataranfrage konnte nicht eindeutig einer Logzeile zugeordnet werden.
+Zusätzlich nutzt die alte Vorladeautomation 8192 Kontext, der Gesprächsagent
+4096; das ist ein auffälliger Unterschied, noch kein belegter Fehlergrund.
+Keine Agenten-, Modell- oder Gedächtnisumstellung während dieser Diagnose.

@@ -99,3 +99,20 @@ Weiterhin fehlen durchgehendes Armheben, unabhängig bewegliche Winkfinger und
 native Hüft-/Verschränkposen. Keine neuen Zwischenformen konstruieren, sondern
 bei weiteren Posen ebenfalls intakte Vorlagen und deren belegte Grenzen prüfen.
 Die normale HA-Karte erst umstellen, wenn deren übriges Verhalten abgedeckt ist.
+
+## Prüfung mit echter Avatar-Steuerung
+
+`node tools/live2d/native-combination-check.mjs` verwendet `markerExpression`
+und `LunaPerformance` statt nur handgesetzter Modellparameter. Neun Fälle:
+neutral, Emoji-Winken, beide Armketten, Freude, schüchtern, sauer, traurig,
+überrascht sowie reduzierte Bewegung. Alle ohne Browserfehler oder ungültige
+Parameter. Beide Armketten, Schulteranschluss und Sprechmund gemeinsam sichtbar
+geprüft. Keine Geometrieänderungen bei dieser Prüfung.
+
+Ergebnis ist ausdrücklich keine Freigabe aller Emotionen: 👋 steuert den
+nativen Winkarm, Blush ist sichtbar, aber die virtuellen Gesichtskorrekturen
+und Hüft-/Verschränkgesten des alten Profils werden im neuen nativen Profil
+nicht ausgeführt. Deshalb wirkt insbesondere „sauer“ noch nicht entsprechend.
+Die originale Zeichnungsreihenfolge lässt die Winkhand bei starker Einwärts-
+bewegung hinter die Haare treten. Keine stillen Formkorrekturen vorgenommen.
+Die normale HA-Karte bleibt bis zur Klärung dieser Funktionslücken unverändert.
