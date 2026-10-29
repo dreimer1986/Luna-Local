@@ -1,0 +1,16 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luna – eingebauter Winkarm</title>
+<style>body{background:#28374b;color:white;font:16px system-ui;margin:20px}canvas{width:600px;max-width:95vw;background:#34465e}button{padding:12px;margin:5px}p{max-width:850px}</style>
+<h1>Luna mit intaktem Chitose-Winkarm</h1><p>Originalgelenke mit Luna-Strickmaterial. Der Posenwechsel blendet zwischen Ruhe- und Winkarm über.</p>
+<button id="wave">Winken</button><button id="rest">Ruhehaltung</button><button id="mao">Linken Mao-Arm zeigen</button><button id="mouth">Sprechbewegung prüfen</button><br><canvas width="900" height="1350"></canvas>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+window.player=await mountLuna(document.querySelector('canvas'),'../tools/live2d/dist/ChitoseIntegration/luna.model3.json');
+window.amount=0;window.target=0;window.raised=0;window.armValue=null;window.parameters={ParamEyeLOpen:1,ParamEyeROpen:1};window.animate=true;window.useAdapter=true;
+let timer,speech=false,tickDt=0;
+document.querySelector('#wave').onclick=()=>{clearTimeout(timer);target=1;raised=0;timer=setTimeout(()=>target=0,6000)};
+document.querySelector('#rest').onclick=()=>{clearTimeout(timer);target=0;raised=0};document.querySelector('#mao').onclick=()=>raised=raised?0:1;document.querySelector('#mouth').onclick=()=>speech=!speech;
+window.render=()=>player.draw(animate?tickDt:0,{nativeRig:!useAdapter,reducedMotion:!useAdapter,parameters:{...parameters,ParamLunaWave:amount,ParamLunaRaisedL:raised,...(armValue===null?{}:{PARAM_ARM_R_B:armValue})},...(useAdapter?{}:{partOpacities:{PartArmRB:1-amount,PartLunaWaveR:amount,PartArmLB:1-raised,PartLunaRaisedL:raised}})});
+let last=performance.now();function frame(now){tickDt=Math.min(.05,(now-last)/1000);if(animate){const step=tickDt/.5;amount+=Math.sign(target-amount)*Math.min(Math.abs(target-amount),step);const t=now/1000,blink=t%5.1;parameters.ParamEyeLOpen=parameters.ParamEyeROpen=blink>4.8?1-Math.sin(Math.PI*(blink-4.8)/.3)**2:1;parameters.ParamMouthOpenY=speech?Math.max(0,Math.sin(t*9))*.65:0;}last=now;render();requestAnimationFrame(frame)}requestAnimationFrame(frame);
+for(let n=0;n<120;n++)await new Promise(requestAnimationFrame);window.ready=true;
+</script>

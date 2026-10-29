@@ -1,5 +1,30 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Aktuell: Chitose in Luna/Mao integriert, 29.10.2026
+
+Nutzer hat den Einbau freigegeben. Rechter Chitose-Winkarm mit Luna-Strickmaterial
+und originalen Gelenkformen in die bestehende Luna/Mao-Kopie eingebaut.
+Schulteranschluss durch Platzierung der ganzen Kette korrigiert. Keine neue
+Gelenkkonstruktion, keine Browser-Vertexverformung im neuen Runtime-Profil.
+Details/Quellen/Grenzen: `docs/live2d/chitose-study.md`.
+
+**Aktuelle Vorschau:** https://ha.dreimer.de/local/luna/native-donors-20261029.html
+Winken, Ruhehaltung, linke Mao-Haltung und Sprechmund per Schaltfläche.
+Geometrieprüfung: 21 Chitose-Stellungen, max. 0,002940 Quellpixel Abweichung;
+31 V9- und vier Mao-Meshes neutral exakt unverändert. Runtime-Prüfung lokal und
+auf HA bestanden, einschließlich exakter Rückkehr, Mund, Blinzeln und Bewegung.
+Private Quelle `chitose-study-20261029/luna-chitose-integration.cmo3`,
+`integration-export/` und `integration-checks/`. Finaler Wine-Export:
+`C:\LunaNative\chitose-aligned-export` (älterer integration-export hat Schulterspalt).
+Runtime-Profil `native-donors-v1`, neue Parts `PartLunaWaveR`, `PartLunaRaisedL`.
+
+Weiterhin A/B-Überblendung statt durchgehendem Armheben. Winkfinger nicht einzeln
+steuerbar; native Hüft-/Verschränkposen fehlen. Normale HA-Karte unverändert,
+neuer Stand als separate Vorschau verfügbar. Kein neuer Sprach-End-to-End-Test.
+Die älteren Abschnitte unten beschreiben Zwischenstände, nicht den aktuellen
+Integrationsstatus. Zwei vollständige Modelle wurden nicht verschmolzen;
+intakte Armketten aus Mao und Chitose sind jetzt gemeinsam in Luna eingebaut.
+
 ## Verbindliche Nutzervorgabe nach der Winkstudie, 29.10.2026
 
 Einziger freigegebener Weg: intakte Armbewegung der Originalvorlage erhalten

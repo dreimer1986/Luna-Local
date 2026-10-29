@@ -26,9 +26,46 @@ kontinuierlichen Weg vom gesenkten zum gehobenen Arm. Die Pose-Gruppierung
 natürliches Armheben ist weiterhin ungelöst. Einzelne Finger sind hier nicht
 als unabhängige Benutzerparameter vorhanden. Nur ein gemeinsamer Armparameter.
 
-Noch keine Integration in Luna, kein fertiger Ärmel, keine gemeinsame Schulter-
-oder Körperprüfung. Der bestehende Mao-B-Arm bleibt unverändert. Nicht behaupten,
-zwei fertige Modelle seien damit bereits in Luna zusammengeführt.
+## In Luna eingebaut, 29.10.2026
+
+Nach Freigabe „Naja, dann bau mal ein“ wurde die vollständige Chitose-Kette
+mit cremefarbenem Luna-Strickmaterial in die bestehende Luna/Mao-Kopie eingesetzt.
+Neue Part-ID `PartLunaWaveR`, äußerer Positionierungsdeformer unter Shoulder R.
+Nur die gesamte Kette wurde einheitlich skaliert und versetzt. Originale innere
+Deformer, UVs und Keyforms blieben erhalten. Der erste Schulterspalt wurde durch
+Versetzen der gesamten Kette geschlossen, nicht durch Gelenkreparaturen.
+
+`--integrated` prüft 21 Originalparameterstellungen: maximale Abweichung
+0,002940 Quellpixel nach einer festen Skalierung/Verschiebung. Alle 31 bisherigen
+V9-Meshes und alle vier übernommenen Mao-Meshes sind neutral exakt unverändert.
+Das exportierte Modell enthält 40 Meshes. Mao links bleibt über
+`PartLunaRaisedL` separat wählbar; beide gesenkten Arme bleiben erhalten.
+
+Vorschau: https://ha.dreimer.de/local/luna/native-donors-20261029.html
+
+Das neue Runtime-Profil `native-donors-v1` verbindet den bestehenden
+`ParamLunaWave` mit der Sichtbarkeit der Armvarianten. Die Winkbewegung steuert
+`PARAM_ARM_R_B` im Bereich 0..8 auf den originalen Formen (eigener Zeitverlauf,
+keine Wiedergabe der Original-Motiondatei). Keine nachträgliche Vertexverformung.
+Die Vorschau blendet die Haltung über 0,5 Sekunden und winkt sechs Sekunden.
+Mund, Augen und kleine native Armbewegungen laufen parallel. Normale HA-Karte
+und Sprachpipeline wurden nicht umgestellt: andere bisherige virtuelle Posen
+wie Hüfte/verschränkt werden vom neuen Profil noch nicht umgesetzt.
+
+`node tools/live2d/native-avatar-check.mjs` prüft den echten Runtime-Pfad:
+Winkbewegung, komplementäre Part-Deckkraft, Mund/Blinzeln, laufende Animation
+und pixelgenaue Rückkehr zur Ruhehaltung. Auch mit `LUNA_NATIVE_URL` auf die
+HA-Vorschau bestanden, keine Lade- oder Browserfehler. Schulteranschluss und
+kleine Körper-/Kopfparameterkombination sichtbar geprüft. Kein vollständiger
+Extremposentest und kein neuer Ende-zu-Ende-Sprachtest.
+
+Gesicherte editierbare Quelle: `luna-chitose-integration.cmo3` (final 12:35),
+`luna-chitose-arm.cmo3`; Runtime `integration-export/`, Befunde
+`integration-checks/`, Ärmelatlas `chitose-luna-atlas.png` in der privaten Ablage.
+Der finale Export stammt aus `C:\LunaNative\chitose-aligned-export`, nicht dem
+älteren Export mit Schulterspalt. `MATERIAL-PROMPT.txt` hält den verwendeten
+Bildgenerierungs-Prompt fest; `sleeves-generated.png` bewahrt das Rohbild.
+Originalhand und Daumen wurden pixelgleich übernommen, nur Kleidung ersetzt.
 
 ## Daten und Vorschau
 
@@ -49,7 +86,7 @@ Vorschau: http://127.0.0.1:8792/tests/chitose-study.html
 Original-Winken nutzt die unveränderte Motion über den SDK-Motionmanager.
 `?isolated` zeigt die exportierte Kette mit demselben Parameterbereich.
 Private Runtime-Kopien liegen unter ignoriertem `dist/Chitose` und `dist/ChitoseArm`.
-Keine Modell-/Texturdaten im Git. Produktion in HA unverändert.
+Keine Modell-/Texturdaten im Git. Normale HA-Karte unverändert; neue separate Vorschau veröffentlicht.
 
 Offizielle Herkunft: https://www.live2d.com/en/learn/sample/chitose/
 Download: https://cubism.live2d.com/sample-data/bin/chitose/chitose_ja.zip
@@ -57,7 +94,8 @@ Download: https://cubism.live2d.com/sample-data/bin/chitose/chitose_ja.zip
 
 ## Fortsetzung
 
-Intakte rechte Kette ist als Spender vorbereitet. Luna-Ärmel und Schulteranschluss
-in separater Kopie daran anpassen und erneut geometrisch gegen diesen Stand prüfen.
-Die A/B-Überblendung dabei ausdrücklich sichtbar lassen; keine natürliche
-Hebebewegung behaupten oder eigenmächtig neue Zwischenformen konstruieren.
+Eingebaute rechte Winkhaltung und linke Mao-Haltung sind zusammen verfügbar.
+Weiterhin fehlen durchgehendes Armheben, unabhängig bewegliche Winkfinger und
+native Hüft-/Verschränkposen. Keine neuen Zwischenformen konstruieren, sondern
+bei weiteren Posen ebenfalls intakte Vorlagen und deren belegte Grenzen prüfen.
+Die normale HA-Karte erst umstellen, wenn deren übriges Verhalten abgedeckt ist.

@@ -1,5 +1,6 @@
 import {createWinterStudy} from './outfits/renderer.mjs';
 import {createBlush} from './blush.mjs';
+import {nativeAvatarFrame} from './native-avatar.mjs';
 import {ARM_MESHES} from './fullbody-pose.mjs';
 // Luna-owned adapter to the official Cubism Web Framework, built locally.
 // No sample model or proprietary Core is embedded in this source file.
@@ -119,7 +120,8 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
     }
     model._model.saveParameters();
     const fullBody = data.LunaRig?.Profile === 'fullbody-face-v1';
-    if(fullBody)blush=createBlush(gl);
+    const nativeAvatar=data.LunaRig?.Profile === 'native-donors-v1';
+    if(fullBody||nativeAvatar)blush=createBlush(gl);
     if(fullBody && data.LunaRig?.WinterStudyTexture){
       const bitmaps=[];
       try{
@@ -146,6 +148,11 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
       motionGroups: [...motions.keys()], dispose,
       draw(dt, {group = 'Idle', motionIndex = 0, expression = 'neutral', parameters = {}, reducedMotion = false, nativeRig = false, partOpacities = {}, view = {}} = {}) {
         if (disposed) return;
+        if(nativeAvatar&&!nativeRig){
+          portraitTime+=Math.max(0,Math.min(.05,Number.isFinite(dt)?dt:0));
+          const frame=nativeAvatarFrame(parameters,portraitTime,reducedMotion);
+          parameters=frame.parameters;partOpacities={...frame.partOpacities,...partOpacities};nativeRig=true;
+        }
         if (nativeRig && winterStudy) throw Error('Native rig study requires the original model, not the winter overlay.');
         if (contextLost) throw Error('Grafikkontext verloren; Ansicht neu öffnen.');
         dt = Math.max(0, Math.min(.05, Number.isFinite(dt) ? dt : 0));
