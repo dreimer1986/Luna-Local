@@ -1,5 +1,18 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Priorität: nativen Arm-Rig reparieren, 29.10.2026
+
+Nutzer lehnt Gummiarm der Runtime-Studie ab und verlangt echte Gelenke aus dem
+fertigen Mao-Modell. Outfit-Ausbau zurückgestellt. Direkter Vergleich ohne
+Runtime-Verformung zeigt: Maos B-Arm ist angehoben angelegt, Lunas übertragener
+B-Arm bleibt bei denselben Parametern unten. Dokumentation und Diagnoseansicht:
+`docs/live2d/native-arm-repair.md`, `tests/native-arm-study.html`.
+Separate V9-CMO3-Arbeitskopie unter `native-arm-repair-20261029/` im privaten
+Luna-Verzeichnis. Noch keine Gelenkkorrektur gespeichert. KDE-Fernsteuerungsdialog
+für python wartet auf Nutzerfreigabe. Danach zuerst native Schulter-/Ellbogen-/
+Handgelenkkette in der Quelle korrigieren, nicht erneut Browser-Verformungen.
+Original-Ganzkörper-Regressionsprüfung unverändert bestanden.
+
 ## Bewegliche Winterstudie, 29.10.2026
 
 Separate Vorschau: https://ha.dreimer.de/local/luna/winter-study-20261029.html

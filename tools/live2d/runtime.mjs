@@ -140,11 +140,13 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
       setOutfit(name) { if(!['classic','winter'].includes(name) || (name==='winter'&&!winterStudy)) throw Error('Outfit nicht verfügbar'); winterActive=name==='winter'; },
       profile: data.LunaRig?.Profile, waistZoom: data.LunaRig?.WaistZoom,
       drawableIds: Array.from({length:model._model.getDrawableCount()}, (_,i)=>model._model.getDrawableId(i).getString()),
+      parameterRanges: Array.from({length:model._model.getParameterCount()},(_,i)=>({id:model._model.getParameterId(i).getString(),min:model._model.getParameterMinimumValue(i),max:model._model.getParameterMaximumValue(i),default:model._model.getParameterDefaultValue(i)})),
       parameterIds: [...ids.keys()], expressionNames: [...expressions.keys()],
       motionCounts: Object.fromEntries([...motions].map(([name, list]) => [name, list.length])),
       motionGroups: [...motions.keys()], dispose,
-      draw(dt, {group = 'Idle', motionIndex = 0, expression = 'neutral', parameters = {}, reducedMotion = false, view = {}} = {}) {
+      draw(dt, {group = 'Idle', motionIndex = 0, expression = 'neutral', parameters = {}, reducedMotion = false, nativeRig = false, partOpacities = {}, view = {}} = {}) {
         if (disposed) return;
+        if (nativeRig && winterStudy) throw Error('Native rig study requires the original model, not the winter overlay.');
         if (contextLost) throw Error('Grafikkontext verloren; Ansicht neu öffnen.');
         dt = Math.max(0, Math.min(.05, Number.isFinite(dt) ? dt : 0));
         const core = model._model;
@@ -171,14 +173,14 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
         for (const [name, value] of Object.entries(parameters)) {
           if (ids.has(name) && Number.isFinite(value)) core.setParameterValueById(ids.get(name), value);
         }
-        if (fullBody) {
+        if (fullBody && !nativeRig) {
           for (const [name, value] of Object.entries(fullBodyParameters(portraitTime, reducedMotion))) {
             if (ids.has(name)) core.setParameterValueById(ids.get(name), value);
           }
         }
         // This first Luna rig has a fixed original-illustration foreground. Head and
         // brow translation would move the facial patches outside their apertures.
-        if (data.LunaRig?.Profile === 'portrait-face-v1' || fullBody) {
+        if (!nativeRig && (data.LunaRig?.Profile === 'portrait-face-v1' || fullBody)) {
           if (ids.has('ParamMouthForm')) core.setParameterValueById(ids.get('ParamMouthForm'), Math.max(-.35, Math.min(.35, parameters.ParamMouthForm || 0)));
           for (const name of ['ParamAngleX','ParamAngleY','ParamAngleZ',
             'ParamBodyAngleX','ParamBodyAngleY','ParamBodyAngleZ','ParamBrowLY','ParamBrowRY',
@@ -187,9 +189,13 @@ export async function mountLuna(canvas, modelURL, {signal} = {}) {
           }
         }
         if (!reducedMotion) model._physics?.evaluate(core, dt);
-        model._pose?.updateParameters(core, dt); core.update();
+        model._pose?.updateParameters(core, dt);
+        if(nativeRig)for(const [id,value] of Object.entries(partOpacities)){
+          if(Number.isFinite(value))core.setPartOpacityById(CubismFramework.getIdManager().getId(id),Math.max(0,Math.min(1,value)));
+        }
+        core.update();
         portraitMeshes?.refresh();
-        if (data.LunaRig?.Profile === 'portrait-face-v1' || fullBody) {
+        if (!nativeRig && (data.LunaRig?.Profile === 'portrait-face-v1' || fullBody)) {
           portraitTime += dt;
           cleanVertices = Array.from({length: core.getDrawableCount()}, (_, i) => {
             const vertices = core.getDrawableVertices(i), clean = vertices.slice();
