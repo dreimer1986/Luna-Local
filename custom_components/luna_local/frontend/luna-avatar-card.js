@@ -1,6 +1,6 @@
 import {AvatarCommands} from './avatar-commands.mjs?v=20261029-v10';
 import {RoomPlayback} from './room-playback.mjs?v=20261029-v10';
-import {LunaSession, PHASES} from './session.mjs?v=20261029-v11';
+import {LunaSession, PHASES} from './session.mjs?v=20261030-v12';
 import {LunaRig} from './rig.mjs?v=0.4.0b5';
 import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261029-v10';
 
@@ -73,6 +73,7 @@ class LunaAvatarCard extends HTMLElement {
         <div class="row"><p class="status" role="status" aria-live="polite"></p><button class="expand" aria-label="Luna als Popup öffnen">Vergrößern</button><button class="close" hidden>Schließen</button></div>
         <p class="error" role="alert" hidden></p>
         <div class="row"><button class="listen primary">Sprechen</button><button class="finish">Fertig</button><button class="stop">Stopp</button><button class="mute" aria-pressed="false">Ton aus</button></div>
+        <p class="note">Aufnahme bis „Fertig“ oder mindestens 3 Sekunden Stille nach dem Sprechen.</p>
         <label><input class="continuous" type="checkbox"> Nach Lunas Antwort wieder zuhören</label>
         <form><input type="text" maxlength="2000" aria-label="Nachricht an Luna" placeholder="Oder schreibe Luna …"><button type="submit">Senden</button></form>
         <details><summary>Gespräch</summary><div class="transcript" aria-live="polite"></div></details>

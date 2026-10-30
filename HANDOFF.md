@@ -1,5 +1,28 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Kachel-Aufnahme bis Fertig oder 3 Sekunden Stille, 30.10.2026 / b9
+
+Die Mikrofonaufnahme setzt bei assist_pipeline/run jetzt input.no_vad=true.
+Damit entfallen HAs externe 0,7-s-Enderkennung und 15-s-VAD-Begrenzung für
+diese Kachel. Kein globaler Eingriff in Satelliten oder HA-Core.
+Der AudioWorklet beendet nach mindestens 3 Sekunden zusammenhängender Ruhe,
+nachdem mindestens 200 ms zusammenhängendes hörbares Audio erkannt wurde.
+20-ms-RMS-Fenster, Schwelle 0,006 nach Browser-Rauschunterdrückung; dies ist
+eine konservative Pegelerkennung, keine semantische Sprachklassifikation.
+Geräusche können die Aufnahme verlängern. Anfangsstille wird nicht automatisch
+als leere Anfrage abgeschickt. Fertig funktioniert weiterhin sofort und flusht
+den letzten PCM-Block. Keine zusätzliche Modusauswahl.
+Technische Gesamtfrist für Audio-Pipeline 600 Sekunden einschließlich Antwort,
+für Text weiterhin 120 Sekunden.
+
+17 Session-/Worklet-Tests bestanden, darunter 20 Sekunden fortlaufendes Audio,
+Pause 2,98 s, Neustart der Pause und Ende bei 3 s bei 16/44,1/48 kHz.
+Live-HA akzeptierte no_vad und 20 Sekunden PCM ohne frühes STT-Ende;
+Prüflauf nur bis STT, ohne Agentenanfrage. Echtes Mikrofon muss der Nutzer testen.
+Frontend und Manifest b9 installiert, Lovelace-Ressource auf b9 aktualisiert;
+kein HA-Neustart nötig. Backup: backups/voice-pause-20261030.
+
+
 ## Anschlusskorrektur an Händen und Torso, 30.10.2026
 
 Aktuelle private Quelle: `joint-material-20261030/luna-joint-material-20261030.cmo3`.

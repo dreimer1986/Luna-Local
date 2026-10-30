@@ -118,13 +118,17 @@ export class LunaSession extends EventTarget {
       this.stream = stream;
       // Reuse the context unlocked by the click, including on mobile Safari.
       this.captureContext = this.audioContext;
-      await this.captureContext.audioWorklet.addModule(new URL('./capture-worklet.js', import.meta.url));
+      await this.captureContext.audioWorklet.addModule(new URL('./capture-worklet.js?v=20261030-v1', import.meta.url));
       if (turn !== this.generation) return;
       this.captureSource = this.captureContext.createMediaStreamSource(stream);
       this.worklet = new this.env.AudioWorkletNode(this.captureContext, 'luna-capture');
       this.worklet.port.onmessage = event => {
         if (turn !== this.generation || !this.stream) return;
-        if (event.data === 'finished') { this.endInput(); return; }
+        if (event.data === 'finished') {
+          if (this.sttReady) this.endInput();
+          else this.finishPending = true;
+          return;
+        }
         if (this.sttReady) this.sendPCM(event.data);
         else {
           this.pendingChunks.push(event.data);
@@ -163,13 +167,15 @@ export class LunaSession extends EventTarget {
     this.runEnded = false;
     this.completed = false;
     this.abort = new AbortController();
+    const timeout = options.start_stage === 'stt' ? 600 : 120;
+    if (options.start_stage === 'stt') options = {...options, input: {...options.input, no_vad: true}};
     this.watchdog = this.env.setTimeout(() => {
       if (turn === this.generation) this.fail('Die Assist-Pipeline hat nicht rechtzeitig geantwortet.');
-    }, 125000);
+    }, (timeout + 5) * 1000);
     const unsub = await this.hass.connection.subscribeMessage(
       event => { if (turn === this.generation) this.handleEvent(event, turn); },
       {type: 'assist_pipeline/run', ...options, end_stage: this.externalAgent ? 'intent' : 'tts', pipeline: this.pipeline.id,
-        conversation_id: this.conversationId, timeout: 120},
+        conversation_id: this.conversationId, timeout},
     );
     if (turn !== this.generation) { await unsub(); return; }
     if (this.runEnded) { await unsub(); return; }

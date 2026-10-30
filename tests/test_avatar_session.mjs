@@ -142,6 +142,7 @@ test('silence overrides spectrum; different spectral bands produce different mou
 test('capture worklet preserves the final short audio block before EOF', () => {
   let Processor; const messages = [];
   vm.runInNewContext(readFileSync(new URL('../custom_components/luna_local/frontend/capture-worklet.js', import.meta.url), 'utf8'), {
+    sampleRate: 48000,
     AudioWorkletProcessor: class { constructor() { this.port = {postMessage: data => messages.push(data)}; } },
     registerProcessor: (_name, cls) => { Processor = cls; },
   });
@@ -171,4 +172,34 @@ test('missing TTS output stops continuous mode instead of repeatedly opening the
   [...timers.values()][0]();
   assert.equal(session.phase, 'error'); assert.equal(session.continuous, false);
   assert.match(session.error, /Sprachausgabe/);
+});
+
+
+test('microphone disables HA early endpoint while text keeps its normal timeout', async () => {
+  const {session,hass}=fixture();session.pipeline={id:'ours'};
+  let request;hass.connection.subscribeMessage=async (_,r)=>{request=r;return ()=>{}};
+  await session.run({start_stage:'stt',input:{sample_rate:48000}},0);
+  assert.equal(request.input.no_vad,true);assert.equal(request.timeout,600);
+  await session.run({start_stage:'intent',input:{text:'Hallo'}},0);
+  assert.equal(request.input.no_vad,undefined);assert.equal(request.timeout,120);
+});
+
+test('capture tolerates long speech and pauses shorter than three seconds', () => {
+  for (const rate of [16000,44100,48000]) {
+    let Processor;const messages=[];
+    vm.runInNewContext(readFileSync(new URL('../custom_components/luna_local/frontend/capture-worklet.js',import.meta.url),'utf8'),{
+      sampleRate:rate,
+      AudioWorkletProcessor:class {constructor(){this.port={postMessage:data=>messages.push(data)}}},
+      registerProcessor:(_,cls)=>{Processor=cls},
+    });
+    const w=new Processor(),block=Math.round(rate*.02);
+    const feed=(seconds,level)=>{for(let n=0;n<Math.round(seconds/.02);n++)w.process([[new Float32Array(block).fill(level)]])};
+    feed(4,0);assert.equal(w.finished,false); // No empty auto-submit.
+    feed(20,.04);assert.equal(w.finished,false); // No former 15 s limit.
+    feed(2.98,0);assert.equal(w.finished,false);
+    feed(.4,.02);feed(2.98,0);assert.equal(w.finished,false); // Speech resets pause.
+    feed(.02,0);assert.equal(w.finished,true);
+    assert.equal(messages.filter(m=>m==='finished').length,1);
+    assert.equal(messages.at(-1),'finished'); // PCM tail precedes EOF.
+  }
 });
