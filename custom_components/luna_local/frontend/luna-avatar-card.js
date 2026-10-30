@@ -1,3 +1,4 @@
+import {installAutoPopup} from './auto-popup.mjs?v=20261030-v1';
 import {AvatarCommands} from './avatar-commands.mjs?v=20261029-v10';
 import {RoomPlayback} from './room-playback.mjs?v=20261029-v10';
 import {LunaSession, PHASES} from './session.mjs?v=20261030-v12';
@@ -130,10 +131,12 @@ class LunaAvatarCard extends HTMLElement {
     root.querySelector('.expand').onclick = root.querySelector('.launch').onclick = () => this.openPopup();
     root.querySelector('.close').onclick = () => this.dialog.close();
     this.dialog.addEventListener('close', () => {
+      if (!this.isConnected || !this.session) return;
       this.dock.append(this.panel);
       root.querySelector('.expand').hidden = false; root.querySelector('.close').hidden = true;
       if (this.popupOnly) this.session.stop();
-      (root.querySelector(this.popupOnly ? '.launch' : '.expand')).focus();
+      if (!this.config.auto_popup_instance)
+        (root.querySelector(this.popupOnly ? '.launch' : '.expand')).focus();
     });
     if (this.config.avatar === 'technical') {
       this.rig = new LunaRig(root.querySelector('.rig'), this.session);
@@ -253,6 +256,8 @@ class LunaAvatarCard extends HTMLElement {
       transcript.append(p);
     }
     transcript.scrollTop = transcript.scrollHeight;
+    if (!this.config.auto_popup_instance)
+      window.dispatchEvent(new CustomEvent('luna-avatar-state', {detail:{card:this,config:this.config}}));
   }
   teardown() {
     if (this.onVisibility) document.removeEventListener('visibilitychange', this.onVisibility);
@@ -270,3 +275,5 @@ window.customCards = window.customCards || [];
 if (!window.customCards.some(card => card.type === 'luna-avatar-card')) window.customCards.push({
   type: 'luna-avatar-card', name: 'Luna Lokal', description: 'Luna mit Browser-Mikrofon, Sprachausgabe und Avatar-Vorschau',
 });
+
+installAutoPopup();

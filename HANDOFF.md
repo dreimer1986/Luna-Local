@@ -1,5 +1,28 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Automatisches seitenübergreifendes Sprech-Popup, 30.10.2026 / b11
+
+auto-popup.mjs wird über das bereits global registrierte Extra-JS geladen und
+lebt unabhängig von Dashboard-Kacheln. Holt hass vom home-assistant-Element,
+abonniert RoomPlayback, übernimmt das Avatar-Design einer vorhandenen Kachel
+oder aus lovelace/config des Standard-Dashboards. Lokale Kachel-Sprechphasen
+werden über luna-avatar-state gemeldet und deren Session nur visuell gespiegelt.
+Popup ohne zusätzliche Audioausgabe/Mikrofon; Lippenbewegung folgt dem bestehenden
+Raum-Audio oder der lokalen Session. Kein Seitenwechsel.
+Schließt mit 3 Sekunden Nachlauf. Schließen/Escape unterdrücken dieselbe Antwort;
+eine neue Antwort darf wieder öffnen. Bereits offenes Avatar-Popup bzw.
+Display-only-Vollbild erhält keine zusätzliche Kopie. Nur im sichtbaren HA-Tab;
+kein Betriebssystem-Fokuswechsel oder Aufwecken einer geschlossenen HA-App.
+RoomPlayback-Fallback bei fehlendem Ende bleibt auf dessen 5 Minuten begrenzt.
+
+5 Timing-/Room-Tests bestanden. Browser-Test auf fremder Route ohne Avatar-Kachel:
+animiertes Popup, keine zweite AudioContext-/Mikrofoninstanz, automatisches Ende,
+manuelles Schließen, nächste Antwort, unveränderte URL, keine Browserfehler.
+HA: b11 Frontend/Manifest/Ressource installiert und Standard-Dashboard-Konfiguration
+live geprüft; kein HA-Neustart. Nutzer muss HA-Seite neu laden.
+Backup und Browser-Nachweis: backups/avatar-auto-popup-20261030.
+
+
 ## Avatar hinter Bedienfeldern, 30.10.2026 / b10
 
 Die Stage liegt absolut über der gesamten Panelhöhe (Kachel maximal 900 px /
