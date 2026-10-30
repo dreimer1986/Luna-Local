@@ -1,5 +1,19 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Kein zusätzliches Popup bei sichtbarer Luna, 30.10.2026 / b12
+
+Popup-Unterdrückung prüft jetzt die tatsächliche Sichtbarkeit und Viewport-
+Überlappung des Avatar-Panels, nicht nur display_only oder dialog.open.
+Damit zählen auch normale Kacheln und interaktives Luna-Vollbild.
+Versteckte, entfernte oder außerhalb des Viewports liegende Kacheln sowie
+ein bloßer Popup-Launcher verhindern das automatische Popup nicht.
+Drei Unit-Tests und Browser-Integration bestanden: normale sichtbare Kachel,
+Display-only-Vollbild, Ausblenden/Entfernen und erneutes Auto-Popup; bestehende
+Nachlauf-/Schließen-/Navigationstests weiterhin erfolgreich.
+b12 auf HA installiert, Ressourcen-URL aktualisiert, ausgelieferte Datei geprüft.
+Backup: backups/avatar-popup-visible-20261030.
+
+
 ## Automatisches seitenübergreifendes Sprech-Popup, 30.10.2026 / b11
 
 auto-popup.mjs wird über das bereits global registrierte Extra-JS geladen und

@@ -14,6 +14,18 @@ export class PopupTiming {
   dismiss(ids) { ids.forEach(id => this.dismissed.add(id)); this.lastActive = null; }
 }
 
+// Inspect the avatar panel rather than its host: a modal lives in the top
+// layer, while the original card host may be empty or outside the viewport.
+export function hasVisibleAvatar(card, env = globalThis) {
+  if (!card.isConnected || card.config?.auto_popup_instance) return false;
+  const panel = card.panel;
+  if (!panel || (card.popupOnly && !card.dialog?.open)) return false;
+  if (panel.checkVisibility && !panel.checkVisibility({checkOpacity:true, checkVisibilityCSS:true})) return false;
+  const rect = panel.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0
+    && rect.top < env.innerHeight && rect.left < env.innerWidth;
+}
+
 function findCard(value) {
   if (!value || typeof value !== 'object') return null;
   if (value.type === 'custom:luna-avatar-card' && !value.display_only) return value;
@@ -65,8 +77,9 @@ export class LunaAutoPopup {
       ...(room ? [`room:${room.id}`] : []),
     ];
     const wanted = this.timing.update(this.ids, this.env.performance.now());
-    // An already-open avatar popup/fullscreen needs no duplicate overlay.
-    const alreadyVisible = [...this.sources.keys()].some(c => c.displayOnly || c.dialog?.open);
+    // Any visible avatar already handles playback, including regular cards and
+    // the interactive full-page view (which need not set display_only).
+    const alreadyVisible = [...this.sources.keys()].some(c => hasVisibleAvatar(c, this.env));
     if (this.env.document.hidden || alreadyVisible || !wanted) { this.close(); return; }
     if (!this.config) return;
     if (!this.card) this.open();

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PopupTiming} from '../custom_components/luna_local/frontend/auto-popup.mjs';
+import {PopupTiming,hasVisibleAvatar} from '../custom_components/luna_local/frontend/auto-popup.mjs';
 test('speech opens, end has three seconds grace, following answer extends it',()=>{
  const p=new PopupTiming();
  assert.equal(p.update([],0),false);
@@ -18,4 +18,19 @@ test('manual dismissal suppresses same answer but allows next and overlapping ro
  assert.equal(p.update(['a','b'],200),true);
  p.dismiss(['a','b']);assert.equal(p.update([],300),false);
  assert.equal(p.update(['c'],400),true);
+});
+
+
+test('visible cards and fullscreen suppress popup, hidden/offscreen/launcher do not',()=>{
+ const env={innerWidth:1200,innerHeight:900};
+ let visible=true,rect={width:400,height:700,top:0,left:0,bottom:700,right:400};
+ const card={isConnected:true,config:{},panel:{checkVisibility:()=>visible,getBoundingClientRect:()=>rect}};
+ assert.equal(hasVisibleAvatar(card,env),true);
+ visible=false;assert.equal(hasVisibleAvatar(card,env),false);
+ visible=true;rect={...rect,top:1000,bottom:1700};assert.equal(hasVisibleAvatar(card,env),false);
+ rect={width:1200,height:900,top:0,left:0,bottom:900,right:1200};
+ assert.equal(hasVisibleAvatar(card,env),true); // Interactive full-page, no display_only.
+ card.popupOnly=true;assert.equal(hasVisibleAvatar(card,env),false);
+ card.dialog={open:true};assert.equal(hasVisibleAvatar(card,env),true);
+ card.config.auto_popup_instance=true;assert.equal(hasVisibleAvatar(card,env),false);
 });

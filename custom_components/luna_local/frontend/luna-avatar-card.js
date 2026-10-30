@@ -1,4 +1,4 @@
-import {installAutoPopup} from './auto-popup.mjs?v=20261030-v1';
+import {installAutoPopup} from './auto-popup.mjs?v=20261030-v2';
 import {AvatarCommands} from './avatar-commands.mjs?v=20261029-v10';
 import {RoomPlayback} from './room-playback.mjs?v=20261029-v10';
 import {LunaSession, PHASES} from './session.mjs?v=20261030-v12';
