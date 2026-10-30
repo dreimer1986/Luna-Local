@@ -13,3 +13,13 @@ test('native donor profile retains approved portrait limits without losing mouth
   assert.equal(result.partOpacities.PartArmRB,0);
  }
 });
+
+test('legacy resting arms remain neutral while intact donor motion stays available',()=>{
+ for(let t=0;t<=60;t+=.25){
+  const rest=nativeAvatarFrame({ParamArmRB03:12,ParamArmLB01:20},t);
+  for(const id of ['ParamArmLB01','ParamArmLB02','ParamArmLB03','ParamArmRB01','ParamArmRB02','ParamArmRB03'])assert.equal(Math.abs(rest.parameters[id]),0);
+ }
+ const raised=nativeAvatarFrame({ParamLunaRaisedL:1},2);
+ assert.notEqual(raised.parameters.ParamArmLB01,0);
+ assert.notEqual(nativeAvatarFrame({ParamLunaWave:1},0).parameters.PARAM_ARM_R_B,nativeAvatarFrame({ParamLunaWave:1},.2).parameters.PARAM_ARM_R_B);
+});

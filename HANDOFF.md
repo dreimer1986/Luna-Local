@@ -1,5 +1,34 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Anschlusskorrektur an Händen und Torso, 30.10.2026
+
+Aktuelle private Quelle: `joint-material-20261030/luna-joint-material-20261030.cmo3`.
+Finaler Export und Rückfallkopie dort unter `final-export/` und `ha-model-before/`.
+Die neue Quelle enthält zwei kleine statische Handverschiebungen unter die Bündchen
+und einen erweiterten Mesh-Randpunkt (ArtMesh10, Vertex 14). Dadurch verschwindet
+der kantige Einschnitt an der Taille. Keine neuen Gelenk-Keyforms; Mao und Chitose
+bleiben unverändert. Die ursprüngliche Pullovertextur ist ausreichend;
+die probeweise generierte Textur wurde NICHT übernommen.
+
+Die alten ruhenden Luna-Arme hatten falsche Drehpunkte. Ihre synthetische
+Idle-Ansteuerung bleibt deshalb auf neutral; Blinzeln, Mimik, Atmung und native
+angehobene Arme bleiben verfügbar. Das ist keine Reparatur dieser alten Gelenke
+und keine zusätzliche Fingerbewegung.
+
+Nach Reexport weiterhin die freigegebene Mundtextur per
+`restore-portrait-atlas.mjs` einsetzen und LunaRig-Metadaten beibehalten.
+Der Modellpfad bleibt für vorhandene Zoom-Einstellungen unverändert.
+Aktuelle Runtime: `/local/luna/runtime-native-donors-joints-20261030/runtime.mjs`.
+
+Lokal und auf HA: Winken, Mund, Blinzeln, Animation und exakte Rückkehr bestanden.
+15 Mundkombinationen entsprechen weiterhin dem freigegebenen V9-Vergleich.
+
+Prüfung: `chitose-transfer-audit.mjs --integrated --joint-correction`
+erlaubt ausschließlich die drei exakt bezifferten statischen Anpassungen;
+alle übrigen bestehenden Meshes bleiben unverändert. Der historische Aufruf
+ohne Zusatzflag prüft weiterhin den alten, vollständig unveränderten Export.
+
+
 ## Mundkorrektur nach nativem Export, 29.10.2026
 
 Der neue Export enthielt wieder den ungepatchten Gesichtsatlas (SHA256 a54acfad…)
