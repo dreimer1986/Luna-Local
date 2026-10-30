@@ -61,7 +61,9 @@ export class LunaLive2DRig {
     if (this.abort.signal.aborted || !this.player) return;
     const dt = Math.min(.05, (now - this.last) / 1000); this.last = now;
     try {
-      if (this.visible && !document.hidden) {
+      // A modal is in the browser top layer; its empty card host can make
+      // IntersectionObserver report it offscreen after the panel is moved.
+      if ((this.visible || this.host.closest('dialog[open]')) && !document.hidden) {
         this.player.draw(dt, {...this.performance.sample(this.session, (now - this.started) / 1000, dt, this.reduced.matches), view: this.view()});
       }
     } catch (error) { this.failed(error); return; }

@@ -2,7 +2,7 @@ import {AvatarCommands} from './avatar-commands.mjs?v=20261029-v10';
 import {RoomPlayback} from './room-playback.mjs?v=20261029-v10';
 import {LunaSession, PHASES} from './session.mjs?v=20261030-v12';
 import {LunaRig} from './rig.mjs?v=0.4.0b5';
-import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261029-v10';
+import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261030-v13';
 
 class LunaAvatarCard extends HTMLElement {
   constructor() { super(); this.attachShadow({mode: 'open'}); }
@@ -37,8 +37,8 @@ class LunaAvatarCard extends HTMLElement {
     const root = this.shadowRoot;
     root.innerHTML = `<style>
       :host{display:block} *{box-sizing:border-box} ha-card{overflow:hidden}
-      .panel{background:var(--card-background-color,#fff);color:var(--primary-text-color,#242032);border-radius:18px;overflow:hidden}
-      .stage{height:390px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 70% 20%,#737ba4 0,#293556 35%,#131c31 85%)}
+      .panel{position:relative;isolation:isolate;height:min(900px,94dvh);background:var(--card-background-color,#fff);color:var(--primary-text-color,#242032);border-radius:18px;overflow:hidden}
+      .stage{position:absolute;inset:0;height:100%;overflow:hidden;background:radial-gradient(ellipse at 70% 20%,#737ba4 0,#293556 35%,#131c31 85%)}
       .stage:before{content:'';position:absolute;width:135px;height:135px;border-radius:50%;right:10%;top:24px;background:#f5f0db;box-shadow:0 0 55px #e2e5ff75}
       .stage[data-background="plain"]{background:var(--secondary-background-color,#e7e9ef)}.stage[data-background="plain"]:before{display:none}
       :host([transparent-background]){background:transparent!important}
@@ -46,22 +46,27 @@ class LunaAvatarCard extends HTMLElement {
       :host([transparent-background]) .stage:before{display:none}
       :host([transparent-background]) dialog::backdrop{background:transparent;backdrop-filter:none}
       .rig{height:100%;position:relative;z-index:1}.rig svg{width:100%;height:100%;display:block}
-      .stage[data-avatar="illustration"],.stage[data-avatar="live2d"]{width:100%;height:auto;aspect-ratio:2/3;max-height:640px}
+      .stage[data-avatar="illustration"],.stage[data-avatar="live2d"]{width:100%;height:100%;aspect-ratio:auto;max-height:none}
       .stage[data-avatar="live2d"] .rig{position:absolute;inset:0}
       .portrait{display:block;width:100%;height:100%;object-fit:contain;object-position:center;position:relative;z-index:1}
       .stage[data-framing="waist"]:not([data-avatar="live2d"]) > .rig,.stage[data-framing="waist"] > .portrait{transform:scale(var(--luna-waist-zoom,1.2));transform-origin:50% 0}
       .framing{position:absolute;right:10px;top:10px;z-index:3;opacity:.85}
-      .badge{position:absolute;bottom:10px;left:12px;background:#121a30d9;color:#fff;padding:5px 10px;border-radius:16px;font:12px system-ui;z-index:2}
-      .controls{padding:14px;display:grid;gap:10px} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+      .badge{position:absolute;top:10px;left:12px;background:#121a30d9;color:#fff;padding:5px 10px;border-radius:16px;font:12px system-ui;z-index:2}
+      .controls{position:absolute;z-index:2;bottom:0;left:0;right:0;max-height:55%;overflow:auto;overscroll-behavior:contain;padding:28px 14px 14px;display:grid;gap:10px;background:linear-gradient(transparent,color-mix(in srgb,var(--card-background-color,#fff) 55%,transparent) 48px);scrollbar-width:thin} .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
       button,input{font:inherit}button{cursor:pointer;border:1px solid var(--divider-color,#ccd0db);border-radius:12px;padding:9px 12px;background:var(--secondary-background-color,#eef0f7);color:inherit}
       button.primary{background:#425ca1;color:#fff;border-color:#425ca1}button:disabled{opacity:.5;cursor:default}
       button:focus-visible,input:focus-visible{outline:3px solid #778ef0;outline-offset:2px}
       .status{margin:0;font-weight:600;flex:1}.error{color:var(--error-color,#b42334);margin:0;white-space:pre-wrap}
       form{display:flex;gap:8px}input[type=text]{min-width:0;flex:1;padding:10px;border:1px solid var(--divider-color,#ccd0db);border-radius:12px;background:var(--card-background-color,#fff);color:inherit}
       label,summary{font-size:13px}.transcript{max-height:180px;overflow:auto;white-space:pre-wrap;font-size:14px}.transcript p{margin:8px 0}
-      .note{font-size:11px;opacity:.7;margin:0}dialog{border:0;border-radius:20px;padding:0;width:min(600px,95vw);max-height:94dvh;color:inherit;background:var(--card-background-color,#fff);overflow:auto}
-      dialog::backdrop{background:#080e20ae;backdrop-filter:blur(5px)}dialog .stage{height:min(58dvh,580px)}.launch{padding:16px;width:100%}
-      [hidden]{display:none!important}@media(max-width:400px){.stage{height:330px}.controls{padding:10px}}
+      .note{font-size:11px;opacity:.7;margin:0}dialog{border:0;border-radius:20px;padding:0;width:min(600px,95vw);max-height:94dvh;color:inherit;background:var(--card-background-color,#fff);overflow:hidden}
+      dialog::backdrop{background:#080e20ae;backdrop-filter:blur(5px)}dialog .panel{height:90dvh}.launch{padding:16px;width:100%}
+      @media(hover:hover) and (pointer:fine){
+        .controls{opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .18s ease,transform .18s ease}
+        .panel:hover .controls,.controls:focus-within{opacity:1;pointer-events:auto;transform:none}
+      }
+      @media(prefers-reduced-motion:reduce){.controls{transition:none}}
+      [hidden]{display:none!important}@media(max-width:400px){.controls{padding:24px 10px 10px;max-height:60%}}
     </style>
     <ha-card><button class="launch" hidden>Luna öffnen</button><div class="dock"></div></ha-card>
     <dialog aria-label="Mit Luna sprechen"></dialog>

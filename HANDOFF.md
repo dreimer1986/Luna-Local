@@ -1,5 +1,20 @@
 # Luna zu Hause fortsetzen — Übergabe 27.10.2026
 
+## Avatar hinter Bedienfeldern, 30.10.2026 / b10
+
+Die Stage liegt absolut über der gesamten Panelhöhe (Kachel maximal 900 px /
+94dvh, Popup 90dvh). Die bisherigen getrennten 640 px Avatar plus Eingabebereich
+entfallen. Bedienfelder liegen halbtransparent am unteren Rand darüber und
+scrollen bei Platzmangel separat; Modell/Zoomwahl/Transparenz bleiben erhalten.
+Desktop mit Hover und feinem Pointer: Felder erscheinen bei Mouse-over der
+Kachel oder Tastaturfokus innerhalb der Felder. Touch: dauerhaft sichtbar.
+Keine Höhenänderung beim Einblenden.
+Live2D zeichnet auch in offenen nativen Dialogen, wenn IntersectionObserver
+wegen des leeren ursprünglichen Card-Hosts fälschlich Unsichtbarkeit meldet.
+Frontend und Manifest b10 sowie Lovelace-Ressource installiert, kein HA-Neustart.
+Backup: backups/avatar-overlay-20261030.
+
+
 ## Kachel-Aufnahme bis Fertig oder 3 Sekunden Stille, 30.10.2026 / b9
 
 Die Mikrofonaufnahme setzt bei assist_pipeline/run jetzt input.no_vad=true.
