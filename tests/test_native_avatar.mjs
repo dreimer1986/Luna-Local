@@ -1,6 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {nativeAvatarFrame} from '../tools/live2d/native-avatar.mjs';
+import {nativeAvatarFrame,nativeTailFrame} from '../tools/live2d/native-avatar.mjs';
+test('tail visits both sides through the hidden centre with gentle bounded idle',()=>{
+ assert.equal(nativeTailFrame(0).ParamLunaTailSide,1);
+ assert.equal(nativeTailFrame(22).ParamLunaTailSide,0);
+ assert.equal(nativeTailFrame(30).ParamLunaTailSide,-1);
+ assert.equal(nativeTailFrame(46).ParamLunaTailSide,0);
+ assert.equal(nativeTailFrame(48).ParamLunaTailSide,1);
+ let previous=nativeTailFrame(0);
+ for(let t=.05;t<100;t+=.05){
+  const f=nativeTailFrame(t);
+  assert.ok(f.PARAM_TAIL>=0&&f.PARAM_TAIL<=.08);
+  assert.ok(Math.abs(f.ParamLunaTailSide-previous.ParamLunaTailSide)<.04);
+  assert.deepEqual(nativeTailFrame(t,true),nativeTailFrame(0,true));
+  previous=f;
+ }
+ const explicit={ParamLunaTailSide:-.5,PARAM_TAIL:.06,PARAM_TAIL_ANGRY:.2};
+ const f=nativeAvatarFrame(explicit,22);
+ for(const [id,value] of Object.entries(explicit))assert.equal(f.parameters[id],value);
+});
 test('native donor profile retains approved portrait limits without losing mouth opening or wave',()=>{
  for(const form of [-1,0,1]){
   const result=nativeAvatarFrame({ParamMouthForm:form,ParamMouthOpenY:.85,ParamAngleX:2.5,ParamEyeLOpen:.2,ParamLunaWave:1,PARAM_ARM_R_B:8},1);

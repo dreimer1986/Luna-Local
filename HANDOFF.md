@@ -842,3 +842,39 @@ Gespeichertes `display_only` bleibt unverändert. Ohne Parameter gilt weiterhin
 Vollbild. Live geprüft: Header und Stift erreichbar, Karten-YAML-Editor geöffnet,
 Vorschau bleibt innerhalb des Editors. Hintergrundwahl bleibt beim Nutzer.
 Frontend-Ressource auf `0.4.0b6-edit1` aktualisiert.
+
+## Native Schwanzstudie, 30.10.2026
+
+Freigegeben: Tororo-Schwanzkette plus zusätzlicher nativer Seitenparameter,
+keine Änderungen an vorhandenen Armen/Gelenken. Aktueller Stand und offene
+Punkte in `docs/live2d/tail-study.md`. Native Arbeitskopie und fertiger
+Vorschauexport privat in `tail-study-20261030/`. Ragdoll-Atlas per
+`restore-tail-atlas.mjs` nach jedem Export wiederherstellen; Portrait-Restore
+bleibt ebenfalls notwendig. 40 ursprüngliche Meshes bei Default unverändert,
+2 Schwanzmeshes ergänzt, 60 Parameterkombinationen geprüft.
+Bedienbare HA-Vorschau: `/local/luna/tail-study-20261030/index.html`.
+**Produktive Kachel noch nicht umgestellt.** Großer Spenderhub rechts und links
+unterschiedlich; Leerlauf bewusst nur 0..0.08. Kleidungsauswahl weiterhin offen.
+
+Update 30.10., 15:54: Schwanzkontur jetzt nativ verbreitert (Warp3 `Luna Tail Fur
+Volume`, über beiden Schwanzmeshes unter Side). Vertikaler Umfang ~1,70x,
+Länge unverändert. V2-Felltextur byteidentisch. Core-/Browsertests bestanden;
+HA-Studienvorschau aktualisiert. Einzelhaare werden nicht separat simuliert.
+Details und Rückfallkopien in docs/live2d/tail-study.md.
+
+Update 30.10., 16:40: Studienvorschau jetzt V3-Fellatlas: rundere Spitze und
+feiner auslaufender Fellrand. Technisch innerhalb vorhandener UV-Fläche
+eingepasst; native Bewegung unverändert. Details in docs/live2d/tail-study.md.
+
+V4-Unterkante: fein abgestuftes Fell innerhalb der UV-Grenze; bestätigte
+Oberseite aus V3 erhalten. Atlas-Restore jetzt V4, nur Studienvorschau.
+
+## Freigegebener Schwanz produktiv, 30.10.2026
+
+V4-Fell abgenommen; Hauptdashboard und Luna-Vollbild über HA-WebSocket umgestellt
+auf model-native-tail-20261030 und runtime-native-tail-20261030. Die vorherigen
+Hinweise „Produktive Kachel noch nicht umgestellt“ sind damit überholt.
+Leerlauf mit sanftem Hub und langsamen nativen Seitenwechseln integriert;
+Reduced Motion statisch rechts. Gesicht und Armsteuerung live geprüft.
+Eigenes V4-Fell unter docs/live2d/tail/ in Git; Modell/SDK weiterhin privat.
+Details, Tests und Rückfallpfade: docs/live2d/tail-study.md.

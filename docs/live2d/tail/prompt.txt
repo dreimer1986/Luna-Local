@@ -1,0 +1,1 @@
+Built-in imagegen edit of V3: preserve canvas, registration, colors, interior, rounded tip and upper edge; feather only lower silhouette with varied-length fine fur wisps and staggered tufts into transparency inside existing silhouette. Technical fitting: fit-tail-underside.py using ImageMagick FX and native UV boundary. Upper region copied from V3 unchanged.

@@ -1,0 +1,15 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Luna – beweglicher Ragdoll-Schwanz</title>
+<style>body{margin:20px;background:#28374b;color:#fff;font:16px system-ui}main{display:flex;gap:24px;flex-wrap:wrap}canvas{width:min(480px,95vw);height:auto;background:#34465e}label{display:block;margin:18px 0}button{padding:10px;margin:4px}input{width:240px}p{max-width:650px}</style>
+<h1>Luna – Schwanzvorschau</h1><p>Beweglicher Ragdoll-Schwanz auf beiden Seiten. Die Schaltflächen wechseln langsam hinter dem Körper. Diese Vorschau verändert die laufende HA-Version nicht.</p>
+<main><canvas width="720" height="1000"></canvas><section><button data-side="-1">Links</button><button data-side="0">Hinter dem Körper</button><button data-side="1">Rechts</button><label><input id="idle" type="checkbox" checked> Leichte Bewegung</label><label>Spenderbewegung <input id="lift" type="range" min="0" max="1" step="0.01" value="0"></label><p id="status">Lädt …</p></section></main>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+window.player=await mountLuna(document.querySelector('canvas'),'../tools/live2d/dist/TailLuna/luna.model3.json');
+let side=1,from=1,target=1,start=0,last=performance.now();
+for(const b of document.querySelectorAll('[data-side]'))b.onclick=()=>{from=side;target=Number(b.dataset.side);start=performance.now()};
+function tick(now){const t=Math.min(1,(now-start)/2200),ease=t*t*(3-2*t);side=from+(target-from)*ease;
+const idle=document.querySelector('#idle').checked,base=Number(document.querySelector('#lift').value);
+player.draw(Math.min(.05,(now-last)/1000),{view:{zoom:.9},reducedMotion:true,parameters:{ParamLunaTailSide:side,PARAM_TAIL:Math.min(1,base+(idle?.04*(1+Math.sin(now*.0012)):0)),PARAM_TAIL_ANGRY:0}});last=now;requestAnimationFrame(tick)}
+document.querySelector('#status').textContent='Bereit';window.ready=true;requestAnimationFrame(tick);
+</script></html>
