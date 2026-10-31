@@ -3,7 +3,7 @@ import {AvatarCommands} from './avatar-commands.mjs?v=20261029-v10';
 import {RoomPlayback} from './room-playback.mjs?v=20261029-v10';
 import {LunaSession, PHASES} from './session.mjs?v=20261030-v12';
 import {LunaRig} from './rig.mjs?v=0.4.0b5';
-import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261030-v13';
+import {LunaLive2DRig, localAssetURL} from './live2d-rig.mjs?v=20261031-emotions1';
 
 class LunaAvatarCard extends HTMLElement {
   constructor() { super(); this.attachShadow({mode: 'open'}); }

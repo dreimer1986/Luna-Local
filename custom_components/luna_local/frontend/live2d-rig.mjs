@@ -1,4 +1,4 @@
-import {LunaPerformance} from './performance.mjs?v=20261029-v10';
+import {LunaPerformance} from './performance.mjs?v=20261031-emotions1';
 
 export function localAssetURL(path, base = globalThis.location.href) {
   const url = new URL(path, base), origin = new URL(base).origin;

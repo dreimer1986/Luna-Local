@@ -94,6 +94,7 @@ export class LunaPerformance {
       ParamEyeBallY: session.phase === 'thinking' ? .2 : 0,
       ParamBrowLY: this.pose[1], ParamBrowRY: this.pose[1],
       ParamMouthOpenY: clamp(this.mouth), ParamMouthForm: clamp(this.form + this.pose[1] * .3, -1, 1),
+      ParamLunaSpeaking: speaking ? 1 : 0,
       ParamLunaBlush: this.pose[3],
       ParamLunaJoy: ['joyful', 'amused'].includes(mood?.name) ? intensity : 0,
       ParamLunaLaugh: mood?.name === 'laughing' ? intensity : 0,

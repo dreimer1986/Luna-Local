@@ -10,6 +10,12 @@ export function nativeTailFrame(time,reduced=false){
 export function nativeAvatarFrame(parameters,time,reduced=false){
  const wave=reduced?0:clamp(parameters.ParamLunaWave),raised=reduced?0:clamp(parameters.ParamLunaRaisedL);
  const raisedIdle=reduced?0:raised;
+ const joy=clamp(parameters.ParamLunaJoy),laugh=clamp((parameters.ParamLunaLaugh||0)/.65);
+ const shy=clamp(parameters.ParamLunaShy),surprise=clamp((parameters.ParamLunaSurprise||0)/.5);
+ const eyeLimit=Math.min(1-.15*joy,1-.92*laugh,1-.22*shy);
+ const mouth=clamp(parameters.ParamMouthOpenY);
+ const restingMouth=Math.max(.10*joy,.18*laugh,.20*surprise);
+ const form=(Number.isFinite(parameters.ParamMouthForm)?parameters.ParamMouthForm:0)+.35*Math.max(joy,laugh)-.25*surprise;
  return {
   parameters:{ParamBreath:0,...nativeTailFrame(time,reduced),...parameters,
    // The resting A arms are still legacy artwork, not intact donor chains.
@@ -21,7 +27,12 @@ export function nativeAvatarFrame(parameters,time,reduced=false){
    ParamArmRB01:0,ParamArmRB02:0,ParamArmRB03:0,ParamArmRB02Y:0,ParamHandLB:0,
    // The portrait patches still use the approved V9 face. Keep its original
    // control limits: unconstrained template forms separate lips/teeth/eyes.
-   ParamMouthForm:Math.max(-.35,Math.min(.35,Number.isFinite(parameters.ParamMouthForm)?parameters.ParamMouthForm:0)),
+   ParamMouthForm:Math.max(-.35,Math.min(.35,form)),
+   // Audio owns mouth opening, including silent gaps. Resting expressions can
+   // part the lips, but never replace an active speech envelope.
+   ParamMouthOpenY:parameters.ParamLunaSpeaking?mouth:Math.max(mouth,restingMouth),
+   ParamEyeLOpen:Math.min(Number.isFinite(parameters.ParamEyeLOpen)?clamp(parameters.ParamEyeLOpen):1,eyeLimit),
+   ParamEyeROpen:Math.min(Number.isFinite(parameters.ParamEyeROpen)?clamp(parameters.ParamEyeROpen):1,eyeLimit),
    ParamAngleX:0,ParamAngleY:0,ParamAngleZ:0,
    ParamBodyAngleX:0,ParamBodyAngleY:0,ParamBodyAngleZ:0,
    ParamBrowLY:0,ParamBrowRY:0,ParamEyeBallX:0,ParamEyeBallY:0,

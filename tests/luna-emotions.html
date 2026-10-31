@@ -1,0 +1,18 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Luna – Emoji-Test</title>
+<style>body{margin:0;background:#28374b;color:white;font:16px system-ui}main{display:flex;flex-wrap:wrap;gap:20px;padding:16px}canvas{width:min(600px,94vw);height:auto;background:#34465e}section{max-width:360px}button,input{font:inherit;padding:10px;margin:5px}button{cursor:pointer}#status{line-height:1.5}</style>
+<main><canvas width="600" height="700" aria-label="Lunas Mimik"></canvas><section><h1>Emoji-Test</h1><p>Wähle ein Emoji oder gib eine Antwort mit Emoji ein. Es wird derselbe Erkennungsweg wie in der Kachel verwendet.</p><div id="buttons"></div><form><input id="reply" aria-label="Antwort mit Emoji" value="Das freut mich! 😄"><button>Prüfen</button></form><button id="speech">Sprechmund testen</button><button id="zoom">Ganzkörper</button><p id="status">Lädt …</p><p>Stumme Vorschau, ohne KI-Anfrage oder Mikrofon. Sauer, Hüftposen und verschränkte Arme sind noch nicht vollständig verfügbar.</p></section></main>
+<script type="module">
+import {mountLuna} from '../tools/live2d/dist/runtime.mjs';
+import {LunaPerformance} from '../custom_components/luna_local/frontend/performance.mjs';
+import {markerExpression} from '../custom_components/luna_local/frontend/emotion-markers.mjs';
+window.player=await mountLuna(document.querySelector('canvas'),'../tools/live2d/dist/TailLuna/luna.model3.json');
+const driver=new LunaPerformance();const session={phase:'idle',generation:0,config:{},expression:null};
+window.clock=0;window.testMode=false;window.speaking=false;let closeup=true;
+window.selectEmoji=text=>{session.expression=markerExpression(text);session.generation++;document.querySelector('#status').textContent=session.expression?`Erkannt: ${session.expression.name}${session.expression.gesture?' · '+session.expression.gesture:''}`:'Neutral – kein unterstütztes Emoji';};
+for(const [label,text] of [['Neutral',''],['Freude 😄','😄'],['Lachen 😂','😂'],['Verlegen 😊','😊'],['Überrascht 😮','😮'],['Winken 👋','👋']]){const b=document.createElement('button');b.textContent=label;b.onclick=()=>selectEmoji(text);document.querySelector('#buttons').append(b);}
+document.querySelector('form').onsubmit=e=>{e.preventDefault();selectEmoji(document.querySelector('#reply').value)};
+document.querySelector('#speech').onclick=()=>{speaking=!speaking;document.querySelector('#speech').textContent=speaking?'Sprechmund stoppen':'Sprechmund testen'};
+document.querySelector('#zoom').onclick=()=>{closeup=!closeup;document.querySelector('#zoom').textContent=closeup?'Ganzkörper':'Gesicht'};
+window.step=(dt=.05)=>{clock+=dt;const frame=driver.sample(session,clock,dt,false);frame.view=closeup?{zoom:2,y:.65}:{};if(speaking){frame.parameters.ParamLunaSpeaking=1;frame.parameters.ParamMouthOpenY=Math.max(0,Math.sin(clock*9))*.7;}frame.parameters.ParamLunaTailSide=1;frame.parameters.PARAM_TAIL=0;player.draw(dt,frame);return frame;};
+let last=performance.now();function tick(now){step(testMode?0:Math.min(.05,(now-last)/1000));last=now;requestAnimationFrame(tick)}selectEmoji('');requestAnimationFrame(tick);window.ready=true;
+</script></html>

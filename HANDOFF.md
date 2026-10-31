@@ -878,3 +878,14 @@ Leerlauf mit sanftem Hub und langsamen nativen Seitenwechseln integriert;
 Reduced Motion statisch rechts. Gesicht und Armsteuerung live geprüft.
 Eigenes V4-Fell unter docs/live2d/tail/ in Git; Modell/SDK weiterhin privat.
 Details, Tests und Rückfallpfade: docs/live2d/tail-study.md.
+
+## Emoji-Mimik verbunden, 31.10.2026
+
+Joy/Laugh/Shy/Surprise werden jetzt auf die geprüften vorhandenen Mund-/Augen-
+formen abgebildet; Wangenröte bleibt erhalten. Audio hat Vorrang für Mundöffnung
+auch während Sprechpausen. Keine Änderungen an Modell, Textur, Gelenken oder
+Vertexdaten. Kopf-/Brauenlimits bleiben. Hüft-/Kreuzposen und vollständiger
+Ärgerausdruck sind weiterhin offen und nicht als fertig anzusehen.
+HA-Hauptdashboard/Vollbild: runtime-emotions-20261031, bestehendes Schwanzmodell.
+Sichtbarer echter Emoji-Test: /local/luna/emotions-20261031.html.
+Details und Grenzen: docs/live2d/emotions.md. Frontend neu laden.

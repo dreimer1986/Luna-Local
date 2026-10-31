@@ -41,3 +41,19 @@ test('legacy resting arms remain neutral while intact donor motion stays availab
  assert.notEqual(raised.parameters.ParamArmLB01,0);
  assert.notEqual(nativeAvatarFrame({ParamLunaWave:1},0).parameters.PARAM_ARM_R_B,nativeAvatarFrame({ParamLunaWave:1},.2).parameters.PARAM_ARM_R_B);
 });
+
+test('native expressions preserve blink closure and speech silence and keep portrait limits',()=>{
+ for(const mood of ['Joy','Laugh','Shy','Surprise'])for(const amount of [0,.4,1]){
+  const p={['ParamLuna'+mood]:amount,ParamEyeLOpen:0,ParamEyeROpen:0,ParamLunaSpeaking:1};
+  for(const mouth of [0,.3,.85]){
+   const f=nativeAvatarFrame({...p,ParamMouthOpenY:mouth},0).parameters;
+   assert.equal(f.ParamEyeLOpen,0);assert.equal(f.ParamEyeROpen,0);
+   assert.equal(f.ParamMouthOpenY,mouth);
+   assert.ok(Math.abs(f.ParamMouthForm)<=.35);
+   assert.equal(f.ParamAngleZ,0);assert.equal(f.ParamBrowLY,0);
+  }
+ }
+ assert.ok(nativeAvatarFrame({ParamLunaLaugh:.65},0).parameters.ParamEyeLOpen<.1);
+ assert.ok(nativeAvatarFrame({ParamLunaSurprise:.5},0).parameters.ParamMouthOpenY>.1);
+ assert.equal(nativeAvatarFrame({},0).parameters.ParamMouthOpenY,0);
+});
